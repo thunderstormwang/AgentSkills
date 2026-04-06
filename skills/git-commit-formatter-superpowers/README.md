@@ -1,3 +1,12 @@
+---
+skill: git-commit-formatter-superpowers
+name: Git Commit Formatter Superpowers
+version: 0.1.0
+description: 強化的 commit 範本與檢查腳本
+author: Copilot
+license: MIT
+---
+
 簡介
 
 此資料夾提供強化版的 git commit message 範本與檢查腳本，方便團隊快速採用 Conventional Commits。

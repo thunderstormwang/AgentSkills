@@ -1,3 +1,12 @@
+---
+skill: git-commit-formatter-superpowers
+name: Git Commit Formatter Superpowers
+version: 0.1.0
+description: Enhanced commit templates, checker and docs
+author: Copilot
+license: MIT
+---
+
 # git-commit-formatter-superpowers
 
 An enhanced companion skill that provides clear commit-message templates, a lightweight commit-msg checker script, and usage guidance to help teams adopt Conventional Commits consistently.

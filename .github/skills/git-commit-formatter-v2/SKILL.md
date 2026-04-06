@@ -1,3 +1,8 @@
+---
+name: git-commit-formatter-v2
+description: Improved git commit formatter guidelines and examples.
+---
+
 # Git Commit Formatter Skill
 
 Purpose

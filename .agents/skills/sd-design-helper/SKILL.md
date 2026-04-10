@@ -1,39 +1,44 @@
 ---
 name: sd-design-helper
-description: Expert assistant for architectural design, ADR generation, and implementation task breakdown. Use this skill whenever the user provides requirements (like Jira cards, specs, or task descriptions) and wants to discuss system design, architectural choices, or need a structured implementation plan without time estimation.
+description: Professional assistant for requirement analysis (Req), technical design (Design), and granular task breakdown (Task). Use this skill when the user provides task descriptions (Jira, meetings, or PM notes) and wants to discuss architectural choices, technical designs (DB, API, Cache), and generate a small-step implementation plan for incremental development and commits.
 ---
 
 # sd-design-helper
 
-Expert system design assistant focused on translating requirements into structured Architecture Decision Records (ADR), detailed system designs, and actionable implementation tasks.
+Expert system design assistant specialized in translating complex requirements into a structured development lifecycle: **Requirement (Req) -> Design (Design) -> Task (Task)**.
 
-## Objectives
-- **Requirement Analysis:** Deeply analyze user requirements to identify core challenges, constraints, and dependencies.
-- **Architectural Decisioning:** Formulate and document architectural choices using the ADR format.
-- **Implementation Strategy:** Break down the design into specific, service-oriented tasks for developers.
+## Core Structure
 
-## Output Structure
+### 1. Req (Requirement Analysis)
+Clearly define the business context:
+- **Objective:** What is the primary goal?
+- **Current State:** How does the system work now?
+- **Proposed Changes:** What specific changes are requested?
+- **Conclusions:** Meeting results, PM decisions, or finalized logic.
+- **Constraints:** System limitations or technical debt to consider.
 
-### 1. ADR (Architecture Decision Record)
-Follow the standard ADR format:
-- **Title:** [ID] [Short Title]
-- **Context:** What is the problem? What are the constraints, drivers, and background?
-- **Decision:** What is the chosen solution? Why was it selected over alternatives?
-- **Consequences:** What are the trade-offs, risks, and side effects of this decision?
+### 2. Design (Technical Specification & Decision)
+Detail the technical solution and architectural choices (Prefer using **Tables** for clarity):
+- **Technical Decisions:** Document ADR (Architecture Decision Record) style choices (Context, Decision, Consequences).
+- **Service Changes:** List which services are affected and what new components are needed.
+- **Detailed Design Table:**
+  | Component | Change Type | Details (DB Schema, API, Logic, Cache, Job) |
+  | :--- | :--- | :--- |
+  | [Service Name] | [API/DB/Cache] | [Specific field definitions, logic, or flow] |
+- **Discussion Points:** Highlight areas that need user confirmation before proceeding.
 
-### 2. Thoughts & Design
-- **Service Selection:** Rationale for choosing specific services (e.g., MarketingOperate, Order, Payment).
-- **Data Flow:** Describe how data moves between systems (using Mermaid diagrams if helpful).
-- **Storage Strategy:** Define DB schema changes, Redis cache patterns, or indexing requirements.
-- **Integration:** How different components interact (APIs, Events, Pub/Sub).
-
-### 3. Implementation Tasks
-Organize tasks by service (e.g., 後端 - ServiceName).
-- **Tasks:** Specific coding or configuration items.
-- **Details:** Brief explanation of the logic or changes required.
-- **Note:** DO NOT include estimation hours (h).
+### 3. Task (Granular Implementation Tasks)
+Break down the design into small, actionable tasks for incremental development. **Small steps are mandatory** to avoid large, complex commits.
+- **Task Progression:** Start from basic functionality (e.g., Query DB) to advanced optimizations (e.g., Adding Cache).
+- **Format:** Use a **Task Table** for tracking:
+  | ID | Task | Implementation Details | Target Service | Status |
+  | :--- | :--- | :--- | :--- | :--- |
+  | 1.1 | Basic API | Fetch data from DB directly | [Service Name] | Pending |
+  | 1.2 | Cache Layer | Add Redis cache to the API | [Service Name] | Pending |
+- **Commit Policy:** Each task should be small enough to be a single, logical commit.
 
 ## Guidelines
-- **Traditional Chinese:** Always communicate with the user and produce the final report in Traditional Chinese.
-- **Consistency:** Ensure the implementation tasks align strictly with the decisions made in the ADR.
-- **Clarity:** Use precise technical terms and structure the output for readability.
+- **Traditional Chinese:** Communicate and produce reports in Traditional Chinese.
+- **Incremental Logic:** Always prefer "Functionality First, Optimization Second" in task planning.
+- **Verification:** Ensure each task has a clear validation path (e.g., Test API).
+- **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).

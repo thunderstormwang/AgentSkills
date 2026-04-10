@@ -1,0 +1,11 @@
+{
+  "eval_id": 1,
+  "eval_name": "complex-cache-job",
+  "prompt": "需求描述：實作『點數過期提醒』功能。需要一個排程每日掃描即將過期的點數，並透過通知服務 (Notification Service) 發送推播。為了效能，過期名單應先暫存在 Redis。請幫我按照 sd-design-helper 的規範產出評估文件。",
+  "assertions": [
+    {"name": "HasReqSection", "instruction": "Check if the output contains a section for 'Req (需求分析)'."},
+    {"name": "HasDesignTable", "instruction": "Check if the Design section uses a Table format."},
+    {"name": "SmallStepTasks", "instruction": "Verify if tasks are broken down from basic (e.g., Job scan) to advanced (e.g., Redis optimization)."},
+    {"name": "NoEstimation", "instruction": "Verify that no estimation hours (e.g., '5h') are present in the Task table."}
+  ]
+}

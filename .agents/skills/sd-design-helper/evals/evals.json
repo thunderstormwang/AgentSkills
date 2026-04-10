@@ -1,0 +1,20 @@
+{
+  "skill_name": "sd-design-helper",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "需求描述：會員服務的取得個人資料 API，需要增加顯示『最後登入時間』欄位，用於稽核。現況是 DB 已有此欄位，但 API 未回傳。請幫我按照 sd-design-helper 的規範產出評估文件。",
+      "expected_output": "包含 Req, Design (含異動表格), Task (從小到大拆解) 的評估文件。"
+    },
+    {
+      "id": 1,
+      "prompt": "需求描述：實作『點數過期提醒』功能。需要一個排程每日掃描即將過期的點數，並透過通知服務 (Notification Service) 發送推播。為了效能，過期名單應先暫存在 Redis。請幫我按照 sd-design-helper 的規範產出評估文件。",
+      "expected_output": "包含 Req, Design (含 Redis 與通知邏輯), Task (從小到大拆解：先排程再 Redis 優化) 的評估文件。"
+    },
+    {
+      "id": 2,
+      "prompt": "需求描述：為了提升效能，計畫將『商品庫存』從主資料庫遷移至 Redis。需確保在高併發下資料的一致性，並有回寫 DB 的機制。請幫我按照 sd-design-helper 的規範產出評估文件。",
+      "expected_output": "包含 Req, Design (含一致性決策與 Redis 回寫機制), Task (從小到大拆解) 的評估文件。"
+    }
+  ]
+}

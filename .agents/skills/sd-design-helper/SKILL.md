@@ -22,13 +22,13 @@ Wait for user to confirm Req before proceeding.
 #### Step 2a — Questions First
 Before writing any Design content, list **all questions** that would affect design decisions.
 - Output **only** the questions in the document (under a `### Pre-Design Questions` section).
-- Add each question as a `Q` row in the Progress Table with status `Review`.
+- Add each question as a `Q` row in the Progress Table with status `Todo`.
 - **Do NOT produce any Design content yet.** Wait for the user to answer each question.
 
 #### Step 2b — Design Content
 Only after **all Q items** are `Done` / `Cancel` / `Pending`, produce the full Design section based on confirmed answers.
-- Replace the `Pre-Design Questions` section with the complete Design content.
-- Update Q rows in the Progress Table to `Done`, and add D rows (one per Design sub-section) with status `Review`.
+- **Append** the Design content after the `Pre-Design Questions` section. **Do NOT replace or remove** the Pre-Design Questions section — keep it intact for reference.
+- Update Q rows in the Progress Table to `Done` / `Cancel`, and add D rows (one per Design sub-section) with status `Review`.
 - Wait for user to confirm each D item before proceeding to Phase 3.
 
 ### Phase 3 — Task Expansion (after all D items approved)
@@ -93,23 +93,19 @@ Every document **must end** with a Progress Table. This table is the single sour
 ```markdown
 ## 進度表
 
-| ID | 項目 | 說明 | 狀態 |
-| :--- | :--- | :--- | :--- |
-| R1 | Req | 需求理解確認 | Review |
-| D1 | Design - Technical Decisions | [簡短說明] | Review |
-| D2 | Design - Service Changes | [簡短說明] | Review |
-| D3 | Design - DB | [簡短說明] | Review |
-| D4 | Design - Domain | [簡短說明] | Review |
-| D5 | Design - Infrastructure | [簡短說明] | Review |
-| D6 | Design - Application Command | [簡短說明] | Review |
-| D7 | Design - Job | [簡短說明] | Review |
-| Q1 | Discussion - [問題標題] | [簡短說明] | Review |
-| Q2 | Discussion - [問題標題] | [簡短說明] | Review |
+| ID | 項目 | 狀態 |
+| :--- | :--- | :--- |
+| R1 | Req | Review |
+| Q1 | Discussion - [問題標題] | Todo |
+| Q2 | Discussion - [問題標題] | Todo |
+| D1 | Design - Technical Decisions | Review |
+| D2 | Design - DB | Review |
+| D3 | Design - Domain | Review |
 ```
 
-> - Adapt the Design rows (D1, D2, …) to match exactly what was designed — one row per Design sub-section.
-> - Each **Discussion Point** gets its own row with prefix `Q` (Q1, Q2, …), one row per question.
-> - Add Task rows (T1, T2, …) only after Phase 2 is unlocked.
+> - Each **Discussion Point** gets its own row with prefix `Q` (Q1, Q2, …), one row per question. Initial status is `Todo`.
+> - Adapt the Design rows (D1, D2, …) to match exactly what was designed — one row per Design sub-section. Initial status is `Review`.
+> - Add Task rows (T1, T2, …) only after Phase 2 is unlocked. Initial status is `Todo`.
 
 ---
 

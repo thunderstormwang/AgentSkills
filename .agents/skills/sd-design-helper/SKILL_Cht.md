@@ -22,13 +22,13 @@ description: 需求分析 (Req)、技術設計 (Design) 與細粒度任務拆解
 #### 步驟 2a — 問題優先
 在撰寫任何 Design 內容之前，列出**所有**會影響設計決策的問題。
 - **僅**在文件中輸出問題（位於 `### Pre-Design Questions` 區塊下）。
-- 將每個問題作為 `Q` 行新增至進度表，狀態為 `Review`。
+- 將每個問題作為 `Q` 行新增至進度表，狀態為 `Todo`。
 - **此時不要產生任何 Design 內容。** 等待使用者回答每個問題。
 
 #### 步驟 2b — Design 內容
 僅在**所有 Q 項目**狀態為 `Done` / `Cancel` / `Pending` 後，根據確認的回答產生完整的 Design 部分。
-- 將 `Pre-Design Questions` 區塊替換為完整的 Design 內容。
-- 將進度表中的 Q 行更新為 `Done`，並新增 D 行（每個 Design 子章節一行），狀態為 `Review`。
+- 將 Design 內容**附加**在 `Pre-Design Questions` 區塊之後。**不要**替換或移除 Pre-Design Questions 區塊 —— 保留它以供參考。
+- 將進度表中的 Q 行更新為 `Done` / `Cancel`，並新增 D 行（每個 Design 子章節一行），狀態為 `Review`。
 - 在進入階段 3 之前，等待使用者確認每個 D 項目。
 
 ### 階段 3 — Task 展開 (在所有 D 項目核准後)
@@ -93,23 +93,19 @@ description: 需求分析 (Req)、技術設計 (Design) 與細粒度任務拆解
 ```markdown
 ## 進度表
 
-| ID | 項目 | 說明 | 狀態 |
-| :--- | :--- | :--- | :--- |
-| R1 | Req | 需求理解確認 | Review |
-| D1 | Design - Technical Decisions | [簡短說明] | Review |
-| D2 | Design - Service Changes | [簡短說明] | Review |
-| D3 | Design - DB | [簡短說明] | Review |
-| D4 | Design - Domain | [簡短說明] | Review |
-| D5 | Design - Infrastructure | [簡短說明] | Review |
-| D6 | Design - Application Command | [簡短說明] | Review |
-| D7 | Design - Job | [簡短說明] | Review |
-| Q1 | Discussion - [問題標題] | [簡短說明] | Review |
-| Q2 | Discussion - [問題標題] | [簡短說明] | Review |
+| ID | 項目 | 狀態 |
+| :--- | :--- | :--- |
+| R1 | Req | Review |
+| Q1 | Discussion - [問題標題] | Todo |
+| Q2 | Discussion - [問題標題] | Todo |
+| D1 | Design - Technical Decisions | Review |
+| D2 | Design - DB | Review |
+| D3 | Design - Domain | Review |
 ```
 
-> - 調整 Design 行 (D1, D2, …) 以完全符合設計內容 —— 每個 Design 子章節一行。
-> - 每個**討論點**擁有自己的一行，前綴為 `Q` (Q1, Q2, …)，每個問題一行。
-> - 僅在階段 2 解鎖後新增 Task 行 (T1, T2, …)。
+> - 每個**討論點**擁有自己的一行，前綴為 `Q` (Q1, Q2, …)，每個問題一行。初始狀態為 `Todo`。
+> - 調整 Design 行 (D1, D2, …) 以完全符合設計內容 —— 每個 Design 子章節一行。初始狀態為 `Review`。
+> - 僅在階段 2 解鎖後新增 Task 行 (T1, T2, …)。初始狀態為 `Todo`。
 
 ---
 

@@ -107,7 +107,8 @@ List every question that must be resolved before design can begin. Two categorie
 Detail the technical solution per sub-section (one `### Dx` per topic). Prefer tables for clarity:
 - DB Schema changes
 - Domain / Entity changes
-- Infrastructure / Cache changes
+- Infrastructure: EntityConfig changes
+- Infrastructure: Cache changes (new or modified cache classes — Redis or in-memory)
 - Application Command / Query changes
 - New Jobs or background workers
 

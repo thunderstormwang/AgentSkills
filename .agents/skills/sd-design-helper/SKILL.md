@@ -104,23 +104,37 @@ List every question that must be resolved before design can begin. Two categorie
 
 > ⚠️ Only after all Pre Design Sync items are resolved.
 
-Detail the technical solution per sub-section (one `### Dx` per topic). Prefer tables for clarity:
-- DB Schema changes
-- Domain / Entity changes
-- Infrastructure: EntityConfig changes
-- Infrastructure: Cache changes (new or modified cache classes — Redis or in-memory)
-- Application Command / Query changes
-- New Jobs or background workers
+Detail the **structural and behavioral definition** (the "What" and "Where"). Focus on contracts, boundaries, and high-level architecture.
+- **DB Schema:** Table/Column changes and **Index** adjustments.
+- **Entity / Domain:** **Entity field** changes and Domain Service interfaces.
+- **Contract:** **API Request/Response** structures and **Event Schemas**.
+- **Caching Strategy:** **Key naming conventions**, TTL, data structures, and Interface/Method definitions.
+- **Core Logic Spec:** Description of **behavioral shifts** (e.g., priority logic between Mode A and Mode B, state transitions).
+- **Component Flow:** **Sequence of calls** between modules and side effects (e.g., "After saving, update Cache X then publish Event Y"). **Always provide diagrams (e.g., Mermaid sequence diagrams or flowcharts)** to visualize the flow instead of relying solely on text descriptions.
 
 ### 4. Task (Granular Implementation Tasks)
 > ⚠️ Only after all Design items are confirmed.
 
-Break down the design into small, atomic tasks. **Each task = one logical commit.**
+Break down the design into small, atomic tasks (the "How"). **Each task = one logical commit.**
+
+- **Task Constraints:** Each task must not modify more than **3 files**.
+- **Content Requirements:** Each task must be detailed enough for a developer to implement without referring back to the Design. It MUST include:
+    - **Target Project:** The name of the project/assembly.
+    - **Component:** Specific Class name (e.g., Handler, Controller, Service).
+    - **Methods:** Names of the methods to be created or modified.
+    - **Logic Details:** Step-by-step logic, code patterns, or specific validation rules.
+    - **Unit Tests:** Every logic change must be verified by unit tests. Unit tests and production code changes can be in the **same task** or **separated into distinct tasks** (e.g., T1 for production code, T2 for unit test) to maintain the 3-file limit.
 - **Task Progression:** Basic functionality first, optimizations second.
-- **Format:**
-  | ID | Task | Implementation Details | Target | Status |
-  | :--- | :--- | :--- | :--- | :--- |
-  | T1 | [名稱] | [實作細節] | [Service] | Todo |
+- **Format:** Use a structured list instead of a table for better readability:
+
+#### T1: [Task Name]
+- **Target:** `[Project Name]` -> `[Class Name]` -> `[Method Name]`
+- **Implementation Details:**
+    - [Step 1: Specific logic/instruction]
+    - [Step 2: Specific logic/instruction]
+    - [Unit Test: Describe the test case to be added/updated]
+- **Affected Files:** (List up to 3 files)
+- **Status:** Todo
 
 ---
 

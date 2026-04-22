@@ -14,21 +14,27 @@ Expert system design assistant specialized in translating complex requirements i
 The document is produced **incrementally** in four phases. Each phase is **gated**: the next phase only begins after the user explicitly confirms the current one is complete.
 
 ### Phase 1 — Req
-Output the Req section. End the section with a **Req 進度表**:
+Output the Req section. End the section with a **Req 進度表** listing each sub-item individually:
 ```markdown
 ### Req 進度表
 | ID | 項目 | 狀態 |
 | :--- | :--- | :--- |
-| R1 | Req | Review |
+| R1 | Objective | Review |
+| R2 | Current State | Review |
+| R3 | Proposed Changes | Review |
+| R4 | Constraints | Review |
+| R5 | Acceptance Criteria | Review |
 ```
-Wait for user to confirm Req (`R1 = Done`) before proceeding to Phase 2.
+Wait for user to confirm all R items (`Done`) before proceeding to Phase 2.
 
 ---
 
 ### Phase 2 — Pre Design Sync
 > **Gate:** Phase 1 must be Done before starting Phase 2.
 
-List **all questions** that would affect design decisions under a `## Pre Design Sync` section.
+List **all questions** that need to be resolved before design can begin under a `## Pre Design Sync` section. Questions fall into two categories:
+1. **Req 理解確認** — Ambiguities or assumptions in the Req that need alignment with the user (e.g., scope boundaries, implicit behaviors, terms that could be interpreted differently)
+2. **設計決策** — Open questions that directly affect architecture, data model, caching strategy, API contract, or external integrations
 - One question per `Q` item. Do not produce Design content yet.
 - End the section with a **Pre Design Sync 進度表** (includes 結論 column, initially empty):
 ```markdown
@@ -84,12 +90,13 @@ Clearly define the business context:
 - **Objective:** What is the primary goal?
 - **Current State:** How does the system work now?
 - **Proposed Changes:** What specific changes are requested?
-- **Conclusions:** Meeting results, PM decisions, or finalized logic.
 - **Constraints:** System limitations or technical debt to consider.
+- **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled.
 
 ### 2. Pre Design Sync (Questions)
-List every open question that must be resolved before design can begin:
-- Questions that affect architecture, data model, caching strategy, API contract, or external integrations
+List every question that must be resolved before design can begin. Two categories:
+- **Req 理解確認** — Ambiguities or implicit assumptions in the Req that need alignment (scope, edge cases, terms)
+- **設計決策** — Questions that affect architecture, data model, caching strategy, API contract, or external integrations
 - For questions with multiple candidate solutions, provide a **comparison table** (approach, pros/cons, scope of change, risk)
 - Record the user's final decision as 結論 in the progress table
 
@@ -146,6 +153,7 @@ Each section ends with its **own** progress table. The document always ends with
 | T1 | Task | Todo |
 ```
 
+> - R items: Req sub-items (Objective / Current State / Proposed Changes / Acceptance Criteria / Constraints). Initial status `Review`. Summary row reflects overall Req phase.
 > - Q items: no prefix, just the question title. Initial status `Todo`.
 > - D items: no prefix, just the sub-section name. Initial status `Review`.
 > - T items: no prefix, just the task name. Initial status `Todo`.

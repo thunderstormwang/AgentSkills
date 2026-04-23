@@ -124,6 +124,9 @@ description: 專門用於需求分析 (Req)、技術設計 (Design) 與細粒度
         - **檔名格式**：`PXBOX-{jira ticket no}.sql`。
         - **Jira 編號**：若 Jira ticket 編號不明，Agent 必須向使用者確認。
         - **執行方式**：註明該腳本將由人工在各個環境中手動執行。
+    - **API 合約變更**：若 Design 包含 API Request/Response 的變動，必須建立一個專門的任務來產出「前端 API 變動說明」，以利前端人員從 Swagger 查找。
+        - **內容要求**：說明必須包含 API 路由、變動類型（新增/修改/刪除 API），以及具體的欄位變動細節（新增/修改/刪除 Request/Response 中的欄位）。
+        - **交付方式**：此說明應直接放在該 Task 的描述中，以便使用者複製貼上。
 - **內容要求**：每個任務的描述必須足夠詳細，使開發者無需反覆查閱 Design 即可實作。必須包含：
     - **引用 (Reference)**：該任務實作的 Design ID (例如：`[Ref: D1]`)。
     - **目標專案**：專案名稱或 Assembly 名稱。

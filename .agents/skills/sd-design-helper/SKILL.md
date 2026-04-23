@@ -124,6 +124,9 @@ Break down the design into small, atomic tasks (the "How"). **Each task = one lo
         - **Filename:** `PXBOX-{jira ticket no}.sql`. 
         - **Jira Ticket:** If the Jira ticket number is unknown, the agent MUST ask the user for confirmation.
         - **Execution:** Note that the script will be manually executed by a human in various environments.
+    - **API Contract Changes:** If the Design includes changes to API Request/Response, a specific Task MUST be created to generate a summary for frontend developers to facilitate Swagger lookups.
+        - **Content:** The summary must include the API route, the type of change (Add/Edit/Delete API), and specific field changes (Add/Edit/Delete fields in Request/Response).
+        - **Delivery:** This summary will be provided directly in the task description for the user to copy-paste.
 - **Content Requirements:** Each task must be detailed enough for a developer to implement without referring back to the Design. It MUST include:
     - **Reference:** The Design ID(s) this task implements (e.g., `[Ref: D1]`).
     - **Target Project:** The name of the project/assembly.

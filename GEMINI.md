@@ -2,7 +2,7 @@
 
 ## Language and Communication
 - **Primary Language:** Always communicate with the user, discuss requirements, and produce system documents in **Traditional Chinese (繁體中文)**.
-- **Exception:** When writing skills (e.g., SKILL.md) and instruction files (e.g., copilot-instructions.md), always use **English**.
+- **Exception:** When writing skills (e.g., SKILL.md) and instruction files (e.g., GEMINI.md, CLAUDE.md, copilot-instructions.md), always use **English**.
 
 ## Response Style
 - Be concise and technical.

@@ -36,7 +36,7 @@ Each task must be detailed enough for a developer to implement without referring
 
 Use a structured list instead of a table for better readability:
 
-### T1: [Task Name] (Ref: D1)
+### T1: [Task Name]
 - **Reference:** `[D1]`
 - **Target:** `[Project Name]` -> `[Class Name]` -> `[Method Name]`
 - **Implementation Details:**
@@ -44,4 +44,3 @@ Use a structured list instead of a table for better readability:
     - [Step 2: Specific logic/instruction]
     - [Unit Test: Describe the test case to be added/updated]
 - **Affected Files:** (List up to 3 files)
-- **Status:** Todo

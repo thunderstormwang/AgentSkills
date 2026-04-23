@@ -71,15 +71,15 @@ Append the `## Design` section after `## Pre Design Sync`. **Do NOT modify or re
 > **Gate:** Phase 3 must be fully confirmed before starting Phase 4.
 
 Append the `## Task` section after `## Design`. **Do NOT modify prior sections.**
-- End the Task section with a **Task 進度表**:
+- End the Task section with a **Task 進度表** (which includes a **Reference** column):
 ```markdown
 ### Task 進度表
-| ID | 項目 | 狀態 |
-| :--- | :--- | :--- |
-| T1 | [Task 名稱] (Ref: D1) | Todo |
-| T2 | [Task 名稱] (Ref: D1, D2) | Todo |
+| ID | 項目 | 引用 | 狀態 |
+| :--- | :--- | :--- | :--- |
+| T1 | [Task 名稱] | D1 | Todo |
+| T2 | [Task 名稱] | D1, D2 | Todo |
 ```
-- **Self-check before notifying the user:** After drafting the Task list, verify that every Task item satisfies the Design requirements, references the correct Design ID(s), and does not contradict any Design decision. Fix any gaps or inconsistencies silently before presenting the result. Only notify the user once the self-check passes.
+- **Self-check before notifying the user:** After drafting the Task list, verify that every Task item satisfies the Design requirements, correctly references the Design ID(s) in the table and implementation details, and does not contradict any Design decision. Fix any gaps or inconsistencies silently before presenting the result. Only notify the user once the self-check passes.
 
 ---
 

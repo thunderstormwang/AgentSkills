@@ -76,10 +76,10 @@ Append the `## Task` section after `## Design`. **Do NOT modify prior sections.*
 ### Task 進度表
 | ID | 項目 | 狀態 |
 | :--- | :--- | :--- |
-| T1 | [Task 名稱] | Todo |
-| T2 | [Task 名稱] | Todo |
+| T1 | [Task 名稱] (Ref: D1) | Todo |
+| T2 | [Task 名稱] (Ref: D1, D2) | Todo |
 ```
-- **Self-check before notifying the user:** After drafting the Task list, verify that every Task item satisfies the Design requirements and does not contradict any Design decision. Fix any gaps or inconsistencies silently before presenting the result. Only notify the user once the self-check passes.
+- **Self-check before notifying the user:** After drafting the Task list, verify that every Task item satisfies the Design requirements, references the correct Design ID(s), and does not contradict any Design decision. Fix any gaps or inconsistencies silently before presenting the result. Only notify the user once the self-check passes.
 
 ---
 
@@ -119,6 +119,7 @@ Break down the design into small, atomic tasks (the "How"). **Each task = one lo
 
 - **Task Constraints:** Each task must not modify more than **3 files**.
 - **Content Requirements:** Each task must be detailed enough for a developer to implement without referring back to the Design. It MUST include:
+    - **Reference:** The Design ID(s) this task implements (e.g., `[Ref: D1]`).
     - **Target Project:** The name of the project/assembly.
     - **Component:** Specific Class name (e.g., Handler, Controller, Service).
     - **Methods:** Names of the methods to be created or modified.
@@ -127,7 +128,8 @@ Break down the design into small, atomic tasks (the "How"). **Each task = one lo
 - **Task Progression:** Basic functionality first, optimizations second.
 - **Format:** Use a structured list instead of a table for better readability:
 
-#### T1: [Task Name]
+#### T1: [Task Name] (Ref: D1)
+- **Reference:** `[D1]`
 - **Target:** `[Project Name]` -> `[Class Name]` -> `[Method Name]`
 - **Implementation Details:**
     - [Step 1: Specific logic/instruction]

@@ -15,7 +15,13 @@ These guidelines apply strictly to **Phase 4 — Task** of the `sd-design-helper
 - **API Contract Changes:** If the Design includes changes to API Request/Response, a specific Task MUST be created to generate a summary for frontend developers to facilitate Swagger lookups.
     - **Content:** The summary must include the API route, the type of change (Add/Edit/Delete API), and specific field changes (Add/Edit/Delete fields in Request/Response).
     - **Delivery:** This summary will be provided directly in the task description for the user to copy-paste.
-- **Task Progression:** Always implement basic functionality first, followed by optimizations.
+- **Task Progression:**
+    1. **DB Schema Changes:** Always prioritize SQL script generation tasks.
+    2. **Entity / Domain Changes:** Core business logic and data structures.
+    3. **API Skeletons & Fields:** Define API Request/Response models and Controller endpoints first (placeholder logic is allowed).
+    4. **API Summary:** Provide the frontend summary immediately after API contracts are defined to enable parallel development.
+    5. **Functional Implementation:** Detailed logic and optimizations.
+- **Stability Requirement:** Every task MUST ensure the system is in a buildable state. **No Build Errors** are allowed after completing any individual task.
 
 ---
 

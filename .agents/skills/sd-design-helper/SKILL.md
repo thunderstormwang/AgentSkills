@@ -117,35 +117,8 @@ Detail the **structural and behavioral definition** (the "What" and "Where"). Fo
 
 Break down the design into small, atomic tasks (the "How"). **Each task = one logical commit.**
 
-- **Task Constraints:** 
-    - Each task must not modify more than **3 files**.
-    - **DB Schema Changes:** If the Design includes DB changes, a specific Task MUST be created to generate the SQL script. 
-        - **Storage:** The script must be saved in the `sql/` folder at the project root.
-        - **Filename:** `PXBOX-{jira ticket no}.sql`. 
-        - **Jira Ticket:** If the Jira ticket number is unknown, the agent MUST ask the user for confirmation.
-        - **Execution:** Note that the script will be manually executed by a human in various environments.
-    - **API Contract Changes:** If the Design includes changes to API Request/Response, a specific Task MUST be created to generate a summary for frontend developers to facilitate Swagger lookups.
-        - **Content:** The summary must include the API route, the type of change (Add/Edit/Delete API), and specific field changes (Add/Edit/Delete fields in Request/Response).
-        - **Delivery:** This summary will be provided directly in the task description for the user to copy-paste.
-- **Content Requirements:** Each task must be detailed enough for a developer to implement without referring back to the Design. It MUST include:
-    - **Reference:** The Design ID(s) this task implements (e.g., `[Ref: D1]`).
-    - **Target Project:** The name of the project/assembly.
-    - **Component:** Specific Class name (e.g., Handler, Controller, Service).
-    - **Methods:** Names of the methods to be created or modified.
-    - **Logic Details:** Step-by-step logic, code patterns, or specific validation rules.
-    - **Unit Tests:** Every logic change must be verified by unit tests. Unit tests and production code changes can be in the **same task** or **separated into distinct tasks** (e.g., T1 for production code, T2 for unit test) to maintain the 3-file limit.
-- **Task Progression:** Basic functionality first, optimizations second.
-- **Format:** Use a structured list instead of a table for better readability:
+Refer to `references/task-guidelines.md` for specific implementation rules, including constraints for DB Schema and API Contract changes, content requirements, and format examples.
 
-#### T1: [Task Name] (Ref: D1)
-- **Reference:** `[D1]`
-- **Target:** `[Project Name]` -> `[Class Name]` -> `[Method Name]`
-- **Implementation Details:**
-    - [Step 1: Specific logic/instruction]
-    - [Step 2: Specific logic/instruction]
-    - [Unit Test: Describe the test case to be added/updated]
-- **Affected Files:** (List up to 3 files)
-- **Status:** Todo
 
 ---
 

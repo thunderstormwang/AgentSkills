@@ -802,4 +802,49 @@ sequenceDiagram
     - 修正 AppTemplateDtoCache.GetCacheAsync() 呼叫：改用 query 傳入的 TemplateType、TopCategoryId、MidCategoryId（不再寫死 ProductMarketingType.TemplateGroupProduct = 4）
     - PrivateSale 判斷：TemplateType、TopCategoryId、MidCategoryId 任一為 0 → 跳過封閉賣場判斷，否則使用同一次 cache 結果
     - 找到目標 group 後讀取 ProductSelectType：
-        - 
+        -  （手動）：走現有 SearchByMarketingAsync(groupId, TemplateGroupProduct)
+        - 2（Appier）：
+            1. AppierTemplateGroupCache.GetAsync(groupId, request.SystemSourceType)
+            2. Cache miss → 回傳空 list（不 fallback）
+            3. Cache hit → SearchByIdsAsync(productIds) 取得商品資料
+    - Unit Test：GetAppGroupProductListQueryHandlerTest
+        - Appier_CacheHit_ShouldCallSearchByIds
+        - Appier_CacheMiss_ShouldReturnEmpty
+        - Manual_ShouldCallSearchByMarketing
+        - PrivateSale_AnyParamZero_ShouldSkip
+- **Affected Files:**
+    - src/PXBox.Spu.API/Application/Queries/App/GetTemplateBlock/GetAppGroupProductListQueryHandler.cs
+    - src/PXBox.Spu.Test/...GetAppGroupProductListQueryHandlerTest.cs
+- **Status:** Todo
+
+---
+
+### Task 進度表
+
+| ID | 項目 | 狀態 |
+| :--- | :--- | :--- |
+| T1 | SQL Script — DB Schema 異動 (Ref: D1) | Todo |
+| T2 | Entity — TemplateBlockGroupEntity 異動 (Ref: D2) | Todo |
+| T3 | Entity — TemplateEntity SetGroupWithAppier (Ref: D2) | Todo |
+| T4 | EntityConfig — TemplateBlockGroupEntityConfig (Ref: D1, D2) | Todo |
+| T5 | Cache — AppierGroupIdCache (Ref: D4) | Todo |
+| T6 | Cache — AppierTemplateGroupCache (Ref: D4) | Todo |
+| T7 | DTO — AppTemplateBlockGroup 新增 ProductSelectType (Ref: D4, D5) | Todo |
+| T8 | Contract — SaveTemplateCommand Appier 欄位 (Ref: D3) | Todo |
+| T9 | Contract — GetAppGroupProductListQuery 新增欄位 (Ref: D3) | Todo |
+| T10 | API Contract 摘要（給前端）(Ref: D3) | Todo |
+| T11 | Handler — SaveTemplateCommandHandler Appier 模式支援 (Ref: D2, D5, D6) | Todo |
+| T12 | Job — RefreshTemplateCahceJob AppierGroupIdCache 更新 (Ref: D5, D6) | Todo |
+| T13 | EventHandler — RefreshTemplateCahceEventHandler Appier 快取更新 (Ref: D4, D6) | Todo |
+| T14 | Job — RefreshAppierTemplateProductJob 建立 (Ref: D4, D6) | Todo |
+| T15 | DI Registration — Startup.cs (Ref: D4, D6) | Todo |
+| T16 | QueryHandler — GetAppGroupProductListQueryHandler Appier 路由 (Ref: D3, D5, D6) | Todo |
+
+## 進度表
+
+| ID | 項目 | 狀態 |
+| :--- | :--- | :--- |
+| R1 | Req | Done |
+| P1 | Pre Design Sync | Done |
+| D1 | Design | Done |
+| T1 | Task | Todo |

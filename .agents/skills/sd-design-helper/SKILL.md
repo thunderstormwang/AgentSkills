@@ -117,7 +117,13 @@ Detail the **structural and behavioral definition** (the "What" and "Where"). Fo
 
 Break down the design into small, atomic tasks (the "How"). **Each task = one logical commit.**
 
-- **Task Constraints:** Each task must not modify more than **3 files**.
+- **Task Constraints:** 
+    - Each task must not modify more than **3 files**.
+    - **DB Schema Changes:** If the Design includes DB changes, a specific Task MUST be created to generate the SQL script. 
+        - **Storage:** The script must be saved in the `sql/` folder at the project root.
+        - **Filename:** `PXBOX-{jira ticket no}.sql`. 
+        - **Jira Ticket:** If the Jira ticket number is unknown, the agent MUST ask the user for confirmation.
+        - **Execution:** Note that the script will be manually executed by a human in various environments.
 - **Content Requirements:** Each task must be detailed enough for a developer to implement without referring back to the Design. It MUST include:
     - **Reference:** The Design ID(s) this task implements (e.g., `[Ref: D1]`).
     - **Target Project:** The name of the project/assembly.

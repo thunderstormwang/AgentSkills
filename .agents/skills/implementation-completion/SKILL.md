@@ -22,7 +22,15 @@ A specialized skill for executing development tasks derived from a structured pl
     *   **Commit Message**: Follow the Conventional Commits format as specified in the `git-commit-helper` skill.
     *   **Authorization**: Perform the commit **without asking for further permission** as the user has pre-authorized this workflow.
 5. **Status Update**:
-    *   Update the "Status" column in the **Task progress table** of the plan document to `Review`.
+    *   Update the "Status" column in the **Task progress table** (located under the `## Task` section, usually titled `### Task 進度表`) of the plan document to `Review`.
+    *   **IMPORTANT**: Do NOT modify the summary table (titled `## 進度表`) at the very bottom of the document. Only update the specific progress table within the Task section.
+    *   **Status Definitions**:
+        | Status | Description |
+        | :--- | :--- |
+        | `Todo` | Not yet started |
+        | `InProgress` | Currently being implemented |
+        | `Review` | Implementation complete and committed; waiting for user review |
+        | `Done` | User confirmed and task is complete |
     *   **Strict Constraint**: You are only allowed to modify the "Status" values. Any other modifications to the plan content require explicit user consent.
 6. **Reporting**: Inform the user that the task(s) are completed and committed.
 

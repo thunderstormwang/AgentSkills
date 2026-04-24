@@ -1,46 +1,48 @@
 # Task Phase Guidelines
 
-These guidelines apply strictly to **Phase 4 — Task** of the `sd-design-helper` development lifecycle.
+These guidelines apply strictly to **Phase 4 — Task** of the `sd-design-helper` development lifecycle. The primary goal is to produce high-quality, actionable tasks that can be executed independently.
 
 ---
 
-## Task Constraints
+## Task Structure & Constraints
 
-- **File Limit:** Each task must not modify more than **3 files**.
-- **DB Schema Changes:** If the Design includes DB changes, a specific Task MUST be created to generate the SQL script.
-    - **Storage:** The script must be saved in the `sql/` folder at the project root.
+- **Logical Commit Granularity:** Each task should ideally correspond to one logical commit.
+- **File Limit:** Each task should not target more than **3 files** to ensure clarity and maintainability.
+- **DB Schema Changes:** Tasks for DB changes MUST involve generating a SQL script.
+    - **Storage:** Save to the `sql/` folder at the project root.
     - **Filename:** `PXBOX-{jira ticket no}.sql`.
-    - **Jira Ticket:** If the Jira ticket number is unknown, the agent MUST ask the user for confirmation.
-    - **Execution:** Note that the script will be manually executed by a human in various environments.
-- **API Contract Changes:** If the Design includes changes to API Request/Response, a specific Task MUST be created to generate a summary for frontend developers to facilitate Swagger lookups.
-    - **Content:** The summary must include the API route, the type of change (Add/Edit/Delete API), and specific field changes (Add/Edit/Delete fields in Request/Response).
-    - **Delivery:** This summary will be provided directly in the task description for the user to copy-paste.
-- **Task Progression:**
-    1. **DB Schema Changes:** Always prioritize SQL script generation tasks.
-    2. **Entity / Domain Changes:** Core business logic and data structures.
-    3. **API Skeletons & Fields:** Define API Request/Response models and Controller endpoints first (placeholder logic is allowed).
-    4. **API Summary:** Provide the frontend summary immediately after API contracts are defined to enable parallel development.
-    5. **Functional Implementation:** Detailed logic and optimizations.
-- **Stability Requirement:** Every task MUST ensure the system is in a buildable state. **No Build Errors** are allowed after completing any individual task.
+    - **Ticket Number:** If the Jira ticket number is unknown, ask the user for confirmation.
+- **API Contract Changes:** Tasks for API changes MUST include a summary for frontend developers.
+    - **Content:** Include API route, change type (Add/Edit/Delete), and specific field changes in Request/Response.
+
+---
+
+## Task Ordering (Prioritization)
+
+When generating the Task list, always follow this order to facilitate parallel development and smooth integration:
+
+1.  **DB Schema Changes**: Always prioritize SQL script generation.
+2.  **Entity / Domain Changes**: Core business logic and data structures.
+3.  **API Skeletons & Fields**: Define Request/Response models and Controller endpoints first (placeholder logic is allowed).
+4.  **API Summary**: Provide the frontend summary immediately after API contracts are defined.
+5.  **Functional Implementation**: Detailed logic and optimizations.
 
 ---
 
 ## Content Requirements
 
-Each task must be detailed enough for a developer to implement without referring back to the Design. It MUST include:
+Each task must be detailed enough to be implemented without referring back to the Design section. It MUST include:
 
 - **Reference:** The Design ID(s) this task implements (e.g., `[Ref: D1]`).
 - **Target Project:** The name of the project/assembly.
 - **Component:** Specific Class name (e.g., Handler, Controller, Service).
 - **Methods:** Names of the methods to be created or modified.
 - **Logic Details:** Step-by-step logic, code patterns, or specific validation rules.
-- **Unit Tests:** Every logic change must be verified by unit tests. Unit tests and production code changes can be in the same task or separated into distinct tasks (e.g., T1 for production code, T2 for unit test) to maintain the 3-file limit.
+- **Unit Tests:** Description of the test cases to be added or updated.
 
 ---
 
 ## Format Example
-
-Use a structured list instead of a table for better readability:
 
 ### T1: [Task Name]
 - **Reference:** `[D1]`

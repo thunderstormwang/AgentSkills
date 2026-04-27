@@ -137,26 +137,12 @@ description: 專門用於需求分析 (Req)、技術設計 (Design) 與細粒度
 
 ### 表格格式
 
-每個章節末尾都有其**專屬**的進度表。文件最後一律以 **4 列摘要表** 結尾。
+每個章節末尾都有其**專屬**的進度表。
 
-**底部摘要表（一律為文件的最後一個元素）：**
-
-```markdown
-## 進度表
-
-| ID | 項目 | 狀態 |
-| :--- | :--- | :--- |
-| R1 | Req | Done |
-| P1 | Pre Design Sync | Done |
-| D1 | Design | Review |
-| T1 | Task | Todo |
-```
-
-> - R 項目: Req 子項目 (Objective / Current State / Proposed Changes / Acceptance Criteria / Constraints)。初始狀態為 `Review`。摘要列反映整體的 Req 階段。
+> - R 項目: Req 子項目 (Objective / Current State / Proposed Changes / Acceptance Criteria / Constraints)。初始狀態為 `Review`。
 > - Q 項目: 無前綴，僅列出問題標題。初始狀態為 `Todo`。
 > - D 項目: 無前綴，僅列出子章節名稱。初始狀態為 `Review`。
 > - T 項目: 無前綴，僅列出任務名稱。初始狀態為 `Todo`。
-> - 底部摘要表固定只有 4 列。當該階段完全完成後，請更新其狀態。
 
 ---
 
@@ -167,4 +153,4 @@ description: 專門用於需求分析 (Req)、技術設計 (Design) 與細粒度
 - **衝突檢測與自我修正:** 主動檢查矛盾：(a) Pre Design Sync 內部的 Q 結論之間 — 立即向使用者提出；(b) Design 與 Pre Design Sync 之間 — 在通知使用者前自行修正；(c) Task 與 Design 之間 — 在通知使用者前自行修正。
 - **驗證:** 確保每個任務都有明確的驗證路徑（例如：API 測試、手動 QA 步驟）。
 - **精準性:** 使用精確的技術術語（例如：Entity, Repository, CacheRepo）。
-- **進度表為強制要求:** 每個章節末尾必須有其專屬進度表。文件最後必須有 4 列摘要表。
+- **進度表為強制要求:** 每個章節末尾必須有其專屬進度表。

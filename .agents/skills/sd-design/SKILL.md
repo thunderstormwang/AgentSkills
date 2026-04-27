@@ -137,26 +137,12 @@ Refer to `references/task-guidelines.md` for specific implementation rules, incl
 
 ### Table Format
 
-Each section ends with its **own** progress table. The document always ends with a **4-row summary table**.
+Each section ends with its **own** progress table.
 
-**Bottom summary table (always the last element in the document):**
-
-```markdown
-## 進度表
-
-| ID | 項目 | 狀態 |
-| :--- | :--- | :--- |
-| R1 | Req | Done |
-| P1 | Pre Design Sync | Done |
-| D1 | Design | Review |
-| T1 | Task | Todo |
-```
-
-> - R items: Req sub-items (Objective / Current State / Proposed Changes / Acceptance Criteria / Constraints). Initial status `Review`. Summary row reflects overall Req phase.
+> - R items: Req sub-items (Objective / Current State / Proposed Changes / Acceptance Criteria / Constraints). Initial status `Review`.
 > - Q items: no prefix, just the question title. Initial status `Todo`.
 > - D items: no prefix, just the sub-section name. Initial status `Review`.
 > - T items: no prefix, just the task name. Initial status `Todo`.
-> - The bottom summary table always has exactly 4 rows. Update its status when that phase is fully complete.
 
 ---
 
@@ -167,4 +153,4 @@ Each section ends with its **own** progress table. The document always ends with
 - **Conflict detection & self-correction:** Actively check for contradictions: (a) between Q conclusions within Pre Design Sync — surface to user immediately; (b) between Design and Pre Design Sync — fix silently before notifying user; (c) between Task and Design — fix silently before notifying user.
 - **Verification:** Ensure each task has a clear validation path (e.g., Test API, Manual QA step).
 - **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).
-- **Progress Table is mandatory:** Each section ends with its own progress table. The document always ends with the 4-row summary table.
+- **Progress Table is mandatory:** Each section ends with its own progress table.

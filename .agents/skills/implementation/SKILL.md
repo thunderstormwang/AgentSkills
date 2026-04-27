@@ -23,7 +23,6 @@ A specialized skill for executing development tasks derived from a structured pl
     *   **Authorization**: Perform the commit **without asking for further permission** as the user has pre-authorized this workflow.
 5. **Status Update**:
     *   Update the "Status" column in the **Task progress table** (located under the `## Task` section, usually titled `### Task 進度表`) of the plan document to `Review`.
-    *   **IMPORTANT**: Do NOT modify the summary table (titled `## 進度表`) at the very bottom of the document. Only update the specific progress table within the Task section.
     *   **Status Definitions**:
         | Status | Description |
         | :--- | :--- |

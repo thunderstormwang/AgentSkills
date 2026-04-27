@@ -37,4 +37,5 @@ A specialized skill for executing development tasks derived from a structured pl
 ## Guidelines
 - **Traditional Chinese**: Communicate with the user in Traditional Chinese.
 - **Precision**: Adhere strictly to the "Implementation Details" provided in the task.
+- **Coding Style**: If the task involves implementing or modifying code, you **MUST** first call `activate_skill("coding-style")` to load the mandatory coding standards and architectural patterns for the relevant programming language(s).
 - **Failure Handling**: If a task cannot be completed due to technical constraints or logic contradictions, stop immediately and report the issue to the user. Do not attempt to guess or bypass errors.

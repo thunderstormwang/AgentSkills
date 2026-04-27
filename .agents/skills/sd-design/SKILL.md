@@ -1,5 +1,5 @@
 ---
-name: sd-design-helper
+name: sd-design
 description: Professional assistant for requirement analysis (Req), technical design (Design), and granular task breakdown (Task). Use this skill when the user provides task descriptions (Jira, meetings, or PM notes) and wants to discuss architectural choices, technical designs (DB, API, Cache), and generate a small-step implementation plan for incremental development and commits.
 ---
 

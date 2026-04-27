@@ -1,5 +1,5 @@
 ---
-name: sd-design-helper
+name: sd-design
 description: 專門用於需求分析 (Req)、技術設計 (Design) 與細粒度任務拆解 (Task) 的專業助手。當使用者提供任務說明（如 Jira、會議記錄或 PM 筆記），且希望討論架構選擇、技術設計（DB、API、Cache）並生成用於增量開發與 commit 的小步實作計畫時，請使用此技能。
 ---
 

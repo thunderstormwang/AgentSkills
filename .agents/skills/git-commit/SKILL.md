@@ -1,5 +1,5 @@
 ---
-name: git-commit-helper
+name: git-commit
 description: Create and format git commit messages following Conventional Commits with up to 3-line body. Use this when the user asks to commit changes, write a commit message, or needs help structuring commits with meaningful descriptions and ticket references.
 ---
 

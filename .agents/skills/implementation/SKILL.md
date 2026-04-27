@@ -1,9 +1,9 @@
 ---
-name: implementation-completion
+name: implementation
 description: Executes specific implementation tasks defined in a plan document (e.g., plan.md). Use this skill when the user specifies which Task IDs to implement. It handles code changes, validation, automatic git commits, and updates the task status in the plan document.
 ---
 
-# implementation-completion
+# implementation
 
 A specialized skill for executing development tasks derived from a structured plan. It focuses on reliable implementation, validation, and maintaining the plan's progress.
 
@@ -19,7 +19,7 @@ A specialized skill for executing development tasks derived from a structured pl
     *   **Verification**: Run relevant unit tests or verification steps if specified.
 4. **Automatic Commit**:
     *   After successful implementation and validation, perform a git commit immediately.
-    *   **Commit Message**: Follow the Conventional Commits format as specified in the `git-commit-helper` skill.
+    *   **Commit Message**: Follow the Conventional Commits format as specified in the `git-commit` skill.
     *   **Authorization**: Perform the commit **without asking for further permission** as the user has pre-authorized this workflow.
 5. **Status Update**:
     *   Update the "Status" column in the **Task progress table** (located under the `## Task` section, usually titled `### Task 進度表`) of the plan document to `Review`.

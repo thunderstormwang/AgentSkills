@@ -867,29 +867,21 @@ sequenceDiagram
 
 | ID | 項目 | 引用 | 狀態 |
 | :--- | :--- | :--- | :--- |
-| T1 | SQL Script — DB Schema 異動 | D1 | Todo |
-| T2 | Entity — TemplateBlockGroupEntity 新增欄位與方法 | D2 | Todo |
-| T3 | Entity — TemplateEntity 新增 SetGroupWithAppier | D2 | Todo |
-| T4 | EntityConfig — TemplateBlockGroupEntityConfig 新增欄位映射 | D1, D2 | Todo |
-| T5 | Contract — SaveTemplateCommand 新增 Appier 欄位 | D3 | Todo |
-| T6 | Contract — GetAppGroupProductListQuery 新增欄位 | D3 | Todo |
-| T17 | Contract — BackendTemplateDetailVo 後台明細回傳新欄位 | D3 | Todo |
-| T7 | API Contract 摘要（給前端） | D3 | Todo |
-| T8 | Cache — AppierGroupIdCache | D4 | Todo |
-| T9 | Cache — AppierTemplateGroupCache | D4 | Todo |
-| T10 | DTO — AppTemplateBlockGroup 新增 ProductSelectType | D4, D5 | Todo |
-| T11 | Handler — SaveTemplateCommandHandler Appier 模式支援 | D2, D5, D6 | Todo |
-| T12 | Job — RefreshTemplateCahceJob AppierGroupIdCache 更新 | D5, D6 | Todo |
-| T13 | EventHandler — RefreshTemplateCahceEventHandler Appier 快取更新 | D4, D6 | Todo |
-| T14 | Job — RefreshAppierTemplateProductJob 建立 | D4, D6 | Todo |
-| T15 | DI Registration — Startup.cs 新增 Cache 與 Job | D4, D6 | Todo |
-| T16 | QueryHandler — GetAppGroupProductListQueryHandler Appier 路由 | D3, D5, D6 | Todo |
+| T1 | SQL Script — DB Schema 異動 | D1 | Done |
+| T2 | Entity — TemplateBlockGroupEntity 新增欄位與方法 | D2 | Done |
+| T3 | Entity — TemplateEntity 新增 SetGroupWithAppier | D2 | Done |
+| T4 | EntityConfig — TemplateBlockGroupEntityConfig 新增欄位映射 | D1, D2 | Done |
+| T5 | Contract — SaveTemplateCommand 新增 Appier 欄位 | D3 | Done |
+| T6 | Contract — GetAppGroupProductListQuery 新增欄位 | D3 | Done |
+| T17 | Contract — BackendTemplateDetailVo 後台明細回傳新欄位 | D3 | Done |
+| T7 | API Contract 摘要（給前端） | D3 | Done |
+| T8 | Cache — AppierGroupIdCache | D4 | Done |
+| T9 | Cache — AppierTemplateGroupCache | D4 | Done |
+| T10 | DTO — AppTemplateBlockGroup 新增 ProductSelectType | D4, D5 | Done |
+| T11 | Handler — SaveTemplateCommandHandler Appier 模式支援 | D2, D5, D6 | Done |
+| T12 | Job — RefreshTemplateCahceJob AppierGroupIdCache 更新 | D5, D6 | Done |
+| T13 | EventHandler — RefreshTemplateCahceEventHandler Appier 快取更新 | D4, D6 | Done |
+| T14 | Job — RefreshAppierTemplateProductJob 建立 | D4, D6 | Done |
+| T15 | DI Registration — Startup.cs 新增 Cache 與 Job | D4, D6 | Review |
+| T16 | QueryHandler — GetAppGroupProductListQueryHandler Appier 路由 | D3, D5, D6 | Review |
 
-## 進度表
-
-| ID | 項目 | 狀態 |
-| :--- | :--- | :--- |
-| R1 | Req | Done |
-| P1 | Pre Design Sync | Done |
-| D1 | Design | Done |
-| T1 | Task | Todo |

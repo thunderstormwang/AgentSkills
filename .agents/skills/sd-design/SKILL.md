@@ -44,7 +44,7 @@ List **all questions** that need to be resolved before design can begin under a 
 | Q1 | [問題標題] |  | Todo |
 | Q2 | [問題標題] |  | Todo |
 ```
-- As the user answers each Q: fill in 結論, flip status to `Done` / `Cancel`.
+- As the user answers each Q: fill in 結論 both within the specific Q item's description in the body of the `## Pre Design Sync` section (detailed) and in the **Pre Design Sync 進度表** (concise, 1-2 sentences), and flip status to `Done` / `Cancel`.
 - **Conflict check:** Whenever a Q is resolved, verify its conclusion does not contradict any already-resolved Q items. If a conflict is found, surface it immediately for user resolution.
 - Wait until **all Q items** are `Done` / `Cancel` / `Pending` before proceeding to Phase 3.
 
@@ -98,7 +98,7 @@ List every question that must be resolved before design can begin. Two categorie
 - **Req 理解確認** — Ambiguities or implicit assumptions in the Req that need alignment (scope, edge cases, terms)
 - **設計決策** — Questions that affect architecture, data model, caching strategy, API contract, or external integrations
 - For questions with multiple candidate solutions, provide a **comparison table** (approach, pros/cons, scope of change, risk)
-- Record the user's final decision as 結論 in the progress table
+- Record the user's final decision as 結論 **both within the specific Q item's description** (detailed) and in the progress table (concise, 1-2 sentences)
 
 ### 3. Design (Technical Specification)
 

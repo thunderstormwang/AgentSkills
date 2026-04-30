@@ -513,9 +513,89 @@ public async Task RemoveExpiredTemplateIdsAsync()
 
 | ID | 項目 | 引用 | 狀態 |
 | :--- | :--- | :--- | :--- |
-| T1 | TemplateElasticsearchDtoCache 新增 RemoveExpiredTemplateIdsAsync | D5 | Review |
-| T2 | AppierTemplateGroupCache 重構（建構子、TTL、ExistsAsync、RefreshAsync） | D1 | Review |
-| T3 | Startup.cs DI 注入確認 | D1 | Review |
-| T4 | RefreshAppierTemplateProductJob 瘦身 | D2 | Review |
-| T5 | RefreshTemplateCahceEventHandler 移除 IAppierApiService | D3 | Review |
-| T6 | RefreshTemplateCahceJob 改用 AddOrUpdateAsync + 清除邏輯 | D4 | Review |
+| T1 | TemplateElasticsearchDtoCache 新增 RemoveExpiredTemplateIdsAsync | D5 | Done |
+| T2 | AppierTemplateGroupCache 重構（建構子、TTL、ExistsAsync、RefreshAsync） | D1 | Done |
+| T3 | Startup.cs DI 注入確認 | D1 | Done |
+| T4 | RefreshAppierTemplateProductJob 瘦身 | D2 | Done |
+| T5 | RefreshTemplateCahceEventHandler 移除 IAppierApiService | D3 | Done |
+| T6 | RefreshTemplateCahceJob 改用 AddOrUpdateAsync + 清除邏輯 | D4 | Done |
+
+---
+
+---
+
+# PXBOX-26599 Phase 2 追加 — AppierTemplateGroupCache L1 MemoryCache 層
+
+---
+
+## Req — 需求分析
+
+### Objective
+
+在 `AppierTemplateGroupCache.GetRecommendProductAsync()` 內部新增一層 L1 MemoryCache，使熱路徑讀取不再每次觸及 Redis，降低 Redis 壓力。
+
+優先使用 L1 的條件：
+1. L1 尚未失效（TTL 內）
+2. 或 L1 已過 TTL，但 L2（Redis）的資料自上次載入後**未曾更新**（L2 不比 L1 新），此時沿用 L1 舊資料並延長 L1 TTL，不需替換內容
+
+---
+
+### Current State
+
+`GetRecommendProductAsync(templateGroupId, systemSourceType)` 目前邏輯：
+
+```
+讀 Redis String key → 反序列化 Dictionary<int, AppierProductDto> → 取 systemSourceType 對應值
+```
+
+每次呼叫皆直接讀 Redis，無任何 in-process 快取。
+
+---
+
+### Proposed Changes
+
+1. **Redis 值格式加入 `WrittenAt`**
+   - `SetRecommendProducts` 序列化時改為 `{ writtenAt, products }` wrapper，記錄 background job 最後寫入時間
+
+2. **L1 MemoryCache 層（版本感知）**
+   - L1 entry 儲存 `{ products, cachedAt }`，MemoryCache 本身 TTL 與 Redis 相同（2h，防止提前被 evict）
+   - 以 `_l1Ttl`（30s）手動判斷 L1 是否需要 re-validate
+   - `GetRecommendProductAsync` 讀取流程：
+     - `now - cachedAt < 30s` → 直接返回 L1，不碰 Redis
+     - 超過 30s → 讀 Redis，比較 `redis.WrittenAt` vs `l1.CachedAt`：
+       - Redis 未更新（`WrittenAt ≤ CachedAt`）→ 重置 `CachedAt`，返回 L1 舊資料
+       - Redis 有新資料（`WrittenAt > CachedAt`）→ 更新 L1，返回新資料
+       - Redis null → 清除 L1，返回 null
+
+3. **Thundering herd 防護**
+   - L1 miss/stale 時以 `ConcurrentDictionary<string, SemaphoreSlim>` per-key 鎖，防止多請求同時打 Redis
+
+---
+
+### Constraints
+
+- 不影響 `SetRecommendProducts` 的分批 pipeline 寫入邏輯
+- Redis 值格式有 breaking change（加 `writtenAt` wrapper）；部署後舊格式反序列化失敗時 fallback 為 null（最多 5 分鐘後 background job 重刷）
+- `SetRecommendProducts` 寫 Redis 後**不主動清 L1**，各 pod 的 L1 自然在 30s 內到期後更新
+
+---
+
+### Acceptance Criteria
+
+- `GetRecommendProductAsync` 在 L1 TTL（30s）內的連續呼叫不觸及 Redis
+- L1 過期且 Redis 自上次寫入後未更新時，返回資料不變，L1 TTL 自動延長
+- L1 過期且 Redis 有新資料時，L1 被刷新，返回新資料
+- Redis 為 null 時 L1 被清除，返回 null
+- 同一 key 同時到期的多個請求只有一個打 Redis（SemaphoreSlim 保護）
+
+---
+
+### Req 進度表
+
+| ID | 項目 | 狀態 |
+| :--- | :--- | :--- |
+| R1 | Objective | Review |
+| R2 | Current State | Review |
+| R3 | Proposed Changes | Review |
+| R4 | Constraints | Review |
+| R5 | Acceptance Criteria | Review |

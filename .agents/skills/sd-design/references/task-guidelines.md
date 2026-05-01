@@ -12,7 +12,7 @@ These guidelines apply strictly to **Phase 4 — Task** of the `sd-design-helper
     - **Storage:** Save to the `sql/` folder at the project root.
     - **Filename:** `PXBOX-{jira ticket no}.sql`.
     - **Ticket Number:** If the Jira ticket number is unknown, ask the user for confirmation.
-- **API Contract Changes:** Tasks for API changes MUST include a summary for frontend developers.
+- **API Contract Changes:** This is a **documentation-only task** (does not involve code changes). Its purpose is to provide a clear, **copy-pasteable summary** for frontend developers.
     - **Content:** Include API route, change type (Add/Edit/Delete), and specific field changes in Request/Response.
 
 ---

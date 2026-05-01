@@ -51,4 +51,4 @@ Each task must be detailed enough to be implemented without referring back to th
     - [Step 1: Specific logic/instruction]
     - [Step 2: Specific logic/instruction]
     - [Unit Test: Describe the test case to be added/updated]
-- **Affected Files:** (List up to 3 files)
+- **Affected Files:** (List all affected files, strictly max 3)

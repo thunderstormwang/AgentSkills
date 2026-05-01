@@ -107,7 +107,7 @@ List every question that must be resolved before design can begin. Two categorie
 
 Detail the **structural and behavioral definition** (the "What" and "Where"). Focus on contracts, boundaries, and high-level architecture.
 - **Impact Scope:** List existing Services or APIs affected by the changes.
-- **DB Schema:** Table/Column changes and **Index** adjustments.
+- **DB Schema:** Table/Column changes, **Index** adjustments, and **Data Migration / Initialization Strategy** (e.g., handling existing records when adding columns or refactoring/replacing tables).
 - **Entity / Domain:** **Entity field** changes and Domain Service interfaces.
 - **Contract:** **API Request/Response** structures and **Event Schemas**.
 - **Caching Strategy:** **Key naming conventions**, TTL, data structures, and Interface/Method definitions.

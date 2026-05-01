@@ -107,7 +107,7 @@ description: 專業的分析需求 (Req)、技術設計 (Design) 與細粒度任
 
 詳細定義**結構與行為**（即「什麼」與「在哪裡」）。專注於合約、邊界與高階架構。
 - **影響範圍 (Impact Scope)：** 列出哪些既有的 Service 或 API 有被異動到。
-- **資料庫綱要 (DB Schema)：** 資料表/欄位變更以及**索引 (Index)** 調整。
+- **資料庫綱要 (DB Schema)：** 資料表/欄位變更、**索引 (Index)** 調整，以及**資料搬移 / 初始值處理策略**（例如：新增欄位時既有資料的補值邏輯，或新舊表切換、重構時的資料搬移方案）。
 - **實體 / 領域 (Entity / Domain)：** **實體欄位**變更與領域服務 (Domain Service) 介面。
 - **合約 (Contract)：** **API 請求/回應 (Request/Response)** 結構與 **事件綱要 (Event Schemas)**。
 - **快取策略 (Caching Strategy)：** **鍵值命名規範 (Key naming conventions)**、TTL、資料結構以及介面/方法定義。

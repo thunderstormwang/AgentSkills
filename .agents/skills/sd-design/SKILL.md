@@ -151,7 +151,7 @@ Each section ends with its **own** progress table.
 - **Traditional Chinese:** Communicate and produce reports in Traditional Chinese.
 - **Incremental Logic:** Always prefer "Functionality First, Optimization Second" in task planning.
 - **Comparison tables & Recommendations:** For Q items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body, followed by a **recommended solution** and **rationale**, before recording the final conclusion.
-- **Conflict detection & self-correction:** Actively check for contradictions: (a) between Q conclusions within Pre Design Sync OR between a Q conclusion and the Req section — surface to user immediately; (b) between Design and Pre Design Sync — fix silently before notifying user; (c) between Task and Design — fix silently before notifying user.
+- **Conflict detection & self-correction:** Actively check for contradictions: (a) between Q conclusions within Pre Design Sync OR between a Q conclusion and the Req section — surface to user immediately; (b) between Design items, or between Design and Pre Design Sync — fix silently before notifying user; (c) between Task and Design — fix silently before notifying user.
 - **Verification:** Ensure each task has a clear validation path (e.g., Test API, Manual QA step).
 - **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).
 - **Progress Table is mandatory:** Each section ends with its own progress table.

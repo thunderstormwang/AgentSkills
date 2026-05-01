@@ -92,7 +92,7 @@ Clearly define the business context:
 - **Current State:** How does the system work now?
 - **Proposed Changes:** What specific changes are requested?
 - **Constraints:** System limitations or technical debt to consider.
-- **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled.
+- **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled. **MUST include Given / When / Then format.** **MUST include Given / When / Then format.**
 
 ### 2. Pre Design Sync (Questions)
 List every question that must be resolved before design can begin. Two categories:
@@ -106,11 +106,12 @@ List every question that must be resolved before design can begin. Two categorie
 > ⚠️ Only after all Pre Design Sync items are resolved.
 
 Detail the **structural and behavioral definition** (the "What" and "Where"). Focus on contracts, boundaries, and high-level architecture.
+- **Impact Scope:** List existing Services or APIs affected by the changes.
 - **DB Schema:** Table/Column changes and **Index** adjustments.
 - **Entity / Domain:** **Entity field** changes and Domain Service interfaces.
 - **Contract:** **API Request/Response** structures and **Event Schemas**.
 - **Caching Strategy:** **Key naming conventions**, TTL, data structures, and Interface/Method definitions.
-- **Core Logic Spec:** Description of **behavioral shifts** (e.g., priority logic between Mode A and Mode B, state transitions).
+- **Core Logic Spec:** Description of **behavioral shifts** (e.g., priority logic between Mode A and Mode B, state transitions). **Explicitly address Concurrency (e.g., potential Race Conditions) and Error Handling (e.g., rollback or compensation for external API failures).**
 - **Component Flow:** **Sequence of calls** between modules and side effects (e.g., "After saving, update Cache X then publish Event Y"). **Always provide diagrams (e.g., Mermaid sequence diagrams or flowcharts)** to visualize the flow instead of relying solely on text descriptions.
 
 ### 4. Task (Granular Implementation Tasks)

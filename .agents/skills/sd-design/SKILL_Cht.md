@@ -92,7 +92,7 @@ description: 專業的分析需求 (Req)、技術設計 (Design) 與細粒度任
 - **Current State (現況)：** 系統目前如何運作？
 - **Proposed Changes (預計變更)：** 要求進行哪些具體變更？
 - **Constraints (限制條件)：** 需考慮的系統限制或技術債。
-- **Acceptance Criteria (驗收標準)：** 需求被視為已完成必須滿足的條件。
+- **Acceptance Criteria (驗收標準)：** 需求被視為已完成必須滿足的條件。**必須包含 Given / When / Then 格式。**
 
 ### 2. 設計前同步 (Pre Design Sync)
 列出設計開始前必須解決的所有問題。分為兩類：
@@ -106,11 +106,12 @@ description: 專業的分析需求 (Req)、技術設計 (Design) 與細粒度任
 > ⚠️ 僅在所有 Pre Design Sync 項目皆已解決後進行。
 
 詳細定義**結構與行為**（即「什麼」與「在哪裡」）。專注於合約、邊界與高階架構。
+- **影響範圍 (Impact Scope)：** 列出哪些既有的 Service 或 API 有被異動到。
 - **資料庫綱要 (DB Schema)：** 資料表/欄位變更以及**索引 (Index)** 調整。
 - **實體 / 領域 (Entity / Domain)：** **實體欄位**變更與領域服務 (Domain Service) 介面。
 - **合約 (Contract)：** **API 請求/回應 (Request/Response)** 結構與 **事件綱要 (Event Schemas)**。
 - **快取策略 (Caching Strategy)：** **鍵值命名規範 (Key naming conventions)**、TTL、資料結構以及介面/方法定義。
-- **核心邏輯規範 (Core Logic Spec)：** 描述**行為轉變**（例如：模式 A 與模式 B 之間的優先級邏輯、狀態轉換）。
+- **核心邏輯規範 (Core Logic Spec)：** 描述**行為轉變**（例如：模式 A 與模式 B 之間的優先級邏輯、狀態轉換）。**強制考慮並說明：併發處理 (Concurrency)（如 Race Condition）與錯誤處理 (Error Handling)（如第三方 API 失敗的回滾或補償）。**
 - **組件流轉 (Component Flow)：** 模組間的**呼叫順序**與副作用（例如：「儲存後，更新快取 X 然後發布事件 Y」）。**務必提供圖表（例如：Mermaid 時序圖或流程圖）**來視覺化流程，而非僅依賴文字描述。
 
 ### 4. 任務拆解 (Task)

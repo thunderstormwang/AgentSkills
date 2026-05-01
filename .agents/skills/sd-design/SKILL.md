@@ -46,7 +46,7 @@ List **all questions** that need to be resolved before design can begin under a 
 | Q2 | [問題標題] |  | Todo |
 ```
 - As the user answers each Q: fill in 結論 both within the specific Q item's description in the body of the `## Pre Design Sync` section (detailed) and in the **Pre Design Sync 進度表** (concise, 1-2 sentences), and flip status to `Done` / `Cancel`.
-- **Conflict check:** Whenever a Q is resolved, verify its conclusion does not contradict any already-resolved Q items. If a conflict is found, surface it immediately for user resolution.
+- **Conflict check:** Whenever a Q is resolved, verify its conclusion does not contradict any already-resolved Q items or any content in the Req section. If a conflict is found, surface it immediately for user resolution.
 - Wait until **all Q items** are `Done` / `Cancel` / `Pending` before proceeding to Phase 3.
 
 ---
@@ -151,7 +151,7 @@ Each section ends with its **own** progress table.
 - **Traditional Chinese:** Communicate and produce reports in Traditional Chinese.
 - **Incremental Logic:** Always prefer "Functionality First, Optimization Second" in task planning.
 - **Comparison tables & Recommendations:** For Q items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body, followed by a **recommended solution** and **rationale**, before recording the final conclusion.
-- **Conflict detection & self-correction:** Actively check for contradictions: (a) between Q conclusions within Pre Design Sync — surface to user immediately; (b) between Design and Pre Design Sync — fix silently before notifying user; (c) between Task and Design — fix silently before notifying user.
+- **Conflict detection & self-correction:** Actively check for contradictions: (a) between Q conclusions within Pre Design Sync OR between a Q conclusion and the Req section — surface to user immediately; (b) between Design and Pre Design Sync — fix silently before notifying user; (c) between Task and Design — fix silently before notifying user.
 - **Verification:** Ensure each task has a clear validation path (e.g., Test API, Manual QA step).
 - **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).
 - **Progress Table is mandatory:** Each section ends with its own progress table.

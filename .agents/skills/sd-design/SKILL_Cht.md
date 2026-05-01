@@ -13,6 +13,8 @@ description: 專業的分析需求 (Req)、技術設計 (Design) 與細粒度任
 
 文件會分四個階段**增量產出**。每個階段都有**閘道 (Gate)**：只有在使用者明確確認目前階段完成後，才會開始下一個階段。
 
+**動態調整機制：** 此流程支援非線性回溯。若在後續階段發現缺漏或錯誤，AI 將協助溯源至先前的階段進行修正，並**遞歸地更新**所有受影響的下游項目，確保全文件一致性。
+
 ### 第一階段 — 需求分析 (Req)
 輸出 Req 區段。在區段末尾附上 **Req 進度表**，逐一列出每個子項目：
 ```markdown
@@ -46,7 +48,7 @@ description: 專業的分析需求 (Req)、技術設計 (Design) 與細粒度任
 | Q2 | [問題標題] |  | Todo |
 ```
 - 當使用者回答每個 Q 時：在 `## Pre Design Sync` 區段內該問題的描述中填寫詳細結論，並同步更新至 **Pre Design Sync 進度表**（簡短總結，1-2 句話），同時將狀態改為 `Done` / `Cancel`。
-- **衝突檢查：** 每當解決一個 Q 時，驗證其結論是否與已解決的其他 Q 項目或 Req 區段中的內容衝突。若發現衝突，請立即提出請使用者裁決。
+- **衝突檢查：** 每當解決一個 Q 時，驗證其結論是否與已解決的其他 Q 項目、Req 區段內容或先前的設計決策衝突。若發現衝突，請立即提出請使用者裁決。
 - 等待**所有 Q 項目**皆為 `Done` / `Cancel` / `Pending` 後，再進入第三階段。
 
 ---
@@ -80,7 +82,7 @@ description: 專業的分析需求 (Req)、技術設計 (Design) 與細粒度任
 | T1 | [Task 名稱] | D1 | Todo |
 | T2 | [Task 名稱] | D1, D2 | Todo |
 ```
-- **通知使用者前的自檢：** 在撰寫完任務清單後，驗證每個 Task 項目是否滿足設計要求，是否在表格及實作細節中正確引用了 Design ID，且不與任何設計決策衝突。靜默修正任何遺漏或不一致之處後再呈現結果。只有在通過自檢後才通知使用者。
+- **Self-check before notifying the user:** After drafting the Task list, verify that every Task item satisfies the Design requirements, correctly references the Design ID(s) in the table and implementation details, and does not contradict any Design decision. Fix any gaps or inconsistencies silently before presenting the result. Only notify the user once the self-check passes.
 
 ---
 
@@ -150,8 +152,11 @@ description: 專業的分析需求 (Req)、技術設計 (Design) 與細粒度任
 
 ## 準則 (Guidelines)
 - **繁體中文：** 以繁體中文進行溝通並產出報告。
+- **對話標頭 (Response Header)：** 在**每次對話的開頭**，提供簡短的狀態標示：`當前階段：[需求分析 | 設計前同步 | 技術設計 | 任務拆解]`。
 - **增量邏輯：** 在任務規劃中始終遵循「功能第一，優化第二」的原則。
 - **比較表與推薦：** 對於有多個候選方案的 Q 項目，務必在 Pre Design Sync 區段內包含比較表，隨後提供**推薦方案**與**理由**，最後再記錄最終結論。
+- **決策溯源與根因診斷 (Lineage & Root Cause Tracing)：** 當產出內容被質疑時，AI **必須提供決策依據（決策鏈）**（例如：`Task T1` <- `Design D1` <- `Sync Conclusion Q1` <- `Req R1`）。協助使用者找出最上游的「根因項目」進行修正。
+- **遞歸影響重評 (Recursive Impact Evaluation)：** 若任何較早階段 (Phase N) 的項目被修改，AI **必須自動遞歸重評**所有直接或間接引用該項目的下游內容 (>N)，將其狀態翻轉回 `Review` 或 `Todo`，並主動摘要變更影響。
 - **衝突偵測與自檢修正：** 主動檢查衝突：(a) Pre Design Sync 內的 Q 結論之間或 Q 結論與 Req 區段之間 — 立即向使用者反映； (b) Design 項目之間，或 Design 與 Pre Design Sync 之間 — 在通知使用者前靜默修正；(c) Task 與 Design 之間 — 在通知使用者前靜默修正。
 - **驗證：** 確保每個任務都有明確的驗證路徑（例如：測試 API、手動 QA 步驟）。
 - **精確性：** 使用準確的技術術語（例如：Entity、Repository、CacheRepo）。

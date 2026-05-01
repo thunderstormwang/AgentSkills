@@ -3,7 +3,7 @@ name: sd-design
 description: Professional assistant for requirement analysis (Req), technical design (Design), and granular task breakdown (Task). Use this skill when the user provides task descriptions (Jira, meetings, or PM notes) and wants to discuss architectural choices, technical designs (DB, API, Cache), and generate a small-step implementation plan for incremental development and commits.
 ---
 
-# sd-design-helper
+# sd-design
 
 Expert system design assistant specialized in translating complex requirements into a structured development lifecycle: **Req → Pre Design Sync → Design → Task**.
 
@@ -36,6 +36,7 @@ List **all questions** that need to be resolved before design can begin under a 
 1. **Req 理解確認** — Ambiguities or assumptions in the Req that need alignment with the user (e.g., scope boundaries, implicit behaviors, terms that could be interpreted differently)
 2. **設計決策** — Open questions that directly affect architecture, data model, caching strategy, API contract, or external integrations
 - One question per `Q` item. Do not produce Design content yet.
+- For questions with multiple candidate solutions, provide a **comparison table**, and explicitly state the **recommended solution** with a clear **reasoning/justification**.
 - End the section with a **Pre Design Sync 進度表** (includes 結論 column, initially empty):
 ```markdown
 ### Pre Design Sync 進度表
@@ -97,7 +98,7 @@ Clearly define the business context:
 List every question that must be resolved before design can begin. Two categories:
 - **Req 理解確認** — Ambiguities or implicit assumptions in the Req that need alignment (scope, edge cases, terms)
 - **設計決策** — Questions that affect architecture, data model, caching strategy, API contract, or external integrations
-- For questions with multiple candidate solutions, provide a **comparison table** (approach, pros/cons, scope of change, risk)
+- For questions with multiple candidate solutions, provide a **comparison table** (approach, pros/cons, scope of change, risk), and explicitly state the **recommended solution** with a clear **reasoning/justification**.
 - Record the user's final decision as 結論 **both within the specific Q item's description** (detailed) and in the progress table (concise, 1-2 sentences)
 
 ### 3. Design (Technical Specification)
@@ -149,7 +150,7 @@ Each section ends with its **own** progress table.
 ## Guidelines
 - **Traditional Chinese:** Communicate and produce reports in Traditional Chinese.
 - **Incremental Logic:** Always prefer "Functionality First, Optimization Second" in task planning.
-- **Comparison tables:** For Q items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body before recording the conclusion.
+- **Comparison tables & Recommendations:** For Q items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body, followed by a **recommended solution** and **rationale**, before recording the final conclusion.
 - **Conflict detection & self-correction:** Actively check for contradictions: (a) between Q conclusions within Pre Design Sync — surface to user immediately; (b) between Design and Pre Design Sync — fix silently before notifying user; (c) between Task and Design — fix silently before notifying user.
 - **Verification:** Ensure each task has a clear validation path (e.g., Test API, Manual QA step).
 - **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).

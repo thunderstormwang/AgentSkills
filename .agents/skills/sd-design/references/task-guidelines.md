@@ -23,9 +23,10 @@ When generating the Task list, always follow this order to facilitate parallel d
 
 1.  **DB Schema Changes**: Always prioritize SQL script generation.
 2.  **Entity / Domain Changes**: Core business logic and data structures.
-3.  **API Skeletons & Fields**: Define Request/Response models and Controller endpoints first (placeholder logic is allowed).
-4.  **API Summary**: Provide the frontend summary immediately after API contracts are defined.
-5.  **Functional Implementation**: Detailed logic and optimizations.
+3.  **API Skeletons & Fields**: Define Request/Response models and Controller endpoints first.
+4.  **API Summary**: Provide the frontend summary immediately after API contracts are defined (Documentation-only task).
+5.  **Verification Task (Test Task)**: Create independent test tasks for entry points. Interfaces are now defined; write tests first to define expected behavior (Fail-First).
+6.  **Functional Implementation**: Detailed logic and optimizations, developed until tests pass.
 
 ---
 
@@ -33,22 +34,24 @@ When generating the Task list, always follow this order to facilitate parallel d
 
 Each task must be detailed enough to be implemented without referring back to the Design section. It MUST include:
 
-- **Reference:** The Design ID(s) this task implements (e.g., `[Ref: D1]`).
+- **Reference:** The Design ID(s) this task implements.
 - **Target Project:** The name of the project/assembly.
-- **Component:** Specific Class name (e.g., Handler, Controller, Service).
+- **Component:** Specific Class name.
 - **Methods:** Names of the methods to be created or modified.
 - **Logic Details:** Step-by-step logic, code patterns, or specific validation rules.
-- **Unit Tests:** Description of the test cases to be added or updated.
+- **Test File (DoD - Test Tasks Only):** MUST specify the physical test file path (e.g., `src/Project.Test/xxxTest.cs`).
 
 ---
 
 ## Format Example
 
 ### T1: [Task Name]
-- **Reference:** `[D1]`
-- **Target:** `[Project Name]` -> `[Class Name]` -> `[Method Name]`
-- **Implementation Details:**
-    - [Step 1: Specific logic/instruction]
-    - [Step 2: Specific logic/instruction]
-    - [Unit Test: Describe the test case to be added/updated]
+... (omitted) ...
 - **Affected Files:** (List all affected files, strictly max 3)
+
+### T5: Test — [Feature Name] Entry Point Test
+- **Reference:** `[D3]`
+- **Test Target:** `[Class Name]`
+- **Implementation Details:** Implement API-level integration test covering [Given/When/Then] scenarios. This task aims to produce a failing test to define logical boundaries.
+- **Test File (DoD):** `src/PXBox.Spu.Test/Handlers/XxxHandlerTest.cs`
+- **Affected Files:** (Test-related files only, strictly max 3)

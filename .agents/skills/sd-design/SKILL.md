@@ -154,6 +154,10 @@ Each section ends with its **own** progress table.
 - **Traditional Chinese:** Communicate and produce reports in Traditional Chinese.
 - **Response Header:** At the start of **every response**, provide a brief status indicator: `Current Phase: [Req | Pre Design Sync | Design | Task]`.
 - **Incremental Logic:** Always prefer "Functionality First, Optimization Second" in task planning.
+- **Independent Test Task:**
+    - **Position**: MUST be placed after API Summary and before Functional Implementation.
+    - **Test-First**: For any entry point logic change, an independent `Test` task MUST be created. During execution, a failing test MUST be produced first to define logical boundaries.
+    - **Physical Path**: The task description MUST include the "Test File Path", otherwise it cannot be marked as Done.
 - **Comparison tables & Recommendations:** For Q items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body, followed by a **recommended solution** and **rationale**, before recording the final conclusion.
 - **Decision Lineage & Root Cause Tracing:** If a proposal is questioned, AI MUST explain the lineage (e.g., `Task T1` <- `Design D1` <- `Sync Conclusion Q1` <- `Req R1`). Help identify the earliest upstream point for correction.
 - **Recursive Modification Impact:** If an item in Phase N is modified, automatically re-evaluate and reset status of all dependent items in Phases > N to `Review` or `Todo`. Summarize these changes for the user.

@@ -14,11 +14,11 @@ tools:
 當接收到一組 Task ID 與計畫文件時，你必須：
 
 1. **理解計畫**：閱讀指定的計畫文件及相關的技術設計（Design）章節，以理解所分配任務的技術需求。
-2. **透過 implementation-v2 執行**：使用 `activate_skill("implementation-v2")` 工具進行實作。該技能已配置為：
-    - 強制執行本地編碼規範（透過 `coding-style-v2`）。
+2. **透過 implementation 執行**：使用 `activate_skill("implementation")` 工具進行實作。該技能已配置為：
+    - 強制執行本地編碼規範（透過 `coding-style`）。
     - 進行精確的程式碼變更。
     - 驗證變更。
-    - 為每個任務建立 git commit（透過 `git-commit-v2`）。
+    - 為每個任務建立 git commit（透過 `git-commit`）。
     - 更新計畫中的任務狀態。
 3. **處理依賴關係**：確保任務按照計畫中指定的邏輯順序執行。
 4. **自主解決問題**：如果在實作過程中發生編譯錯誤或測試失敗，在回報前嘗試在自己的對話迴圈中進行診斷與修復。

@@ -27,8 +27,6 @@ For each assigned Task ID, the skill MUST follow this sequence:
     - STOP ALL subsequent tasks and notify the user immediately if:
         - A build error persists after a repair attempt.
         - The plan refers to files, classes, or methods that do not exist in the codebase.
-        - New dependencies are required but not authorized in the plan.
-        - A single Task affects more than 9 files (Atomic design safety threshold).
 5. **Atomic Commit (Finalize)**:
     - **Status Finalization**: Update the Task status in the plan from `InProgress` to `Review`.
     - **Single Commit**: Stage both the **Code Changes** and the **Plan Update** (Status: Review).

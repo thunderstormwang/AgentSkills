@@ -35,9 +35,15 @@ For each identified `Todo` task, perform the following actions in sequence:
 - Update the status of the task in the plan file to `Review`.
 - Modify only the Status column.
 
-### 3. Final Report
-Once all `Todo` tasks are processed (or an unrecoverable error is encountered):
-- Compile a summary list of the batch execution results.
+### 3. Iterative Workflow & Acceptance
+- **No Autonomous Acceptance**: The agent MUST NOT mark tasks as `Done` autonomously.
+- **User Confirmation**: Upon receiving user instruction (e.g., "T1-T5 are good, proceed with T6-T10"):
+    1.  Update the status of the reviewed tasks to `Done`.
+    2.  Automatically scan for the next batch of `Todo` tasks and repeat the **Main Execution Loop**.
+
+### 4. Final Report
+Once all `Todo` tasks in a batch are processed (or an unrecoverable error is encountered):
+- Compile a summary list of the execution results.
 - List the Commit SHA and affected files for each task.
 - Request the user to perform a final review and mark tasks as `Done`.
 

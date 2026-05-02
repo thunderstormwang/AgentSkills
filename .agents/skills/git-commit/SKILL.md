@@ -53,34 +53,40 @@ Trailers are key-value pairs placed at the end of the commit message footer (aft
   - Should follow the Conventional Commits specification
 
 ## Instructions
-1. Analyze the changes to determine the primary `type`.
-2. Identify the `scope` if applicable (e.g., specific component or file).
-3. Write a concise `description` in **Traditional Chinese** using imperative mood (e.g., "新增功能" not "已新增功能"). The `type` and `scope` remain in English.
-4. **Jira ticket number handling:**
-   - If the user provides a number (e.g., `26739`), append `#26739` at the end of the header.
-   - If no Jira ticket number is provided, **ask the user for it before proceeding**.
-   - If the user explicitly says this commit does not need a Jira ticket, omit it.
-5. **Compose the header (required):** Single line following `<type>[optional scope]: <description> #<jira ticket no>` format.
-6. **Compose the body (optional):** If more context is needed:
-   - Add up to 3 lines of explanation
-   - Each line should be concise and meaningful
-   - Omit if the header sufficiently describes the change
-7. **Breaking Changes Detection:**
-   - Detect if changes involve:
-     * API signature removal or modification
-     * Database schema breaking changes
-     * Dependency major version upgrade
-     * Configuration format changes
-     * Public method/property removal
-   - If breaking changes detected, suggest adding `BREAKING CHANGE:` footer
-   - Offer user confirmation before inclusion
-8. **Handle trailers:**
-   - If breaking changes exist, add `BREAKING CHANGE: <description>` footer (see Trailers section)
-   - Always append `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` trailer to all commits
-9. **Always show the proposed commit message to the user for approval BEFORE executing the git commit command. Do NOT run git commit until the user explicitly confirms.**
-   - This rule applies unconditionally — even if the user says "commit", "幫我 commit", "commit 吧", or any other direct commit instruction.
-   - The required flow is always: **propose message → wait for confirmation → then commit**.
-   - Never skip the confirmation step, regardless of how direct the user's instruction is.
+
+AI must follow this **Dual-Source Synthesis Flow** to generate the commit message:
+
+1.  **Verify Physical Changes (Source of Truth)**: ALWAYS run `git status` and `git diff` first. This establishes the absolute reality of what changed (files, methods, logic).
+2.  **Contextualize Intent**: Refer to recent conversations or planned tasks (e.g., T[x]) to understand "Why" these changes were made.
+3.  **Analyze the changes to determine the primary `type`**: Based on the synthesis of intent and diff.
+4.  **Identify the `scope` if applicable** (e.g., specific component or file).
+5.  **Write a concise `description` in Traditional Chinese** using imperative mood (e.g., "新增功能" not "已新增功能"). The `type` and `scope` remain in English.
+6.  **Jira ticket number handling**:
+    - If the user provides a number (e.g., `26739`), append `#26739` at the end of the header.
+    - If no Jira ticket number is provided, **ask the user for it before proceeding**.
+    - If the user explicitly says this commit does not need a Jira ticket, omit it.
+7.  **Compose the header (required)**: Single line following `<type>[optional scope]: <description> #<jira ticket no>` format. The header should reflect the primary intent.
+8.  **Compose the body (optional)**:
+    - **Synthesis Rule**: The body MUST accurately describe the physical changes found in `git diff`.
+    - If `git diff` contains logic or refinements NOT mentioned in the conversation/task, AI MUST technically summarize these additional changes in the body.
+    - **Prohibition**: NEVER output a message that purely follows the task description but contradicts the actual `git diff`.
+    - Maximum of 3 lines. Each line should be concise and meaningful.
+9.  **Breaking Changes Detection**:
+    - Detect if changes involve:
+        * API signature removal or modification
+        * Database schema breaking changes
+        * Dependency major version upgrade
+        * Configuration format changes
+        * Public method/property removal
+    - If breaking changes detected, suggest adding `BREAKING CHANGE:` footer
+    - Offer user confirmation before inclusion
+10. **Handle trailers**:
+    - If breaking changes exist, add `BREAKING CHANGE: <description>` footer (see Trailers section)
+    - Always append `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` trailer to all commits
+11. **Always show the proposed commit message to the user for approval BEFORE executing the git commit command. Do NOT run git commit until the user explicitly confirms.**
+    - This rule applies unconditionally — even if the user says "commit", "幫我 commit", "commit 吧", or any other direct commit instruction.
+    - The required flow is always: **propose message → wait for confirmation → then commit**.
+    - Never skip the confirmation step, regardless of how direct the user's instruction is.
 
 ## Examples
 

@@ -1,0 +1,45 @@
+{
+  "skill_name": "git-commit",
+  "evals": [
+    {
+      "id": 0,
+      "name": "zero-context-db-and-perf",
+      "prompt": "幫我 commit",
+      "expected_output": "AI must detect DB field addition and loop optimization purely from git diff.",
+      "files": [
+        {
+          "path": "sql/PXBOX-12345.sql",
+          "content": "ALTER TABLE products ADD COLUMN brand_id INT;"
+        },
+        {
+          "path": "src/Service.cs",
+          "content": "// Optimized loop logic\nforeach(var item in items.AsSpan()) { ... }"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "zero-context-refactor",
+      "prompt": "幫我 commit",
+      "expected_output": "AI must detect MemoryCache refactor purely from git diff.",
+      "files": [
+        {
+          "path": "src/Handler.cs",
+          "content": "- private Dictionary<string, object> _cache;\n+ private IMemoryCache _cache;"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "zero-context-breaking-change",
+      "prompt": "幫我 commit",
+      "expected_output": "AI must detect public field removal and flag as BREAKING CHANGE purely from git diff.",
+      "files": [
+        {
+          "path": "src/Dto.cs",
+          "content": "- public string OldField { get; set; }"
+        }
+      ]
+    }
+  ]
+}

@@ -5,36 +5,37 @@ description: Executes specific implementation tasks defined in a plan document (
 
 # implementation
 
-A specialized skill for executing development tasks derived from a structured plan. It focuses on reliable implementation, validation, and maintaining the plan's progress.
+A specialized engine for the autonomous execution of development tasks. It transforms high-level plan items into verified code changes with atomic commits.
 
-## Workflow
+## Workflow (The Atomic Execution Loop)
 
-1. **Task Identification**: Only execute the specific Task IDs (e.g., T1, T2) explicitly requested by the user.
-2. **Impact Assessment**:
-    *   Check how many files will be modified by the requested tasks.
-    *   If the total number of affected files exceeds **9**, you MUST ask the user for confirmation before proceeding, explaining that this is to avoid overly large commits and difficult reviews.
-3. **Implementation & Validation**:
-    *   Apply code changes as described in the task's "Implementation Details".
-    *   **Stability**: Ensure the system is in a buildable state. **No Build Errors** are allowed.
-    *   **Verification**: Run relevant unit tests or verification steps if specified.
-4. **Automatic Commit**:
-    *   After successful implementation and validation, perform a git commit immediately.
-    *   **Commit Message**: Follow the Conventional Commits format as specified in the `git-commit` skill.
-    *   **Authorization**: Perform the commit **without asking for further permission** as the user has pre-authorized this workflow.
-5. **Status Update**:
-    *   Update the "Status" column in the **Task progress table** (located under the `## Task` section, usually titled `### Task 進度表`) of the plan document to `Review`.
-    *   **Status Definitions**:
-        | Status | Description |
-        | :--- | :--- |
-        | `Todo` | Not yet started |
-        | `InProgress` | Currently being implemented |
-        | `Review` | Implementation complete and committed; waiting for user review |
-        | `Done` | User confirmed and task is complete |
-    *   **Strict Constraint**: You are only allowed to modify the "Status" values. Any other modifications to the plan content require explicit user consent.
-6. **Reporting**: Inform the user that the task(s) are completed and committed.
+For each assigned Task ID, the skill MUST follow this strict sequence:
+
+1. **Context Initialization**:
+    - Identify the target files and technology stack (e.g., C#, Python, TypeScript).
+    - **Auto-Style Injection**: Immediately call `activate_skill("coding-style")` to load relevant standards for the detected stack. DO NOT skip this step.
+2. **Implementation (Act)**:
+    - Apply surgical code changes strictly following the "Implementation Details" and "Approach" in the plan.
+    - Maintain architectural integrity as defined in the loaded coding styles.
+3. **Verification (Validate)**:
+    - **Build Check**: Execute the project's build command (e.g., `dotnet build`, `npm run build`). The system MUST be in a buildable state.
+    - **Test Check**: Run specific unit tests or verification scripts mentioned in the plan.
+    - **Self-Correction**: If validation fails, attempt to diagnose and fix the error within the current loop.
+4. **Halt Condition (Fail-Safe)**:
+    - STOP ALL subsequent tasks and notify the user immediately if:
+        - A build error persists after a repair attempt.
+        - A critical logic contradiction is discovered in the plan.
+        - A single Task affects more than 9 files (Safety threshold for atomic design).
+5. **Atomic Commit (Finalize)**:
+    - Perform a git commit **only after** successful validation.
+    - **Dual-Source Synthesis**: Call `git-commit` to generate a message that synthesizes the **Plan Intent** (from the task description) with the **Physical Reality** (from `git diff`).
+    - **Authorization**: Execute the commit without further confirmation (Pre-authorized by the agent workflow).
+6. **Progress Tracking**:
+    - Update the "Status" column in the plan's task table to `Review`.
+    - If it's the first task in a batch, you may set it to `InProgress` during execution.
 
 ## Guidelines
 - **Traditional Chinese**: Communicate with the user in Traditional Chinese.
-- **Precision**: Adhere strictly to the "Implementation Details" provided in the task.
-- **Coding Style**: If the task involves implementing or modifying code, you **MUST** first call `activate_skill("coding-style")` to load the mandatory coding standards and architectural patterns for the relevant programming language(s).
-- **Failure Handling**: If a task cannot be completed due to technical constraints or logic contradictions, stop immediately and report the issue to the user. Do not attempt to guess or bypass errors.
+- **Atomicity**: One Task ID = One Commit. Never combine multiple tasks into a single commit.
+- **Dependency Awareness**: Tasks must be executed in the order defined in the plan to respect logical dependencies.
+- **Minimal Intervention**: Aim for full autonomy; only request user intervention when the Fail-Safe conditions are met.

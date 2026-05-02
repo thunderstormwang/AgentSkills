@@ -74,15 +74,15 @@ Append the `## Design` section after `## Pre Design Sync`. **Do NOT modify or re
 > **Gate:** Phase 3 must be fully confirmed before starting Phase 4.
 
 Append the `## Task` section after `## Design`. **Do NOT modify prior sections.**
-- End the Task section with a **Task 進度表** (which includes a **Reference** column):
+- End the Task section with a **Task 進度表** (which includes **Reference** and **Dependency** columns):
 ```markdown
 ### Task 進度表
-| ID | 項目 | 引用 | 狀態 |
-| :--- | :--- | :--- | :--- |
-| T1 | [Task 名稱] | D1 | Todo |
-| T2 | [Task 名稱] | D1, D2 | Todo |
+| ID | 項目 | 引用 | 依賴 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| T1 | [Task 名稱] | D1 | None | Todo |
+| T2 | [Task 名稱] | D1, D2 | T1 | Todo |
 ```
-- **Self-check before notifying the user:** After drafting the Task list, verify that every Task item satisfies the Design requirements, correctly references the Design ID(s) in the table and implementation details, and does not contradict any Design decision. Fix any gaps or inconsistencies silently before presenting the result. Only notify the user once the self-check passes.
+- **Self-check before notifying the user:** After drafting the Task list, verify that every Task item satisfies the Design requirements, correctly references the Design ID(s) in the table and implementation details, correctly lists dependencies, and does not contradict any Design decision. Fix any gaps or inconsistencies silently before presenting the result. Only notify the user once the self-check passes.
 
 ---
 
@@ -146,7 +146,7 @@ Each section ends with its **own** progress table.
 > - R items: Req sub-items (Objective / Current State / Proposed Changes / Acceptance Criteria / Constraints). Initial status `Review`.
 > - Q items: no prefix, just the question title. Initial status `Todo`.
 > - D items: no prefix, just the sub-section name. Initial status `Review`.
-> - T items: no prefix, just the task name. Initial status `Todo`.
+> - T items: no prefix, just the task name. Initial status `Todo`. Should include **Dependency** (e.g., `T1`) if applicable.
 
 ---
 

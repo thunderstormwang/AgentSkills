@@ -74,15 +74,15 @@ description: 專業的分析需求 (Req)、技術設計 (Design) 與細粒度任
 > **閘道：** 第三階段必須完全確認後才能開始第四階段。
 
 在 `## Design` 之後附加 `## Task` 區段。**請勿修改前面的區段。**
-- 在 Task 區段末尾附上 **Task 進度表**（包含 **Reference (引用)** 欄位）：
+- 在 Task 區段末尾附上 **Task 進度表**（包含 **Reference (引用)** 與 **依賴 (Dependency)** 欄位）：
 ```markdown
 ### Task 進度表
-| ID | 項目 | 引用 | 狀態 |
-| :--- | :--- | :--- | :--- |
-| T1 | [Task 名稱] | D1 | Todo |
-| T2 | [Task 名稱] | D1, D2 | Todo |
+| ID | 項目 | 引用 | 依賴 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| T1 | [Task 名稱] | D1 | 無 | Todo |
+| T2 | [Task 名稱] | D1, D2 | T1 | Todo |
 ```
-- **Self-check before notifying the user:** After drafting the Task list, verify that every Task item satisfies the Design requirements, correctly references the Design ID(s) in the table and implementation details, and does not contradict any Design decision. Fix any gaps or inconsistencies silently before presenting the result. Only notify the user once the self-check passes.
+- **通知使用者前的自檢：** 在撰寫完任務清單後，驗證每個 Task 項目是否滿足設計要求，是否在表格及實作細節中正確引用了 Design ID，是否正確列出依賴關係，且不與任何設計決策衝突。靜默修正任何遺漏或不一致之處後再呈現結果。只有在通過自檢後才通知使用者。
 
 ---
 
@@ -146,7 +146,7 @@ description: 專業的分析需求 (Req)、技術設計 (Design) 與細粒度任
 > - R 項目：Req 子項目（目標 / 現況 / 預計變更 / 驗收標準 / 限制條件）。初始狀態為 `Review`。
 > - Q 項目：無前綴，僅顯示問題標題。初始狀態為 `Todo`。
 > - D 項目：無前綴，僅顯示子區段名稱。初始狀態為 `Review`。
-> - T 項目：無前綴，僅顯示任務名稱。初始狀態為 `Todo`。
+> - T 項目：無前綴，僅顯示任務名稱。初始狀態為 `Todo`。應包含**依賴** (例如：`T1`) 若適用。
 
 ---
 

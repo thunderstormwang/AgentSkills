@@ -35,6 +35,7 @@ When generating the Task list, always follow this order to facilitate parallel d
 Each task must be detailed enough to be implemented without referring back to the Design section. It MUST include:
 
 - **Reference:** The Design ID(s) this task implements.
+- **Dependency (Mandatory):** List the Task ID(s) that must be completed before this task (e.g., `[Dep: T1, T2]`). Use `None` if there are no dependencies.
 - **Target Project:** The name of the project/assembly.
 - **Component:** Specific Class name.
 - **Methods:** Names of the methods to be created or modified.
@@ -46,11 +47,17 @@ Each task must be detailed enough to be implemented without referring back to th
 ## Format Example
 
 ### T1: [Task Name]
-... (omitted) ...
+- **Reference:** `[D1]`
+- **Dependency:** `None`
+- **Target:** `[Project Name]` -> `[Class Name]` -> `[Method Name]`
+- **Implementation Details:**
+    - [Step 1: Specific logic/instruction]
+    - [Step 2: Specific logic/instruction]
 - **Affected Files:** (List all affected files, strictly max 3)
 
 ### T5: Test — [Feature Name] Entry Point Test
 - **Reference:** `[D3]`
+- **Dependency:** `T1, T2`
 - **Test Target:** `[Class Name]`
 - **Implementation Details:** Implement API-level integration test covering [Given/When/Then] scenarios. This task aims to produce a failing test to define logical boundaries.
 - **Test File (DoD):** `src/PXBox.Spu.Test/Handlers/XxxHandlerTest.cs`

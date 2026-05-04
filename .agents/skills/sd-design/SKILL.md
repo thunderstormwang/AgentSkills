@@ -57,6 +57,11 @@ List **all questions** that need to be resolved before design can begin under a 
 > **Gate:** Phase 2 must be fully resolved before starting Phase 3.
 
 Append the `## Design` section after `## Pre Design Sync`. **Do NOT modify or remove** the Pre Design Sync section.
+
+**Code Snippet Boundary (strictly enforced):**
+- ✅ **Allowed in Design:** field declarations, method signatures (interface or public method), event schema shape — anything that expresses *what the contract is*, not how it works.
+- ❌ **Not allowed in Design:** method bodies, SQL queries, mapping/assembly logic, or any implementation detail. These belong exclusively in Task.
+
 - End the Design section with a **Design 進度表**:
 ```markdown
 ### Design 進度表
@@ -108,6 +113,10 @@ List every question that must be resolved before design can begin. Two categorie
 > ⚠️ Only after all Pre Design Sync items are resolved.
 
 Detail the **structural and behavioral definition** (the "What" and "Where"). Focus on contracts, boundaries, and high-level architecture.
+
+> **Code Snippet Rule — Contract only, no implementation:**
+> - ✅ Use snippets for: field declarations (`public int Foo { get; set; }`), method signatures (`Task<Dto> GetXxxAsync(int id);`), event schema shape.
+> - ❌ Do NOT include: method bodies, SQL queries, mapping logic, or any "how it works" code. Those belong in Task.
 - **Impact Scope:** List existing Services or APIs affected by the changes.
 - **DB Schema:** Table/Column changes, **Index** adjustments, and **Data Migration / Initialization Strategy** (e.g., handling existing records when adding columns or refactoring/replacing tables).
 - **Entity / Domain:** **Entity field** changes and Domain Service interfaces.

@@ -8,6 +8,7 @@ These guidelines apply strictly to **Phase 4 — Task** of the `sd-design-helper
 
 - **Logical Commit Granularity:** Each task should ideally correspond to one logical commit.
 - **File Limit:** Each task should not target more than **3 files** to ensure clarity and maintainability.
+- **Implementation Code Belongs Here:** All method bodies, SQL queries, mapping/assembly logic, and other implementation details MUST appear in Task, not in Design. Design only expresses contracts (field declarations, method signatures).
 - **DB Schema Changes:** Tasks for DB changes MUST involve generating a SQL script.
     - **Storage:** Save to the `sql/` folder at the project root.
     - **Filename:** `PXBOX-{jira ticket no}.sql`.

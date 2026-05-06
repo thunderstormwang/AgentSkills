@@ -16,6 +16,13 @@
 對於 Windows:
 > 將全域路徑 $HOME\.gemini\gemini.md 建立一個軟連結到當前 Repo 的 GEMINI.md。  
 
+然後生出類似以下語法，但可能因為權限問題，需要手動在管理者模式的 power shell 下執行:  
+> New-Item -ItemType SymbolicLink -Path "{$home}\.copilot\copilot-instructions.md" -Value "{RepoPath}\AgentSkills\.github\copilot-instructions.md"
+
+> New-Item -ItemType SymbolicLink -Path "{$home}\.gemini\GEMINI.md" -Value "{RepoPath}\GitRepositories\AgentSkills\GEMINI.md"
+
+> New-Item -ItemType SymbolicLink -Path "{$home}\.claude\CLAUDE.md" -Value  "{RepoPath}\GitRepositories\AgentSkills\CLAUDE.md"
+
 ## 參考資料
 
 參考 Repo

@@ -37,3 +37,8 @@ Ask the user where to save the plan file if no path is specified.
 2. If not approved, revise until approved.
 3. Implement the plan step by step.
 4. After all steps are complete, **commit the changes**.
+
+## Git Commit
+
+- **Always** use the `git-commit` skill when committing.
+- **Never** run `git commit` directly via Bash.

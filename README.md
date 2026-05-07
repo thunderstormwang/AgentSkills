@@ -11,7 +11,9 @@
 ## 將 Repo 內的 instruction 放到全域
 
 對於 Mac Book Pro(macOS):  
-> 請幫我建立一個軟連結(Symbolic Link)，將全域設定檔 ~/.gemini/gemini.md 連結到目前目錄的 GEMINI.md。
+> 請幫我建立一個軟連結(Symbolic Link)，將全域設定檔 ~/.gemini/gemini.md 指向目前目錄的 GEMINI.md。
+
+> 建立軟連結，讓全域 ~/.copilot/copilot-instructions.md 指向 目前 repo 的 .github/copilot-instructions.md
 
 對於 Windows:
 > 將全域路徑 $HOME\.gemini\gemini.md 建立一個軟連結到當前 Repo 的 GEMINI.md。  

@@ -35,3 +35,8 @@ Each plan item must include:
 2. If not approved, revise the plan until it is approved
 3. After approval, implement the plan step by step
 4. After completing all steps, **commit**
+
+## Git Commit
+
+- **Always** use the `git-commit` skill when committing.
+- **Never** run `git commit` directly via Bash.

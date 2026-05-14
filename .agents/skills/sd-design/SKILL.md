@@ -34,6 +34,7 @@ Wait for user to confirm all R items (`Done`) before proceeding to Phase 2.
 
 ### Phase 2 — Pre Design Sync
 > **Gate:** Phase 1 must be Done before starting Phase 2.
+> **Note:** TIA in Req is reference-level. Re-read the actual code when formulating design questions — do not assume TIA is complete or accurate at the file/method level.
 
 List **all questions** that need to be resolved before design can begin under a `## Pre Design Sync` section. Questions fall into two categories:
 1. **Req 理解確認** — Ambiguities or assumptions in the Req that need alignment with the user (e.g., scope boundaries, implicit behaviors, terms that could be interpreted differently)
@@ -56,6 +57,7 @@ List **all questions** that need to be resolved before design can begin under a 
 
 ### Phase 3 — Design
 > **Gate:** Phase 2 must be fully resolved before starting Phase 3.
+> **Note:** Do not rely solely on TIA for scope. Re-read the actual code for each TIA area before specifying the design — TIA only identifies logical areas, not the full detail of what needs to change.
 
 Append the `## Design` section after `## Pre Design Sync`. **Do NOT modify or remove** the Pre Design Sync section.
 
@@ -118,11 +120,13 @@ Clearly define the business context:
   4. **Data precision / format specs** — non-functional requirements that affect field type design
   - Do NOT include: which class implements something (belongs in TIA), factual statements about current state (belongs in Current State), or implementation details like handler names
 
-- **Technical Impact Analysis:** Component-level impact list scoped to the services in this SD. For each affected component:
-  - **現行:** Brief description of what the component currently does (relevant to the change)
-  - **調整:** Brief description of what will change
-  - **路徑:** File path
-  - This is the correct place for class names, method names, and field names. Exclude out-of-scope components explicitly.
+- **Technical Impact Analysis:** A logical-area impact map that helps reviewers understand the scope of change. Generation process:
+  1. **Read the code first** — browse the relevant parts of the codebase to identify what logical areas actually exist; do not infer areas without reading
+  2. **Group by logical area** — cluster related components into coherent groups (e.g., "活動建立/編輯", "折扣計算"); each group = one TIA entry
+  3. **Cross-check with Proposed Changes** — verify every proposed change maps to at least one TIA area; surface any uncovered area
+  4. **List 1~2 representative files per area** as path hints for implementers
+  - Each entry: one sentence for 現行 (current behavior), one sentence for 調整 (what changes), and representative 路徑
+  - ⚠️ **TIA is reference-level, not definitive.** Pre Design Sync and Design phases must re-read the actual code — do not treat TIA as a complete or authoritative spec
 
 - **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled. **MUST include Given / When / Then format.**
 

@@ -25,7 +25,8 @@ Output the Req section. End the section with a **Req 進度表** listing each su
 | R2 | Current State | Review |
 | R3 | Proposed Changes | Review |
 | R4 | Constraints | Review |
-| R5 | Acceptance Criteria | Review |
+| R5 | Technical Impact Analysis | Review |
+| R6 | Acceptance Criteria | Review |
 ```
 Wait for user to confirm all R items (`Done`) before proceeding to Phase 2.
 
@@ -95,10 +96,34 @@ Append the `## Task` section after `## Design`. **Do NOT modify prior sections.*
 
 ### 1. Req (Requirement Analysis)
 Clearly define the business context:
+
 - **Objective:** What is the primary goal?
-- **Current State:** How does the system work now?
-- **Proposed Changes:** What specific changes are requested?
-- **Constraints:** System limitations or technical debt to consider.
+
+- **Current State:** Describe what the system **can do today**, in functional/capability language. Rules:
+  - Written at a level readable by PM and non-engineers — no class names, method names, or internal field references
+  - Every statement is a **confirmed fact** about the current system — no "pending", "to be decided", or future-oriented language
+  - Component-level details (which class does what) belong in Technical Impact Analysis, not here
+  - May include a reference link to a detailed existing-state analysis document (e.g., `[analysis.md](analysis.md)`)
+
+- **Proposed Changes:** Describe what **new capabilities will be added** or what **behaviors will change**. Rules:
+  - Written in functional/capability language, readable by PM — focus on "what the system will do", not "which component will change"
+  - Pending items (e.g., "⚠️ 待 PM 確認") are acceptable here, since this describes the target state
+  - Component-level change details belong in Technical Impact Analysis, not here
+  - May include a reference link to a detailed new-feature design document
+
+- **Constraints:** Fixed conditions the design must respect, decided **before** the Design phase begins. Four sources:
+  1. **Immutable existing behaviors** — things that cannot change without breaking downstream
+  2. **Scope exclusions** — items explicitly out of this SD's scope; describe by functionality, not by class name
+  3. **Pre-decided design choices** — decisions already made (e.g., reuse an existing field instead of adding a new one); when a technical detail IS the constraint itself (e.g., a specific field name or convention), keep it
+  4. **Data precision / format specs** — non-functional requirements that affect field type design
+  - Do NOT include: which class implements something (belongs in TIA), factual statements about current state (belongs in Current State), or implementation details like handler names
+
+- **Technical Impact Analysis:** Component-level impact list scoped to the services in this SD. For each affected component:
+  - **現行:** Brief description of what the component currently does (relevant to the change)
+  - **調整:** Brief description of what will change
+  - **路徑:** File path
+  - This is the correct place for class names, method names, and field names. Exclude out-of-scope components explicitly.
+
 - **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled. **MUST include Given / When / Then format.**
 
 ### 2. Pre Design Sync (Questions)
@@ -152,7 +177,7 @@ Refer to `references/task-guidelines.md` for specific implementation rules, incl
 
 Each section ends with its **own** progress table.
 
-> - R items: Req sub-items (Objective / Current State / Proposed Changes / Acceptance Criteria / Constraints). Initial status `Review`.
+> - R items: Req sub-items (Objective / Current State / Proposed Changes / Constraints / Technical Impact Analysis / Acceptance Criteria). Initial status `Review`.
 > - Q items: no prefix, just the question title. Initial status `Todo`.
 > - D items: no prefix, just the sub-section name. Initial status `Review`.
 > - T items: no prefix, just the task name. Initial status `Todo`. Should include **Dependency** (e.g., `T1`) if applicable.

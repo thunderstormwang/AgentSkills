@@ -21,11 +21,12 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
 ### Req 進度表
 | ID | 項目 | 狀態 |
 | :--- | :--- | :--- |
-| R1 | Objective (目標) | Review |
-| R2 | Current State (現況) | Review |
-| R3 | Proposed Changes (建議變更) | Review |
-| R4 | Constraints (限制條件) | Review |
-| R5 | Acceptance Criteria (驗收標準) | Review |
+| R1 | Objective | Review |
+| R2 | Current State | Review |
+| R3 | Proposed Changes | Review |
+| R4 | Constraints | Review |
+| R5 | Technical Impact Analysis | Review |
+| R6 | Acceptance Criteria | Review |
 ```
 等待使用者確認所有 R 項目（狀態變更為 `Done`）後，再進入第二階段。
 
@@ -33,6 +34,7 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
 
 ### 第二階段 — Pre Design Sync (設計前同步)
 > **閘口：** 第一階段必須全部為 `Done` 才能開始第二階段。
+> **注意：** Req 中的 TIA 僅供參考。在擬定設計問題時，請重新閱讀實際程式碼——不要假設 TIA 在檔案/方法層級是完整或準確的。
 
 在 `## Pre Design Sync` 章節下，列出設計開始前需要解決的**所有問題**。問題分為兩類：
 1. **Req 理解確認** — Req 中需要與使用者對齊的模糊之處或假設（例如：範圍邊界、隱含行為、可能有多種解釋的術語）。
@@ -55,6 +57,7 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
 
 ### 第三階段 — Design (技術設計)
 > **閘口：** 第二階段必須完全解決後才能開始第三階段。
+> **注意：** 不可僅依賴 TIA 來確定範圍。在指定設計前，請重新閱讀每個 TIA 區域的實際程式碼——TIA 只識別邏輯區域，而非需要變更的完整細節。
 
 在 `## Pre Design Sync` 之後附加 `## Design` 章節。**請勿修改或刪除** Pre Design Sync 章節。
 
@@ -94,12 +97,38 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
 ## 核心結構 (Core Structure)
 
 ### 1. Req (需求分析)
-清晰定義業務背景：
-- **Objective (目標)：** 主要目標是什麼？
-- **Current State (現況)：** 系統目前是如何運作的？
-- **Proposed Changes (建議變更)：** 具體要求哪些變更？
-- **Constraints (限制條件)：** 需要考慮的系統限制或技術債。
-- **Acceptance Criteria (驗收標準)：** 需求被視為完成必須滿足的條件。**必須包含 Given / When / Then 格式。**
+清楚定義業務情境：
+
+- **Objective（目標）：** 主要目的是什麼？
+
+- **Current State（現況）：** 描述系統**目前能做什麼**，以功能/能力語言呈現。規則：
+  - 以 PM 和非工程師可讀的層次撰寫——不含類別名稱、方法名稱或內部欄位引用
+  - 每個陳述都是關於現有系統的**確認事實**——不含「待確認」、「待決定」或面向未來的語言
+  - 元件層級的細節（哪個類別做什麼）屬於 Technical Impact Analysis，不在此處
+  - 可包含指向詳細現況分析文件的參考連結（例如：`[analysis.md](analysis.md)`）
+
+- **Proposed Changes（預計變更）：** 描述**將新增哪些新功能**或**哪些行為將改變**。規則：
+  - 以 PM 可讀的功能/能力語言撰寫——聚焦在「系統將做什麼」，而非「哪個元件將改變」
+  - 可包含待確認項目（例如：「⚠️ 待 PM 確認」），因為這描述的是目標狀態
+  - 元件層級的變更細節屬於 Technical Impact Analysis，不在此處
+  - 可包含指向詳細新功能設計文件的參考連結
+
+- **Constraints（限制條件）：** 設計必須遵守的固定條件，在 Design 階段**之前**決定。四個來源：
+  1. **不可變的現有行為** — 變更後會破壞下游的內容
+  2. **範圍排除** — 明確排除在此 SD 範圍外的項目；以功能描述，而非類別名稱
+  3. **預先決定的設計選擇** — 已做出的決策（例如：重用現有欄位而非新增一個）；當技術細節本身就是限制條件時（例如特定欄位名稱或慣例），保留該細節
+  4. **資料精度/格式規格** — 影響欄位類型設計的非功能性需求
+  - **不包含：** 哪個類別實作某功能（屬於 TIA）、關於現況的事實陳述（屬於 Current State）、或實作細節如 handler 名稱
+
+- **Technical Impact Analysis（技術影響分析）：** 邏輯區域影響圖，幫助審查者了解變更範圍。產生流程：
+  1. **先讀程式碼** — 瀏覽程式碼庫的相關部分，識別實際存在的邏輯區域；不可在未閱讀的情況下推斷區域
+  2. **依邏輯區域分組** — 將相關元件歸類為連貫的群組（例如：「活動建立/編輯」、「折扣計算」）；每個群組 = 一個 TIA 條目
+  3. **與 Proposed Changes 交叉核對** — 驗證每個預計變更至少對應到一個 TIA 區域；浮出任何未涵蓋的區域
+  4. **每個區域列出 1~2 個代表性檔案**作為實作者的路徑提示
+  - 每個條目：一句話描述 現行（當前行為），一句話描述 調整（變更內容），以及代表性 路徑
+  - ⚠️ **TIA 僅供參考，非最終定論。** Pre Design Sync 和 Design 階段必須重新閱讀實際程式碼——不可將 TIA 視為完整或權威的規格
+
+- **Acceptance Criteria（驗收標準）：** 需求被視為已實現所必須滿足的條件。**必須包含 Given / When / Then 格式。**
 
 ### 2. Pre Design Sync (問題同步)
 列出設計開始前必須解決的所有問題。分為兩類：
@@ -152,7 +181,7 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
 
 每個章節以其**專屬**的進度表結束。
 
-> - R 項目：Req 子項目（目標 / 現況 / 建議變更 / 驗收標準 / 限制條件）。初始狀態為 `Review`。
+> - R 項目：Req 子項目（Objective / Current State / Proposed Changes / Constraints / Technical Impact Analysis / Acceptance Criteria）。初始狀態為 `Review`。
 > - Q 項目：無前綴，僅問題標題。初始狀態為 `Todo`。
 > - D 項目：無前綴，僅子章節名稱。初始狀態為 `Review`。
 > - T 項目：無前綴，僅任務名稱。初始狀態為 `Todo`。應包含**依賴關係**（例如：`T1`），如果適用。

@@ -36,10 +36,15 @@ description: 使用符合 Conventional Commits 規範的格式建立 Commit 訊�
 頁腳標記是位於 Commit 訊息末尾（內文或標題之後）的鍵值對。
 
 ### 強制標記
-- **Co-authored-by**: 自動加入所有 Commit。
-  - 格式：`Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>`
-  - 這標示了 Copilot 的貢獻，符合 GitHub 規範。
-  - 無論內文是否為空，皆必須存在於 Commit 訊息中。
+- **Co-authored-by**: 自動加入所有 Commit；無論內文是否為空皆須存在。
+  - 依「你目前運行的 AI agent 產品家族」（從自身的 system prompt / 執行身份得知）選擇對應的標記值。**一個品牌共用一個 trailer**，不分介面（CLI、桌面 app、Web、IDE 擴充）：
+    | Agent 產品家族 | 涵蓋介面範例 | Trailer |
+    |---|---|---|
+    | Claude / Claude Code | Claude Code CLI、桌面 app、claude.ai/code Web、VS Code / JetBrains 擴充 | `Co-authored-by: Claude <noreply@anthropic.com>` |
+    | Gemini | Gemini CLI、Gemini Code Assist（VS Code / JetBrains）、Android Studio 整合、Gemini app、Workspace | `Co-authored-by: Gemini <gemini-cli@google.com>` |
+    | GitHub Copilot | Copilot CLI（`gh copilot`）、Copilot Chat（VS Code / JetBrains / Visual Studio）、Copilot Workspace、github.com 上的 Copilot、Copilot for Xcode | `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` |
+    | 無法判斷 | — | `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>`（預設 fallback） |
+  - 以「agent 產品家族」為準，而非底層模型或介面。例如 Claude 模型若是透過 Copilot CLI 執行，應使用 Copilot 的 trailer。
 
 ### 選填標記
 - **BREAKING CHANGE**: 用於標示破壞性變更或重大版本影響。
@@ -82,7 +87,7 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
     - 加入前請先徵詢使用者確認。
 10. **處理頁腳標記**：
     - 若存在破壞性變更，加入 `BREAKING CHANGE: <描述>` 頁腳。
-    - 所有 Commit 皆須附加 `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>`。
+    - 所有 Commit 皆須附加 `Co-authored-by:` 頁腳，依「你目前運行的 AI agent 產品家族」（Claude / Gemini / Copilot）選擇對應值 — 一個品牌共用一個 trailer，不分介面（對照表見上方「強制標記」）；若無法判斷，則 fallback 為 Copilot。
 11. **在執行 Git Commit 指令前，務必將提議的訊息呈現給使用者核准。在使用者明確確認前，嚴禁執行 Git Commit。**
     - 無論使用者說「commit」、「幫我 commit」或任何直接指令，此規則皆無條件適用。
     - 流程必須始終為：**提議訊息 → 等待確認 → 執行提交**。

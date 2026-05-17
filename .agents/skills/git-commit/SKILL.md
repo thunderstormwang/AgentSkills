@@ -36,10 +36,15 @@ If no Jira ticket number is provided, omit the `#<jira ticket no>` part.
 Trailers are key-value pairs placed at the end of the commit message footer (after body or header).
 
 ### Required Trailers
-- **Co-authored-by**: Automatically added to all commits
-  - Format: `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>`
-  - This identifies Copilot's contribution per GitHub conventions
-  - Always present in commit message, even if body is empty
+- **Co-authored-by**: Automatically added to all commits. Always present, even if body is empty.
+  - Select the trailer value based on which AI agent product family you are running as (known from your own system prompt / runtime identity). One trailer per brand, regardless of surface (CLI, desktop, web, IDE extension):
+    | Agent product family | Example surfaces | Trailer |
+    |---|---|---|
+    | Claude / Claude Code | Claude Code CLI, desktop app, claude.ai/code web, VS Code / JetBrains extension | `Co-authored-by: Claude <noreply@anthropic.com>` |
+    | Gemini | Gemini CLI, Gemini Code Assist (VS Code / JetBrains), Android Studio integration, Gemini app, Workspace | `Co-authored-by: Gemini <gemini-cli@google.com>` |
+    | GitHub Copilot | Copilot CLI (`gh copilot`), Copilot Chat (VS Code / JetBrains / Visual Studio), Copilot Workspace, Copilot on github.com, Copilot for Xcode | `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` |
+    | Unknown / cannot determine | — | `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` (fallback default) |
+  - Identify by the agent product family, not the underlying model or surface. E.g., if a Claude model is invoked inside Copilot CLI, use the Copilot trailer.
 
 ### Optional Trailers
 - **BREAKING CHANGE**: Used to indicate breaking changes or major version impacts
@@ -81,8 +86,8 @@ AI must follow this **Dual-Source Synthesis Flow** to generate the commit messag
     - If breaking changes detected, suggest adding `BREAKING CHANGE:` footer
     - Offer user confirmation before inclusion
 10. **Handle trailers**:
-    - If breaking changes exist, add `BREAKING CHANGE: <description>` footer (see Trailers section)
-    - Always append `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` trailer to all commits
+    - If breaking changes exist, add `BREAKING CHANGE: <description>` footer (see Trailers section).
+    - Always append a `Co-authored-by:` trailer. Choose the value based on which AI agent product family you are running as (Claude / Gemini / Copilot) — one trailer per brand regardless of surface — per the mapping in Required Trailers above; fall back to Copilot if the agent cannot be determined.
 11. **Always show the proposed commit message to the user for approval BEFORE executing the git commit command. Do NOT run git commit until the user explicitly confirms.**
     - This rule applies unconditionally — even if the user says "commit", "幫我 commit", "commit 吧", or any other direct commit instruction.
     - The required flow is always: **propose message → wait for confirmation → then commit**.

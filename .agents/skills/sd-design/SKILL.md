@@ -120,13 +120,17 @@ Clearly define the business context:
   4. **Data precision / format specs** — non-functional requirements that affect field type design
   - Do NOT include: which class implements something (belongs in TIA), factual statements about current state (belongs in Current State), or implementation details like handler names
 
-- **Technical Impact Analysis:** A logical-area impact map that helps reviewers understand the scope of change. Generation process:
-  1. **Read the code first** — browse the relevant parts of the codebase to identify what logical areas actually exist; do not infer areas without reading
+- **Technical Impact Analysis:** A logical-area map that helps reviewers understand the scope of change. Generation process:
+  1. **Identify areas:**
+     - Refactor / extension: read the relevant parts of the codebase first to identify what logical areas actually exist; do not infer without reading
+     - Greenfield: decompose Proposed Changes into the major components / layers that need to be created
   2. **Group by logical area** — cluster related components into coherent groups (e.g., "活動建立/編輯", "折扣計算"); each group = one TIA entry
   3. **Cross-check with Proposed Changes** — verify every proposed change maps to at least one TIA area; surface any uncovered area
-  4. **List 1~2 representative files per area** as path hints for implementers
-  - Each entry: one sentence for 現行 (current behavior), one sentence for 調整 (what changes), and representative 路徑
-  - ⚠️ **TIA is reference-level, not definitive.** Pre Design Sync and Design phases must re-read the actual code — do not treat TIA as a complete or authoritative spec
+  4. **Path hint per area:**
+     - Refactor / extension: 1~2 representative existing files
+     - Greenfield: suggested target file paths or namespaces for the new component
+  - Each entry: one sentence for 現行 (or `N/A (new)` for greenfield), one sentence for 調整 (or `新建：目的 + 職責` for greenfield), and representative 路徑
+  - ⚠️ **TIA is reference-level, not definitive.** Pre Design Sync and Design phases must re-read the actual code (refactor) or finalize the detailed structure (greenfield) — do not treat TIA as a complete or authoritative spec
 
 - **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled. **MUST include Given / When / Then format.**
 

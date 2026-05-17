@@ -50,6 +50,9 @@ List **all questions** that need to be resolved before design can begin under a 
 | Q2 | [問題標題] |  | Todo |
 ```
 - As the user answers each Q: fill in 結論 both within the specific Q item's description in the body of the `## Pre Design Sync` section (detailed) and in the **Pre Design Sync 進度表** (concise, 1-2 sentences), and flip status to `Done` / `Cancel`.
+- **Conclusion handling by question type:**
+  - **Req 理解確認 (Req clarification):** in addition to recording 結論, **update the corresponding Req section** to incorporate the clarified understanding (rewrite ambiguous wording, add a clarifying clause, or split a vague statement into specific ones). Treat this as a Req modification — the **Recursive Modification Impact** rule applies: any dependent Design / Task items downstream must be reset to `Review` / `Todo`.
+  - **設計決策 (Design choice):** record 結論 in the Q item only; the decision feeds the Design phase. No Req section change is needed.
 - **Conflict check:** Whenever a Q is resolved, verify its conclusion does not contradict any already-resolved Q items or any content in the Req section. If a conflict is found, surface it immediately for user resolution.
 - Wait until **all Q items** are `Done` / `Cancel` / `Pending` before proceeding to Phase 3.
 

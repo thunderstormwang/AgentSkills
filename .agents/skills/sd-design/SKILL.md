@@ -130,6 +130,28 @@ Clearly define the business context:
 
 - **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled. **MUST include Given / When / Then format.**
 
+  **AC Writing Principles:**
+
+  1. **Align each AC to the source of truth** —
+     - For refactor / extension work, the source is the existing code: trace the relevant code path before drafting each AC and reflect real behavior. If code has a known defect that contradicts spec, mark `⚠️ 已知缺陷：...` and keep AC describing current behavior — do not retrofit AC to match broken code.
+     - For greenfield work, the source is the spec / PRD; align ACs to spec language and surface any contradictions or gaps for the user before drafting.
+
+  2. **One concern per AC** — Don't combine multiple test concerns (e.g., mixed prices + truncation boundary + tie-break) in a single AC. Prefer more simple ACs over fewer complex ones — each AC should fail for exactly one reason.
+
+  3. **Cover boundary values with dedicated ACs** — For every conditional branch, ask: where's the off-by-one? Common boundaries to check explicitly:
+     - Equality vs strict-greater (`>= threshold` vs `> limit`)
+     - Stable-sort tie-break when multiple items share the sort key
+     - Rounding to zero pushing a per-item value below the minimum
+     - Multi-pass allocation: residual from first pass falling into a second pass
+     - Per-element floor / minimum preservation
+     - Early-exit branches (e.g., `if (remainder == 0) break;`)
+
+  4. **Two readers, both must succeed** — Write so both PM (non-engineer) and AI (test author) can use the AC directly:
+     - PM-friendly: replace jargon (e.g., "LINQ stable sort" → "依輸入順序取第一件"); make tie-break and sort orders explicit; avoid class / method names
+     - AI-testable: every Given has concrete inputs; every Then specifies exact expected outputs; no "approximately" or "depending on configuration"
+
+  5. **AC ID format: `AC-{案型}-{序號}`, not global sequential** — Adding or removing ACs in one case type must not cause renumbering across the whole document. The case-prefix also doubles as a test-class / method naming hint (e.g., `AC-滿件金-1` maps to `OrderQuantity_Money_NoCumulate_Test`).
+
 ### 2. Pre Design Sync (Questions)
 List every question that must be resolved before design can begin. Two categories:
 - **Req 理解確認** — Ambiguities or implicit assumptions in the Req that need alignment (scope, edge cases, terms)

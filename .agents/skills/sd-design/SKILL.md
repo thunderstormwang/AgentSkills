@@ -155,9 +155,31 @@ Clearly define the business context:
 
   4. **Two readers, both must succeed** — Write so both PM (non-engineer) and AI (test author) can use the AC directly:
      - PM-friendly: replace jargon (e.g., "LINQ stable sort" → "依輸入順序取第一件"); make tie-break and sort orders explicit; avoid class / method names
-     - AI-testable: every Given has concrete inputs; every Then specifies exact expected outputs; no "approximately" or "depending on configuration"
+     - AI-testable: every Given has concrete inputs; every Then specifies exact expected outputs. **Placeholders such as `$X`, `$Y`, or "視設定而定" are forbidden** — if a value depends on context, split the AC into multiple concrete cases. No "approximately" or "depending on configuration".
 
   5. **AC ID format: `AC-{案型}-{序號}`, not global sequential** — Adding or removing ACs in one case type must not cause renumbering across the whole document. The case-prefix also doubles as a test-class / method naming hint (e.g., `AC-滿件金-1` maps to `OrderQuantity_Money_NoCumulate_Test`).
+
+  6. **Test observable behavior, not internal pipeline** — When describing outcomes (達標 / 跳過 / 折扣), use externally observable conditions (e.g., "首購商品 A 存在於購物車"), not internal pipeline state (e.g., "checkItems 縮減後總件數 3", "進入 CheckPromoteCondition 看到 itemQtyTotal=2"). The AC must survive internal refactors of pipeline stages, helper methods, or naming.
+     - Violation example: writing 「總件數 3 ≥ 門檻 1 達標」 when `3` is the pre-pipeline count but the Handler reduces `checkItems` to 2 internally. State the observable trigger (e.g., 「首購商品 A 存在於購物車 → 達標」) instead, so the AC survives a refactor that removes or renames `checkItems`.
+
+  7. **Rule names must mirror the spec 1:1** — When an AC describes the rule triggering a behavior, use the rule's exact name from the spec; do not collapse multiple distinct rules into a generic term. AC titles and contents must match the underlying field / rule.
+     - Violation example: using 「per-product 規則」 to describe what is actually 「買一送一首購商品排除規則」 — the two have different trigger conditions and scope (per-product is cross-promotion within a group; 首購商品排除 is a single-promotion rule of 買一送一).
+     - Violation example: an AC titled 「滿件滿額不適用商品排除」 when the underlying field is `IsComboShipment` (組合商品). The title should be 「組合商品（IsComboShipment）排除」.
+
+  8. **Lift shared rules to chapter preambles** — When the same rule applies across multiple AC sections, state it once in each chapter's preamble; do not repeat the rule inside every AC's Then clause.
+     - Example: 「折數型 IsCumulate flag 不讀，但 CumulateLimit > 0 仍作單筆上限截斷」 applies to 滿件折 / 滿額折 / 首購折 / 贈點百分比. Document it in each chapter's preamble once; the AC body need only reference the rule, not re-explain it.
+
+  9. **No "📝 待釐清" placeholders inside AC sections** — AC chapters must contain only finalized, executable AC items. Handle pending items elsewhere:
+     - Resolved → rewrite as a concrete Given/When/Then
+     - Unresolved → file under Pre Design Sync as a Q item
+     - Future scope → move to a follow-up note in plan.md (or the relevant ticket), not the AC chapter
+     - An AC chapter with `📝 待釐清` paragraphs signals incomplete work and tends to get skipped by reviewers.
+
+  10. **State chapter-level prerequisites up front** — Each AC chapter's preamble must declare:
+      - The spec / plan prerequisites assumed by the chapter (e.g., 「本章假設輸入符合 plan.md L67 前提」)
+      - The forbidden-but-not-tested combinations + who enforces them (e.g., 「人工+人工 由衝突檢核擋下、系統+系統 由 plan L67 擋下」), so the reader does not mistakenly try to write tests for those.
+      - Cross-references to the source-of-truth documents (e.g., 現況案型分析、新增案型分析).
+      - This prevents readers from inferring that violating combinations need to be tested, and surfaces the chain of responsibility for upstream validation.
 
 ### 2. Pre Design Sync (Questions)
 List every question that must be resolved before design can begin. Two categories:
@@ -232,3 +254,6 @@ Each section ends with its **own** progress table.
 - **Verification:** Ensure each task has a clear validation path (e.g., Test API, Manual QA step).
 - **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).
 - **Progress Table is mandatory:** Each section ends with its own progress table.
+- **Output Format by Decision Scope:**
+    - **Internal decisions** (architecture / implementation choice the AI can resolve with the user): present a comparison table + explicit recommendation + rationale, then wait for the user to pick.
+    - **External decisions** (PM / stakeholder / external-team confirmation required): default to outputting a forwardable Given/When/Then draft that captures the current behavior under each spec option, with the clarification questions called out explicitly. The user should be able to copy the draft to PM verbatim.

@@ -181,6 +181,32 @@ Clearly define the business context:
       - Cross-references to the source-of-truth documents (e.g., 現況案型分析、新增案型分析).
       - This prevents readers from inferring that violating combinations need to be tested, and surfaces the chain of responsibility for upstream validation.
 
+  11. **Two-layer artifact structure (high-level AC + detailed TC)** — When features have non-trivial calculation rules, split deliverables into two distinct artifacts:
+
+      **High-level AC** (`{topic}_ac.md`): rule summary for PM / stakeholder validation.
+      - Content: rule statements, formulas (e.g., 折扣 = totalAmount × (100 − 折數) / 100)
+      - **NO** concrete values, calculation traces, per-item attribution
+      - ID format: `AC-{group}-N` (e.g., `AC-現折-1`, `AC-贈點-1`)
+      - 案型 heading prefix with ID (e.g., `## AC-現折-1 訂單滿件 — 現折金額`)
+      - 共用 fields 抽到頂層「共用欄位定義」，分子組（共通 / 案型群組）
+      - 各案型內「系統欄位定義」段集中欄位英文名 mapping；body 用純中文
+      - 無 emoji；公式用 plain text（如 `floor(x / y)`）
+      - 檔案超過 5 章節時，加目錄（TOC）
+
+      **Detailed TC / Spec by Example** (`{topic}_tc_{layer}.md` — 可拆多檔):
+      - Content: concrete Given/When/Then with specific values, calculation traces, per-item attribution
+      - ID format: `TC-{case_type}-N` (e.g., `TC-滿件金-1`, `TC-整合-排序-1`)
+      - 開頭引用對應的 AC 章節（e.g., 「對應 AC-現折-1」）
+
+      **Cross-references**:
+      - AC 文件頂部列出對應 TC 檔（含一句話描述每檔範圍）
+      - TC 檔頂部說明對應 AC 章節
+      - **規則變動時 MUST cross-check 既有 TC 是否衝突**（不要等 user 抓）
+
+      **When to single-layer vs two-layer**:
+      - 計算規則簡單、邊界 case 少 → 單層 AC 即可（Spec by Example 適度）
+      - 計算規則含複雜算法、攤提、多 case → **必拆兩層**（PM 才看得懂 AC，工程師才能寫測試）
+
 ### 2. Pre Design Sync (Questions)
 List every question that must be resolved before design can begin. Two categories:
 - **Req 理解確認** — Ambiguities or implicit assumptions in the Req that need alignment (scope, edge cases, terms)

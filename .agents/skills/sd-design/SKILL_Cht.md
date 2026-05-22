@@ -181,6 +181,32 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
       - 引用 source-of-truth 文件（例如：現況案型分析、新增案型分析）。
       - 這可防止讀者推論「違規組合需要被測試」，並把上游驗證的責任歸屬說清楚。
 
+  11. **兩層 artifact 結構（高階 AC + 詳細 TC）**：當需求含非典型的計算規則時，將驗收標準拆成兩個獨立 artifact：
+
+      **高階 AC**（`{topic}_ac.md`）：供 PM / stakeholder validate spec 的規則摘要。
+      - 內容：規則陳述、公式（如 `折扣 = totalAmount × (100 − 折數) / 100`）
+      - **不寫**具體數值、計算追蹤、商品攤提明細
+      - ID 格式：`AC-{group}-N`（例如：`AC-現折-1`、`AC-贈點-1`）
+      - 案型 heading 加 ID prefix（例如：`## AC-現折-1 訂單滿件 — 現折金額`）
+      - 共用 fields 抽到頂層「共用欄位定義」，分子組（共通 / 案型群組）
+      - 各案型內「系統欄位定義」段集中欄位英文名 mapping；body 用純中文
+      - 無 emoji；公式用 plain text（如 `floor(x / y)`）
+      - 檔案超過 5 章節時，加目錄（TOC）
+
+      **詳細實例化 TC（Spec by Example）**（`{topic}_tc_{layer}.md` — 可拆多檔）：
+      - 內容：具體 Given/When/Then 含實際數值、計算追蹤、商品攤提明細
+      - ID 格式：`TC-{case_type}-N`（例如：`TC-滿件金-1`、`TC-整合-排序-1`）
+      - 開頭引用對應的 AC 章節（例如：「對應 AC-現折-1」）
+
+      **Cross-references**：
+      - AC 文件頂部列出對應 TC 檔（含一句話描述每檔範圍）
+      - TC 檔頂部說明對應 AC 章節
+      - **規則變動時 MUST cross-check 既有 TC 是否衝突**（不要等 user 抓）
+
+      **何時用單層 vs 兩層**：
+      - 計算規則簡單、邊界 case 少 → 單層 AC 即可（Spec by Example 適度）
+      - 計算規則含複雜算法、攤提、多 case → **必拆兩層**（PM 才看得懂 AC，工程師才能寫測試）
+
 ### 2. Pre Design Sync (問題同步)
 列出設計開始前必須解決的所有問題。分為兩類：
 - **Req 理解確認** — Req 中需要對齊的模糊之處或隱含假設（範圍、邊際案例、術語）。

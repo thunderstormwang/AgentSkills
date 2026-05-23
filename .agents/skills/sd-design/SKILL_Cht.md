@@ -189,7 +189,10 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
       - ID 格式：`AC-{group}-N`（例如：`AC-現折-1`、`AC-贈點-1`）
       - 案型 heading 加 ID prefix（例如：`## AC-現折-1 訂單滿件 — 現折金額`）
       - 共用 fields 抽到頂層「共用欄位定義」，分子組（共通 / 案型群組）
-      - 各案型內「系統欄位定義」段集中欄位英文名 mapping；body 用純中文
+      - 每個案型章節必須包含兩個子段：
+        - **系統欄位定義**：將領域 / 中文欄位名稱對應到英文系統欄位名稱（例如：觸發上限 → `CumulateLimit`、折扣金額 → `DiscountAmount`）
+        - **核心驗收標準**：構成 AC 主體的規則陳述（純中文，不含 Given/When/Then）
+      - 主體一律使用純中文；英文欄位名稱僅出現在「系統欄位定義」中，規則陳述不夾雜英文技術名詞
       - 無 emoji；公式用 plain text（如 `floor(x / y)`）
       - 檔案超過 5 章節時，加目錄（TOC）
 
@@ -197,6 +200,8 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
       - 內容：具體 Given/When/Then 含實際數值、計算追蹤、商品攤提明細
       - ID 格式：`TC-{case_type}-N`（例如：`TC-滿件金-1`、`TC-整合-排序-1`）
       - 開頭引用對應的 AC 章節（例如：「對應 AC-現折-1」）
+      - **術語對照**：文件開頭加一張對照表，將領域術語映射到系統欄位名稱（例如：活動結果 → `DiscountPromotions`、達標 → `IsApplied = true`）。讓文件自給自足，AI 可直接生成測試程式碼，無需另查 spec。
+      - **驗收欄位對照**：以短表格或列表說明 Then 段所斷言的可觀察輸出結構（例如：「活動結果（DiscountPromotion）：IsApplied、LackAmount、DiscountAmount」；「各商品折扣明細（DiscountDetail）：ProductId、DiscountAmount」）。避免測試斷言了錯誤欄位或遺漏欄位。
 
       **Cross-references**：
       - AC 文件頂部列出對應 TC 檔（含一句話描述每檔範圍）
@@ -206,6 +211,11 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
       **何時用單層 vs 兩層**：
       - 計算規則簡單、邊界 case 少 → 單層 AC 即可（Spec by Example 適度）
       - 計算規則含複雜算法、攤提、多 case → **必拆兩層**（PM 才看得懂 AC，工程師才能寫測試）
+
+  12. **為共用元件補充回歸覆蓋（Regression coverage）** — 當功能擴充或新增了共用計算邏輯時（例如：所有案型共用的 `AssignPromotionDiscount`），即使該方法本次未修改，仍需在 TC 文件中加入一個專屬的回歸 TC 章節，覆蓋共用方法的現行行為。這可防止未來的重構在不知不覺中破壞新功能 TC 未覆蓋的既有行為。
+      - 位置：獨立 TC 章節（例如：`## 共用邏輯回歸 — AssignPromotionDiscount`），不與案型章節混在一起。
+      - 範圍：覆蓋共用方法的可觀察合約（如：兩輪攤提、$1 下限、按比例分配）——不測試實作細節。
+      - 判斷訊號：若共用方法在功能上線後仍無任何 TC 覆蓋，視為覆蓋缺口。
 
 ### 2. Pre Design Sync (問題同步)
 列出設計開始前必須解決的所有問題。分為兩類：

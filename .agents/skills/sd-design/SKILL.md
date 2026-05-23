@@ -189,7 +189,10 @@ Clearly define the business context:
       - ID format: `AC-{group}-N` (e.g., `AC-現折-1`, `AC-贈點-1`)
       - 案型 heading prefix with ID (e.g., `## AC-現折-1 訂單滿件 — 現折金額`)
       - 共用 fields 抽到頂層「共用欄位定義」，分子組（共通 / 案型群組）
-      - 各案型內「系統欄位定義」段集中欄位英文名 mapping；body 用純中文
+      - Each 案型 chapter has two mandatory sub-sections:
+        - **系統欄位定義**: maps domain / Chinese field names → English system field names (e.g., 觸發上限 → `CumulateLimit`, 折扣金額 → `DiscountAmount`)
+        - **核心驗收標準**: the rule statements that form the AC body (plain Chinese, no Given/When/Then)
+      - Body uses plain Chinese; English field names appear only in 系統欄位定義, not inside rule statements
       - 無 emoji；公式用 plain text（如 `floor(x / y)`）
       - 檔案超過 5 章節時，加目錄（TOC）
 
@@ -197,6 +200,8 @@ Clearly define the business context:
       - Content: concrete Given/When/Then with specific values, calculation traces, per-item attribution
       - ID format: `TC-{case_type}-N` (e.g., `TC-滿件金-1`, `TC-整合-排序-1`)
       - 開頭引用對應的 AC 章節（e.g., 「對應 AC-現折-1」）
+      - **術語對照**: a mapping table at the start of each TC file — domain term → system field name (e.g., 活動結果 → `DiscountPromotions`, 達標 → `IsApplied = true`). Makes the TC self-contained; an AI test author can write test code without reading the spec separately.
+      - **驗收欄位對照**: a short table or list explaining the observable output structure asserted in Then clauses (e.g., 「活動結果（DiscountPromotion）：IsApplied, LackAmount, DiscountAmount」; 「各商品折扣明細（DiscountDetail）：ProductId, DiscountAmount」). Prevents tests from asserting on wrong / missing fields.
 
       **Cross-references**:
       - AC 文件頂部列出對應 TC 檔（含一句話描述每檔範圍）
@@ -206,6 +211,11 @@ Clearly define the business context:
       **When to single-layer vs two-layer**:
       - 計算規則簡單、邊界 case 少 → 單層 AC 即可（Spec by Example 適度）
       - 計算規則含複雜算法、攤提、多 case → **必拆兩層**（PM 才看得懂 AC，工程師才能寫測試）
+
+  12. **Include regression coverage for shared components** — When a feature extends or adds to shared calculation logic (e.g., `AssignPromotionDiscount` used by all case types), include a dedicated regression TC chapter that covers the shared method's existing behavior, even if the method was not modified in this feature. This prevents future refactors from silently breaking behaviors not covered by the new-feature TCs alone.
+      - Position: a separate TC chapter (e.g., `## 共用邏輯回歸 — AssignPromotionDiscount`), not mixed into case-type chapters.
+      - Scope: cover the observable contracts of the shared method (two-pass allocation, $1 floor, proportional attribution) — not implementation details.
+      - Signal: if a shared method has zero TC coverage after a feature is shipped, treat it as a coverage gap.
 
 ### 2. Pre Design Sync (Questions)
 List every question that must be resolved before design can begin. Two categories:

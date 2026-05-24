@@ -135,7 +135,7 @@ Clearly define the business context:
   - Each entry: one sentence for 現行 (or `N/A (new)` for greenfield), one sentence for 調整 (or `新建：目的 + 職責` for greenfield), and representative 路徑
   - ⚠️ **TIA is reference-level, not definitive.** Pre Design Sync and Design phases must re-read the actual code (refactor) or finalize the detailed structure (greenfield) — do not treat TIA as a complete or authoritative spec
 
-- **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled. **MUST include Given / When / Then format.**
+- **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled. **Primary reader of AC is PM / stakeholder** — write in plain business language; technical jargon, class names, and method names are forbidden. Given/When/Then belongs in TC, not AC (see Principle 11).
 
   **AC Writing Principles:**
 
@@ -153,37 +153,33 @@ Clearly define the business context:
      - Per-element floor / minimum preservation
      - Early-exit branches (e.g., `if (remainder == 0) break;`)
 
-  4. **Two readers, both must succeed** — Write so both PM (non-engineer) and AI (test author) can use the AC directly:
-     - PM-friendly: replace jargon (e.g., "LINQ stable sort" → "依輸入順序取第一件"); make tie-break and sort orders explicit; avoid class / method names
-     - AI-testable: every Given has concrete inputs; every Then specifies exact expected outputs. **Placeholders such as `$X`, `$Y`, or "視設定而定" are forbidden** — if a value depends on context, split the AC into multiple concrete cases. No "approximately" or "depending on configuration".
+  4. **AC ID format: `AC-{案型}-{序號}`, not global sequential** — Adding or removing ACs in one case type must not cause renumbering across the whole document. The case-prefix also doubles as a test-class / method naming hint (e.g., `AC-滿件金-1` maps to `OrderQuantity_Money_NoCumulate_Test`).
 
-  5. **AC ID format: `AC-{案型}-{序號}`, not global sequential** — Adding or removing ACs in one case type must not cause renumbering across the whole document. The case-prefix also doubles as a test-class / method naming hint (e.g., `AC-滿件金-1` maps to `OrderQuantity_Money_NoCumulate_Test`).
-
-  6. **Test observable behavior, not internal pipeline** — When describing outcomes (達標 / 跳過 / 折扣), use externally observable conditions (e.g., "首購商品 A 存在於購物車"), not internal pipeline state (e.g., "checkItems 縮減後總件數 3", "進入 CheckPromoteCondition 看到 itemQtyTotal=2"). The AC must survive internal refactors of pipeline stages, helper methods, or naming.
+  5. **Test observable behavior, not internal pipeline** — When describing outcomes (達標 / 跳過 / 折扣), use externally observable conditions (e.g., "首購商品 A 存在於購物車"), not internal pipeline state (e.g., "checkItems 縮減後總件數 3", "進入 CheckPromoteCondition 看到 itemQtyTotal=2"). The AC must survive internal refactors of pipeline stages, helper methods, or naming.
      - Violation example: writing 「總件數 3 ≥ 門檻 1 達標」 when `3` is the pre-pipeline count but the Handler reduces `checkItems` to 2 internally. State the observable trigger (e.g., 「首購商品 A 存在於購物車 → 達標」) instead, so the AC survives a refactor that removes or renames `checkItems`.
 
-  7. **Rule names must mirror the spec 1:1** — When an AC describes the rule triggering a behavior, use the rule's exact name from the spec; do not collapse multiple distinct rules into a generic term. AC titles and contents must match the underlying field / rule.
+  6. **Rule names must mirror the spec 1:1** — When an AC describes the rule triggering a behavior, use the rule's exact name from the spec; do not collapse multiple distinct rules into a generic term. AC titles and contents must match the underlying field / rule.
      - Violation example: using 「per-product 規則」 to describe what is actually 「買一送一首購商品排除規則」 — the two have different trigger conditions and scope (per-product is cross-promotion within a group; 首購商品排除 is a single-promotion rule of 買一送一).
      - Violation example: an AC titled 「滿件滿額不適用商品排除」 when the underlying field is `IsComboShipment` (組合商品). The title should be 「組合商品（IsComboShipment）排除」.
 
-  8. **Lift shared rules to chapter preambles** — When the same rule applies across multiple AC sections, state it once in each chapter's preamble; do not repeat the rule inside every AC's Then clause.
+  7. **Lift shared rules to chapter preambles** — When the same rule applies across multiple AC sections, state it once in each chapter's preamble; do not repeat the rule inside every AC's Then clause.
      - Example: 「折數型 IsCumulate flag 不讀，但 CumulateLimit > 0 仍作單筆上限截斷」 applies to 滿件折 / 滿額折 / 首購折 / 贈點百分比. Document it in each chapter's preamble once; the AC body need only reference the rule, not re-explain it.
 
-  9. **No "📝 待釐清" placeholders inside AC sections** — AC chapters must contain only finalized, executable AC items. Handle pending items elsewhere:
+  8. **No "📝 待釐清" placeholders inside AC sections** — AC chapters must contain only finalized, executable AC items. Handle pending items elsewhere:
      - Resolved → rewrite as a concrete Given/When/Then
      - Unresolved → file under Pre Design Sync as a Q item
      - Future scope → move to a follow-up note in plan.md (or the relevant ticket), not the AC chapter
      - An AC chapter with `📝 待釐清` paragraphs signals incomplete work and tends to get skipped by reviewers.
 
-  10. **State chapter-level prerequisites up front** — Each AC chapter's preamble must declare:
+  9. **State chapter-level prerequisites up front** — Each AC chapter's preamble must declare:
       - The spec / plan prerequisites assumed by the chapter (e.g., 「本章假設輸入符合 plan.md L67 前提」)
       - The forbidden-but-not-tested combinations + who enforces them (e.g., 「人工+人工 由衝突檢核擋下、系統+系統 由 plan L67 擋下」), so the reader does not mistakenly try to write tests for those.
       - Cross-references to the source-of-truth documents (e.g., 現況案型分析、新增案型分析).
       - This prevents readers from inferring that violating combinations need to be tested, and surfaces the chain of responsibility for upstream validation.
 
-  11. **Two-layer artifact structure (high-level AC + detailed TC)** — When features have non-trivial calculation rules, split deliverables into two distinct artifacts:
+  10. **Two-layer artifact structure (high-level AC + detailed TC)** — When features have non-trivial calculation rules, split deliverables into two distinct artifacts:
 
-      **High-level AC** (`{topic}_ac.md`): rule summary for PM / stakeholder validation.
+      **High-level AC** (`{topic}_ac.md`): rule summary for PM / stakeholder validation. **Primary reader: PM** — plain business language; avoid class / method names, field names, and implementation jargon; replace technical terms with functional descriptions (e.g., "LINQ stable sort" → "依輸入順序取第一件"); make tie-break and sort orders explicit in natural language. **No Given/When/Then.**
       - Content: rule statements, formulas (e.g., 折扣 = totalAmount × (100 − 折數) / 100)
       - **NO** concrete values, calculation traces, per-item attribution
       - ID format: `AC-{group}-N` (e.g., `AC-現折-1`, `AC-贈點-1`)
@@ -196,7 +192,7 @@ Clearly define the business context:
       - 無 emoji；公式用 plain text（如 `floor(x / y)`）
       - 檔案超過 5 章節時，加目錄（TOC）
 
-      **Detailed TC / Spec by Example** (`{topic}_tc_{layer}.md` — 可拆多檔):
+      **Detailed TC / Spec by Example** (`{topic}_tc_{layer}.md` — 可拆多檔): **Primary reader: RD / QA / unit test writers. MUST use Given/When/Then format with concrete values. Placeholders such as `$X`, `$Y`, or "視設定而定" are forbidden — split into concrete cases instead.**
       - Content: concrete Given/When/Then with specific values, calculation traces, per-item attribution
       - ID format: `TC-{case_type}-N` (e.g., `TC-滿件金-1`, `TC-整合-排序-1`)
       - 開頭引用對應的 AC 章節（e.g., 「對應 AC-現折-1」）
@@ -204,15 +200,14 @@ Clearly define the business context:
       - **驗收欄位對照**: a short table or list explaining the observable output structure asserted in Then clauses (e.g., 「活動結果（DiscountPromotion）：IsApplied, LackAmount, DiscountAmount」; 「各商品折扣明細（DiscountDetail）：ProductId, DiscountAmount」). Prevents tests from asserting on wrong / missing fields.
 
       **Cross-references**:
-      - AC 文件頂部列出對應 TC 檔（含一句話描述每檔範圍）
-      - TC 檔頂部說明對應 AC 章節
+      - TC 檔頂部說明對應 AC 章節（AC 不需反向列出 TC 檔）
       - **規則變動時 MUST cross-check 既有 TC 是否衝突**（不要等 user 抓）
 
       **When to single-layer vs two-layer**:
       - 計算規則簡單、邊界 case 少 → 單層 AC 即可（Spec by Example 適度）
       - 計算規則含複雜算法、攤提、多 case → **必拆兩層**（PM 才看得懂 AC，工程師才能寫測試）
 
-  12. **Include regression coverage for shared components** — When a feature extends or adds to shared calculation logic (e.g., `AssignPromotionDiscount` used by all case types), include a dedicated regression TC chapter that covers the shared method's existing behavior, even if the method was not modified in this feature. This prevents future refactors from silently breaking behaviors not covered by the new-feature TCs alone.
+  11. **Include regression coverage for shared components** — When a feature extends or adds to shared calculation logic (e.g., `AssignPromotionDiscount` used by all case types), include a dedicated regression TC chapter that covers the shared method's existing behavior, even if the method was not modified in this feature. This prevents future refactors from silently breaking behaviors not covered by the new-feature TCs alone.
       - Position: a separate TC chapter (e.g., `## 共用邏輯回歸 — AssignPromotionDiscount`), not mixed into case-type chapters.
       - Scope: cover the observable contracts of the shared method (two-pass allocation, $1 floor, proportional attribution) — not implementation details.
       - Signal: if a shared method has zero TC coverage after a feature is shipped, treat it as a coverage gap.
@@ -286,7 +281,7 @@ Each section ends with its **own** progress table.
 - **Comparison tables & Recommendations:** For Q items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body, followed by a **recommended solution** and **rationale**, before recording the final conclusion.
 - **Decision Lineage & Root Cause Tracing:** If a proposal is questioned, AI MUST explain the lineage (e.g., `Task T1` <- `Design D1` <- `Sync Conclusion Q1` <- `Req R1`). Help identify the earliest upstream point for correction.
 - **Recursive Modification Impact:** If an item in Phase N is modified, automatically re-evaluate and reset status of all dependent items in Phases > N to `Review` or `Todo`. Summarize these changes for the user.
-- **Conflict detection & self-correction:** Actively check for contradictions: (a) between Q conclusions within Pre Design Sync OR between a Q conclusion and the Req section — surface to user immediately; (b) between Design items, or between Design and Pre Design Sync — fix silently before notifying user; (c) between Task and Design — fix silently before notifying user.
+- **Conflict detection & self-correction:** Actively check for contradictions: (a) between AC and TC (e.g., a TC case contradicts an AC rule), or between AC/TC and other Req content (Objective, Proposed Changes, Constraints) — fix silently before presenting; if a genuine spec ambiguity cannot be resolved, surface to user; (b) between Q conclusions within Pre Design Sync OR between a Q conclusion and the Req section — surface to user immediately; (c) between Design items, or between Design and Pre Design Sync — fix silently before notifying user; (d) between Task and Design — fix silently before notifying user.
 - **Verification:** Ensure each task has a clear validation path (e.g., Test API, Manual QA step).
 - **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).
 - **Progress Table is mandatory:** Each section ends with its own progress table.

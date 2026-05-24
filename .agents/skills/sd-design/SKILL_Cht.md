@@ -135,7 +135,7 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
   - 每個條目：一句話描述 現行（全新開發填 `N/A (new)`），一句話描述 調整（全新開發填 `新建：目的 + 職責`），以及代表性 路徑
   - ⚠️ **TIA 僅供參考，非最終定論。** Pre Design Sync 和 Design 階段必須重新閱讀實際程式碼（重構模式）或敲定詳細結構（全新開發模式）——不可將 TIA 視為完整或權威的規格
 
-- **Acceptance Criteria（驗收標準）：** 需求被視為已實現所必須滿足的條件。**必須包含 Given / When / Then 格式。**
+- **Acceptance Criteria（驗收標準）：** 需求被視為已實現所必須滿足的條件。**AC 的主要讀者為 PM / stakeholder** — 使用平易的業務語言，不得出現技術術語、類別名稱或方法名稱。Given/When/Then 格式屬於 TC，不屬於 AC（詳見原則 11）。
 
   **AC 撰寫原則：**
 
@@ -153,37 +153,33 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
      - 單筆下限保留（如「每件至少留 $1」）
      - 提早離開的分支（例如 `if (remainder == 0) break;`）
 
-  4. **雙讀者，兩邊都要看得懂**：AC 同時要服務 PM（非工程師）與 AI（測試撰寫者）：
-     - PM 友善：避免技術術語（例如 "LINQ stable sort" →「依輸入順序取第一件」）；平手規則與排序方式要明寫；不出現類別 / 方法名稱
-     - AI 可寫測試：每個 Given 都有具體輸入數值；每個 Then 都指出明確的預期輸出。**禁止使用 `$X`、`$Y` 或「視設定而定」這類占位符** — 若值依情境而異，將 AC 拆成多筆具體 case。不出現「約」、「視設定而定」等模糊用語。
+  4. **AC ID 用 `AC-{案型}-{序號}`，不用全域連續編號**：在單一案型中新增或刪除 AC 時，不應該影響其他案型的編號。案型前綴也可以當作測試類別 / 方法命名的提示（例如 `AC-滿件金-1` 對應到 `OrderQuantity_Money_NoCumulate_Test`）。
 
-  5. **AC ID 用 `AC-{案型}-{序號}`，不用全域連續編號**：在單一案型中新增或刪除 AC 時，不應該影響其他案型的編號。案型前綴也可以當作測試類別 / 方法命名的提示（例如 `AC-滿件金-1` 對應到 `OrderQuantity_Money_NoCumulate_Test`）。
-
-  6. **驗 observable behavior，不耦合 internal pipeline**：描述結果（達標 / 跳過 / 折扣）時，使用**外部可觀察的條件**（例如「首購商品 A 存在於購物車」），不要描述內部 pipeline 狀態（例如「checkItems 縮減後總件數 3」、「進入 CheckPromoteCondition 看到 itemQtyTotal=2」）。AC 應能在 pipeline 階段、helper 方法、或命名被重構後仍然有效。
+  5. **驗 observable behavior，不耦合 internal pipeline**：描述結果（達標 / 跳過 / 折扣）時，使用**外部可觀察的條件**（例如「首購商品 A 存在於購物車」），不要描述內部 pipeline 狀態（例如「checkItems 縮減後總件數 3」、「進入 CheckPromoteCondition 看到 itemQtyTotal=2」）。AC 應能在 pipeline 階段、helper 方法、或命名被重構後仍然有效。
      - 違反例：寫「總件數 3 ≥ 門檻 1 達標」，但 `3` 是 pipeline 前的件數，Handler 內部已把 `checkItems` 縮減為 2。改用觀察到的觸發條件（如「首購商品 A 存在於購物車 → 達標」），AC 才能在 `checkItems` 被移除/改名的重構中存活。
 
-  7. **規則名稱必須對應 SPEC 1:1**：當 AC 描述觸發行為的規則時，使用 SPEC 中**規則的精確名稱**；不要把多個不同規則收斂成籠統術語。AC 標題與內容必須與底層欄位 / 規則一致。
+  6. **規則名稱必須對應 SPEC 1:1**：當 AC 描述觸發行為的規則時，使用 SPEC 中**規則的精確名稱**；不要把多個不同規則收斂成籠統術語。AC 標題與內容必須與底層欄位 / 規則一致。
      - 違反例：用「per-product 規則」描述實際是「買一送一首購商品排除規則」的行為 — 兩者的觸發條件與適用範圍不同（per-product 是同群組跨活動規則；買一送一首購排除是單一活動內的規則）。
      - 違反例：AC 標題「滿件滿額不適用商品排除」，但底層欄位是 `IsComboShipment`（組合商品）。標題應為「組合商品（IsComboShipment）排除」。
 
-  8. **跨案型共用規則抽到章節序言**：同樣規則套用到多個 AC 章節時，在各章節序言一次說明；不要在每筆 AC 的 Then 段重複註記。
+  7. **跨案型共用規則抽到章節序言**：同樣規則套用到多個 AC 章節時，在各章節序言一次說明；不要在每筆 AC 的 Then 段重複註記。
      - 例：「折數型 IsCumulate flag 不讀，但 CumulateLimit > 0 仍作單筆上限截斷」套用到 滿件折 / 滿額折 / 首購折 / 贈點百分比。在每個章節序言寫一次即可，AC 主體只需引用此規則，不需重新解釋。
 
-  9. **AC 章節內不夾「📝 待釐清」段落**：AC 章節只能包含**最終、可執行的 AC 項目**。未敲定的事項處理方式：
+  8. **AC 章節內不夾「📝 待釐清」段落**：AC 章節只能包含**最終、可執行的 AC 項目**。未敲定的事項處理方式：
      - 已釐清 → 改寫為具體的 Given/When/Then
      - 未釐清 → 列入 Pre Design Sync 作為 Q 項目
      - 未來範圍 → 移到 plan.md（或相關 ticket）的 follow-up note，不放 AC 章節
      - AC 章節若出現 `📝 待釐清` 段落代表工作未完成，且 reviewer 容易直接跳過。
 
-  10. **前提聲明放章節前文**：每個 AC 章節的前文必須聲明：
+  9. **前提聲明放章節前文**：每個 AC 章節的前文必須聲明：
       - 本章 AC 假設的 spec / plan 前提（例如「本章假設輸入符合 plan.md L67 前提」）
       - **不需測試的違規組合 + 由誰擋住**（例如「人工+人工 由衝突檢核擋下、系統+系統 由 plan L67 擋下」），避免讀者誤以為要為這些組合寫測試。
       - 引用 source-of-truth 文件（例如：現況案型分析、新增案型分析）。
       - 這可防止讀者推論「違規組合需要被測試」，並把上游驗證的責任歸屬說清楚。
 
-  11. **兩層 artifact 結構（高階 AC + 詳細 TC）**：當需求含非典型的計算規則時，將驗收標準拆成兩個獨立 artifact：
+  10. **兩層 artifact 結構（高階 AC + 詳細 TC）**：當需求含非典型的計算規則時，將驗收標準拆成兩個獨立 artifact：
 
-      **高階 AC**（`{topic}_ac.md`）：供 PM / stakeholder validate spec 的規則摘要。
+      **高階 AC**（`{topic}_ac.md`）：供 PM / stakeholder validate spec 的規則摘要。**主要讀者：PM** — 以平易的業務語言撰寫；避免類別 / 方法名稱、欄位名稱與實作術語；以功能性描述取代技術用詞（例如 "LINQ stable sort" →「依輸入順序取第一件」）；平手規則與排序方式明確以自然語言說明。**不含 Given/When/Then。**
       - 內容：規則陳述、公式（如 `折扣 = totalAmount × (100 − 折數) / 100`）
       - **不寫**具體數值、計算追蹤、商品攤提明細
       - ID 格式：`AC-{group}-N`（例如：`AC-現折-1`、`AC-贈點-1`）
@@ -196,7 +192,7 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
       - 無 emoji；公式用 plain text（如 `floor(x / y)`）
       - 檔案超過 5 章節時，加目錄（TOC）
 
-      **詳細實例化 TC（Spec by Example）**（`{topic}_tc_{layer}.md` — 可拆多檔）：
+      **詳細實例化 TC（Spec by Example）**（`{topic}_tc_{layer}.md` — 可拆多檔）：**主要讀者：RD / QA / 單元測試撰寫者。必須使用 Given/When/Then 格式並附具體數值。禁止使用 `$X`、`$Y` 或「視設定而定」等占位符 — 若值依情境而異，拆成多筆具體 case。**
       - 內容：具體 Given/When/Then 含實際數值、計算追蹤、商品攤提明細
       - ID 格式：`TC-{case_type}-N`（例如：`TC-滿件金-1`、`TC-整合-排序-1`）
       - 開頭引用對應的 AC 章節（例如：「對應 AC-現折-1」）
@@ -204,15 +200,14 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
       - **驗收欄位對照**：以短表格或列表說明 Then 段所斷言的可觀察輸出結構（例如：「活動結果（DiscountPromotion）：IsApplied、LackAmount、DiscountAmount」；「各商品折扣明細（DiscountDetail）：ProductId、DiscountAmount」）。避免測試斷言了錯誤欄位或遺漏欄位。
 
       **Cross-references**：
-      - AC 文件頂部列出對應 TC 檔（含一句話描述每檔範圍）
-      - TC 檔頂部說明對應 AC 章節
+      - TC 檔頂部說明對應 AC 章節（AC 不需反向列出 TC 檔）
       - **規則變動時 MUST cross-check 既有 TC 是否衝突**（不要等 user 抓）
 
       **何時用單層 vs 兩層**：
       - 計算規則簡單、邊界 case 少 → 單層 AC 即可（Spec by Example 適度）
       - 計算規則含複雜算法、攤提、多 case → **必拆兩層**（PM 才看得懂 AC，工程師才能寫測試）
 
-  12. **為共用元件補充回歸覆蓋（Regression coverage）** — 當功能擴充或新增了共用計算邏輯時（例如：所有案型共用的 `AssignPromotionDiscount`），即使該方法本次未修改，仍需在 TC 文件中加入一個專屬的回歸 TC 章節，覆蓋共用方法的現行行為。這可防止未來的重構在不知不覺中破壞新功能 TC 未覆蓋的既有行為。
+  11. **為共用元件補充回歸覆蓋（Regression coverage）** — 當功能擴充或新增了共用計算邏輯時（例如：所有案型共用的 `AssignPromotionDiscount`），即使該方法本次未修改，仍需在 TC 文件中加入一個專屬的回歸 TC 章節，覆蓋共用方法的現行行為。這可防止未來的重構在不知不覺中破壞新功能 TC 未覆蓋的既有行為。
       - 位置：獨立 TC 章節（例如：`## 共用邏輯回歸 — AssignPromotionDiscount`），不與案型章節混在一起。
       - 範圍：覆蓋共用方法的可觀察合約（如：兩輪攤提、$1 下限、按比例分配）——不測試實作細節。
       - 判斷訊號：若共用方法在功能上線後仍無任何 TC 覆蓋，視為覆蓋缺口。
@@ -286,7 +281,7 @@ description: 專業的需求分析 (Req)、技術設計 (Design) 與細粒度任
 - **比較表與建議：** 對於有多種候選方案的 Q 項目，務必在 Pre Design Sync 章節正文中包含比較表，接著提供**建議方案**與**理據**，最後記錄最終結論。
 - **決策脈絡與根因追溯：** 如果提案受到質疑，AI 必須解釋脈絡（例如：`Task T1` <- `Design D1` <- `Sync 結論 Q1` <- `Req R1`）。協助識別最早的開發上游修正點。
 - **遞迴修改影響：** 如果修改了第 N 階段的項目，則自動重新評估並重置所有在階段 > N 的相依項目狀態為 `Review` 或 `Todo`。為使用者摘要這些變更。
-- **衝突偵測與自我修正：** 主動檢查矛盾：(a) Pre Design Sync 內部的 Q 結論之間，或是 Q 結論與 Req 章節之間 —— 立即向使用者提出；(b) Design 項目之間，或是 Design 與 Pre Design Sync 之間 —— 在通知使用者前自行修正；(c) Task 與 Design 之間 —— 在通知使用者前自行修正。
+- **衝突偵測與自我修正：** 主動檢查矛盾：(a) AC 與 TC 之間（例如某 TC case 與對應 AC 規則衝突），或是 AC/TC 與 Req 其他內容（Objective、Proposed Changes、Constraints）之間 —— 在呈現前自行修正；若涉及真正的 spec 歧義無法自行裁決，則提出給使用者；(b) Pre Design Sync 內部的 Q 結論之間，或是 Q 結論與 Req 章節之間 —— 立即向使用者提出；(c) Design 項目之間，或是 Design 與 Pre Design Sync 之間 —— 在通知使用者前自行修正；(d) Task 與 Design 之間 —— 在通知使用者前自行修正。
 - **驗證：** 確保每個任務都有清晰的驗證路徑（例如：測試 API、手動 QA 步驟）。
 - **精確性：** 使用準確的技術術語（例如：Entity、Repository、CacheRepo）。
 - **進度表是強制性的：** 每個章節都必須以其專屬的進度表結束。

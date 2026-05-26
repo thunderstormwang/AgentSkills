@@ -7,7 +7,10 @@ These guidelines apply strictly to **Phase 4 — Task** of the `sd-design-helper
 ## Task Structure & Constraints
 
 - **Logical Commit Granularity:** Each task should ideally correspond to one logical commit.
-- **File Limit:** Each task should not target more than **3 files** to ensure clarity and maintainability.
+- **File Limit:** Default ≤ 3 files per task.
+    - **Spirit:** Each task must be reviewable independently and revertible cleanly.
+    - **Allowed exception:** Mechanical edits (rename, enum/const addition, identical pattern across files) may span more files when each per-file diff is small (~< 5 lines) and shares one purpose.
+    - **When in doubt, split smaller** — over-splitting is cheap, over-bundling hurts review.
 - **Implementation Code Belongs Here:** All method bodies, SQL queries, mapping/assembly logic, and other implementation details MUST appear in Task, not in Design. Design only expresses contracts (field declarations, method signatures).
 - **DB Schema Changes:** Tasks for DB changes MUST involve generating a SQL script.
     - **Storage:** Save to the `sql/` folder at the project root.
@@ -54,7 +57,7 @@ Each task must be detailed enough to be implemented without referring back to th
 - **Implementation Details:**
     - [Step 1: Specific logic/instruction]
     - [Step 2: Specific logic/instruction]
-- **Affected Files:** (List all affected files, strictly max 3)
+- **Affected Files:** (List all affected files; respect the File Limit rule above)
 
 ### T5: Test — [Feature Name] Entry Point Test
 - **Reference:** `[D3]`
@@ -62,4 +65,4 @@ Each task must be detailed enough to be implemented without referring back to th
 - **Test Target:** `[Class Name]`
 - **Implementation Details:** Implement API-level integration test covering [Given/When/Then] scenarios. This task aims to produce a failing test to define logical boundaries.
 - **Test File (DoD):** `src/PXBox.Spu.Test/Handlers/XxxHandlerTest.cs`
-- **Affected Files:** (Test-related files only, strictly max 3)
+- **Affected Files:** (Test-related files only; respect the File Limit rule above)

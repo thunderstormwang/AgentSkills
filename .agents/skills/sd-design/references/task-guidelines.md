@@ -1,6 +1,6 @@
 # Task Phase Guidelines
 
-These guidelines apply strictly to **Phase 4 — Task** of the `sd-design-helper` development lifecycle. The primary goal is to produce high-quality, actionable tasks that can be executed independently.
+These guidelines apply strictly to **Phase 4 — Task** of the `sd-design` development lifecycle. The primary goal is to produce high-quality, actionable tasks that can be executed independently.
 
 ---
 

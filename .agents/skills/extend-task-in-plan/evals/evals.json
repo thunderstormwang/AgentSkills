@@ -1,0 +1,26 @@
+{
+  "skill_name": "extend-task-in-plan",
+  "evals": [
+    {
+      "id": 0,
+      "name": "compatible-append",
+      "prompt": "在 fixtures/plan_compatible.md 這份 plan 加一個 task：把 OrderQuantity.cs 測試檔裡 [Trait(\"PromotionCondition\", \"OrderPrice\")] 這個 typo 改成 \"OrderQuantity\"（這個 Trait 標籤標錯案型了）。",
+      "expected_output": "skill 判定為 compatible（純 typo 修正、不改行為），直接在 plan 檔 append 一個新 task（R10）含 detail block，並在 Task Progress Table 補一列 Status=Todo。回報新 task ID。",
+      "files": ["fixtures/plan_compatible.md"]
+    },
+    {
+      "id": 1,
+      "name": "violating-stop",
+      "prompt": "在 fixtures/plan_violating.md 加一個 task：在 CalculateDiscountService 新增一個「滿額免運」的折扣案型，包含 prod 邏輯跟測試。",
+      "expected_output": "skill 判定為 violating（plan Req 是『測試重組、零行為變更、零生產碼動到』，但新 task 要動 prod + 加新案型）。STOP 不寫檔，引用被違反的 Req 段落，提兩個選項（開新 plan / 改原 Req），等 user 決定。",
+      "files": ["fixtures/plan_violating.md"]
+    },
+    {
+      "id": 2,
+      "name": "ambiguous-surface",
+      "prompt": "在 fixtures/plan_ambiguous.md 加一個 task：對 CheckPromoteCondition 補一個測試，覆蓋傳入 null promotion 的邊界情況。",
+      "expected_output": "skill 判定為 ambiguous（補測試本身 compatible，但 null case 是否曝出 prod 未處理、迫使後續修 prod 取決於 prod 現況）。不寫檔，列出兩種詮釋與各自假設，請 user 判斷。",
+      "files": ["fixtures/plan_ambiguous.md"]
+    }
+  ]
+}

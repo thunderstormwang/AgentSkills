@@ -1,17 +1,17 @@
 ---
 name: sd-design
-description: Professional assistant for requirement analysis (Req), technical design (Design), and granular task breakdown (Task). Use this skill when the user provides task descriptions (Jira, meetings, or PM notes) and wants to discuss architectural choices, technical designs (DB, API, Cache), and generate a small-step implementation plan for incremental development and commits.
+description: Professional assistant for requirement analysis (Req) and technical design (Design). Use this skill when the user provides task descriptions (Jira, meetings, or PM notes) and wants to discuss architectural choices, technical designs (DB, API, Cache), and produce a confirmed Design specification. Task generation is handled by extend-task-in-plan.
 ---
 
 # sd-design
 
-Expert system design assistant specialized in translating complex requirements into a structured development lifecycle: **Req → Pre Design Sync → Design → Task**.
+Expert system design assistant specialized in translating complex requirements into a structured design lifecycle: **Req → Pre Design Sync → Design**. Task generation is handled by **extend-task-in-plan** after Design is confirmed.
 
 ---
 
 ## Document Lifecycle
 
-The document is produced **incrementally** in four phases. Each phase is **gated**: the next phase only begins after the user explicitly confirms the current one is complete.
+The document is produced **incrementally** in three phases. Each phase is **gated**: the next phase only begins after the user explicitly confirms the current one is complete.
 
 **Dynamic Adjustment:** This process is non-linear. If a gap or error is discovered in a later phase, the AI will assist in tracing the root cause back to an earlier phase, applying the necessary corrections, and recursively updating all dependent downstream items to maintain consistency.
 
@@ -77,23 +77,7 @@ Append the `## Design` section after `## Pre Design Sync`. **Do NOT modify or re
 | D2 | [子章節名稱] | Review |
 ```
 - **Self-check before notifying the user:** After drafting the Design, verify that every Design item aligns with the Pre Design Sync conclusions and does not contradict any of them. Fix any inconsistency silently before presenting the result. Only notify the user once the self-check passes.
-- Wait for user to confirm each D item (`Done` / `Cancel` / `Pending`) before proceeding to Phase 4.
-
----
-
-### Phase 4 — Task
-> **Gate:** Phase 3 must be fully confirmed before starting Phase 4.
-
-Append the `## Task` section after `## Design`. **Do NOT modify prior sections.**
-- End the Task section with a **Task 進度表** (which includes **Reference** and **Dependency** columns):
-```markdown
-### Task 進度表
-| ID | 項目 | 引用 | 依賴 | 狀態 |
-| :--- | :--- | :--- | :--- | :--- |
-| T1 | [Task 名稱] | D1 | None | Todo |
-| T2 | [Task 名稱] | D1, D2 | T1 | Todo |
-```
-- **Self-check before notifying the user:** After drafting the Task list, verify that every Task item satisfies the Design requirements, correctly references the Design ID(s) in the table and implementation details, correctly lists dependencies, and does not contradict any Design decision. Fix any gaps or inconsistencies silently before presenting the result. Only notify the user once the self-check passes.
+- Wait for user to confirm each D item (`Done` / `Cancel` / `Pending`). Once all D items are confirmed, Design is complete — proceed to Task generation with **extend-task-in-plan**.
 
 ---
 
@@ -163,13 +147,6 @@ Detail the **structural and behavioral definition** (the "What" and "Where"). Fo
 - **Core Logic Spec:** Description of **behavioral shifts** (e.g., priority logic between Mode A and Mode B, state transitions). **Explicitly address Concurrency (e.g., potential Race Conditions) and Error Handling (e.g., rollback or compensation for external API failures).**
 - **Component Flow:** **Sequence of calls** between modules and side effects (e.g., "After saving, update Cache X then publish Event Y"). **Always provide diagrams (e.g., Mermaid sequence diagrams or flowcharts)** to visualize the flow instead of relying solely on text descriptions.
 
-### 4. Task (Granular Implementation Tasks)
-> ⚠️ Only after all Design items are confirmed.
-
-Break down the design into small, atomic tasks (the "How"). **Each task = one logical commit.**
-
-Refer to `references/task-guidelines.md` for specific implementation rules, including constraints for DB Schema and API Contract changes, content requirements, and format examples.
-
 
 ---
 
@@ -193,23 +170,16 @@ Each section ends with its **own** progress table.
 > - R items: Req sub-items (Objective / Current State / Proposed Changes / Constraints / Technical Impact Analysis / Acceptance Criteria). Initial status `Review`.
 > - Q items: no prefix, just the question title. Initial status `Todo`.
 > - D items: no prefix, just the sub-section name. Initial status `Review`.
-> - T items: no prefix, just the task name. Initial status `Todo`. Should include **Dependency** (e.g., `T1`) if applicable.
 
 ---
 
 ## Guidelines
 - **Traditional Chinese:** Communicate and produce reports in Traditional Chinese.
-- **Response Header:** At the start of **every response**, provide a brief status indicator: `Current Phase: [Req | Pre Design Sync | Design | Task]`.
-- **Incremental Logic:** Always prefer "Functionality First, Optimization Second" in task planning.
-- **Independent Test Task:**
-    - **Position**: MUST be placed after API Summary and before Functional Implementation.
-    - **Test-First**: For any entry point logic change, an independent `Test` task MUST be created. During execution, a failing test MUST be produced first to define logical boundaries.
-    - **Physical Path**: The task description MUST include the "Test File Path", otherwise it cannot be marked as Done.
+- **Response Header:** At the start of **every response**, provide a brief status indicator: `Current Phase: [Req | Pre Design Sync | Design]`.
 - **Comparison tables & Recommendations:** For Q items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body, followed by a **recommended solution** and **rationale**, before recording the final conclusion.
 - **Decision Lineage & Root Cause Tracing:** If a proposal is questioned, AI MUST explain the lineage (e.g., `Task T1` <- `Design D1` <- `Sync Conclusion Q1` <- `Req R1`). Help identify the earliest upstream point for correction.
 - **Recursive Modification Impact:** If an item in Phase N is modified, automatically re-evaluate and reset status of all dependent items in Phases > N to `Review` or `Todo`. Summarize these changes for the user.
 - **Conflict detection & self-correction:** Actively check for contradictions: (a) between AC and TC (e.g., a TC case contradicts an AC rule), or between AC/TC and other Req content (Objective, Proposed Changes, Constraints) — fix silently before presenting; if a genuine spec ambiguity cannot be resolved, surface to user; (b) between Q conclusions within Pre Design Sync OR between a Q conclusion and the Req section — surface to user immediately; (c) between Design items, or between Design and Pre Design Sync — fix silently before notifying user; (d) between Task and Design — fix silently before notifying user.
-- **Verification:** Ensure each task has a clear validation path (e.g., Test API, Manual QA step).
 - **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).
 - **Progress Table is mandatory:** Each section ends with its own progress table.
 - **Output Format by Decision Scope:**

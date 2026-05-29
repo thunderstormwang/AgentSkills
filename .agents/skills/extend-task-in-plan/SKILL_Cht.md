@@ -1,19 +1,29 @@
 ---
 name: extend-task-in-plan
-description: "在既有 plan 上附加一個衍生 task，附加前先驗證它不違反 plan 原本的 Req。當使用者要求在已建立的 plan 上加入後續工作（補測試 / refactor / typo fix / 改風格 / 樣式調整 / 補欄位 / 補例外處理）時觸發。典型說法 —— 「在 {plan} 加 task / 補 task / 衍生 task / 順手改 / 順便加」。不確定是否該觸發時，傾向觸發本 skill；它的核心價值是 Req 違反檢查，跳過的話會無聲失效。"
+description: "plan 文件的 Task 生成工具。Mode A —— 在所有 Design 項目確認後生成初始 Task 列表（sd-design 的延續）。Mode B —— 在驗證不違反 plan 原始 Req 後，附加衍生 task。當 Design 完成且使用者想進行 Task 生成時觸發 Mode A；當使用者要求在已建立的 plan 加入後續工作（補測試 / refactor / typo fix / 改風格 / 樣式調整 / 補欄位 / 補例外處理）時觸發 Mode B。不確定是否觸發 Mode B 時，傾向觸發本 skill；它的核心價值是 Req 違反檢查，跳過的話會無聲失效。"
 ---
 
 > **注意**：本檔為 `SKILL.md` 的繁體中文對照參考，**非執行用檔案**。skill router 實際載入的是英文版 `SKILL.md`；本檔僅供閱讀理解。兩者內容需保持同步。
 
 # extend-task-in-plan
 
-本 skill 在既有的 plan 文件上加入一個**衍生 task**。它設計給**實作完一版後的精修情境** —— 補測試、調整成偏好的程式風格、改善 SOLID 合規性、或清理工作 —— **且不改變 plan 原本的需求**。
+本 skill 管理 plan 文件內的 **Task 生成**，分為兩種模式：
 
-關鍵不變量：新 task 必須服務於 plan 的原始目的，不可引入新的範疇。
+- **Mode A — 初始 Task 生成**：在所有 Design 項目確認後觸發。讀取 Design 段落，拆解為有引用來源的原子級可實作任務。
+- **Mode B — 衍生 Task 附加**：當使用者想在既有 plan 加入精修、清理或後續工作時觸發。附加前先做 Req 違反檢查。
+
+Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不可引入新的範疇。
+
+---
 
 ## 何時使用
 
-當使用者要求在既有 plan 加 task 時觸發。典型說法：
+**Mode A** —— 當：
+
+- 「Design 完成，生 Task」/ 「Phase 4」/ 「幫我從 Design 生成 Task」
+- 在 sd-design 走完後，所有 D 項目皆為 Done
+
+**Mode B** —— 當：
 
 - 「在 `{plan-name}` 加一個 task 做 `{X}`」
 - 「`{plan}` 補一個 task 來 `{refactor / 補測試 / 改風格 / 修 typo}`」
@@ -28,7 +38,73 @@ description: "在既有 plan 上附加一個衍生 task，附加前先驗證它�
 - **修改既有 task**（非新增） → 直接 `Edit` plan 檔
 - **沒有母 plan 的獨立 task** → 手寫
 
-## 工作流程
+---
+
+## Mode A — 初始 Task 生成
+
+### Step 1 — 確認目標 plan
+
+- 若使用者指定了 plan 路徑，直接使用
+- 若只給 plan 名稱，搜尋可能位置（`docs/`、repo 根目錄等）
+- 若模糊或找不到，先詢問使用者再繼續
+
+### Step 2 — 確認 Design 已完成
+
+- 定位 plan 內的 **Design 進度表**
+- 所有 D 項目必須為 `Done` / `Cancel` / `Pending` 才能繼續
+- 若仍有 `Review` / `Todo` 項目，通知使用者並等待確認
+
+### Step 3 — 讀取並理解 Design
+
+- 完整讀取所有 Design 子章節（D1、D2……）
+- 不可僅依賴 TIA —— 此階段 Design 段落是權威規格
+- 對 Design 有引用但未完整說明的區域，需重新讀實際程式碼
+
+### Step 4 — 生成 Task 列表
+
+依 `references/task-guidelines.md` 的順序（位於 `.agents/skills/extend-task-in-plan/references/task-guidelines.md`）：
+
+1. **DB Schema 變更** —— SQL script task 優先
+2. **Entity / Domain 變更** —— 核心業務結構
+3. **API 合約變更** —— Request/Response model task
+4. **API Summary** —— API 合約後立即附上的純文件 task
+5. **Test Task** —— 獨立測試任務（Fail-First，置於實作之前）
+6. **功能實作** —— 詳細邏輯，開發至測試通過
+
+Task 限制：
+- 每個 task = 一個邏輯 commit
+- 預設 ≤ 3 個檔案（機械式修改可超出）
+- 每個 task 必須包含 **Reference** 欄位，指向它所實作的 Design ID
+
+**通知使用者前的自我檢查：**
+- 每個非取消的 Design 項目都被 ≥ 1 個 Task 覆蓋
+- 每個 Task 都引用有效的 Design ID
+- 依賴關係無循環且正確
+自行修正任何遺漏後再呈現。通過自我檢查後才通知使用者。
+
+### Step 5 — 附加 `## Task` 章節
+
+附加在 `## Design` 之後。**請勿修改之前的章節。**
+
+以 **Task 進度表**結尾：
+
+```markdown
+### Task 進度表
+| ID | 項目 | 引用 | 依賴 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| T1 | [Task 名稱] | D1 | None | Todo |
+| T2 | [Task 名稱] | D1, D2 | T1 | Todo |
+```
+
+### Step 6 — 確認回報
+
+向使用者回報：
+- 生成的 Task 總數與 ID 範圍
+- 被修改的 plan 檔路徑
+
+---
+
+## Mode B — 衍生 Task 附加
 
 ### Step 1 — 確認目標 plan
 
@@ -70,7 +146,7 @@ description: "在既有 plan 上附加一個衍生 task，附加前先驗證它�
 
 **C. 模糊（Ambiguous）** —— 分類取決於對未來狀態的假設，或落在邊界上：
 - 為一個 prod 行為不明的邊界 case 補測試（可能迫使改 prod → 會變成違反）
-- 改名一個對外的公開 API（可能在 plan 範圍內，也可能不在 —— 取決於 plan）
+- 改名一個對外的公開 API（可能在 plan 範圍內，也可能不在）
 - 優化某個可能跨越 plan 邊界的東西（例如在「只動測試」的 plan 裡做一個會碰到生產碼的效能調整）
 - 模式對齊，可能被解讀成風格美化（相容）或設計變更（違反）
 
@@ -78,7 +154,7 @@ description: "在既有 plan 上附加一個衍生 task，附加前先驗證它�
 
 **若相容（A）** → 進入 Step 5。
 
-**若違反（B）** → 先不要寫任何檔案。無聲附加會擴張 plan 的範疇，違背本 skill 的目的。把衝突浮現出來：
+**若違反（B）** → 先不要寫任何檔案。把衝突浮現出來：
 
 - 引用被違反的具體 Req / Background 段落
 - 解釋為何新 task 違反它
@@ -137,17 +213,34 @@ ID 慣例：沿用 plan 既有的模式（例如前面是 `R1`–`R9` 就用 `R1
 - 被修改的 plan 檔路徑
 - Status 設為 `Todo`，待實作
 
+---
+
 ## 輸出慣例
 
 - **繁體中文**：plan 內容維持繁體中文，與既有 plan 語言一致。對使用者的訊息也用繁體中文。
 - **沿用既有風格**：若 plan 在既有 task 間有一致的格式 / 用詞，跟著走。
 - **冪等（Idempotent）**：若已存在範疇相似的 task，先詢問使用者再決定是否重複建立。
 - **不改程式碼**：本 skill 只編輯 plan 文件。程式碼實作之後交給 `implementation` skill 或 `implementation-agent`。
-- **每次呼叫一個 task（v1）**：若使用者一次要求多個 task，依序處理並逐一確認。未來版本可能支援批次。
+- **Mode B — 每次呼叫一個 task（v1）**：若使用者一次要求多個 task，依序處理並逐一確認。
+
+---
 
 ## 範例
 
-### 範例 1 — 相容 task
+### 範例 1 — Mode A：生成初始 Task 列表
+
+**使用者**：「Design 都確認了，幫我生 Task」
+
+**Skill**：
+1. 讀 plan 的 Design 進度表 —— 所有 D1–D6 皆為 `Done`
+2. 完整讀取 D1–D6 內容
+3. 依 task 順序（DB → Entity → API → Test → Implementation）生成 T1–T18
+4. 附加 `## Task` 章節與 Task 進度表
+5. 回報：「✅ 已生成 18 個 Task (T1–T18)，進度表已附於 Design 之後」
+
+---
+
+### 範例 2 — Mode B：相容 task
 
 **使用者**：「在 `task_refactor.md` 加一個 task 把 `OrderQuantity.cs` 的 `[Trait("PromotionCondition", "OrderPrice")]` typo 改成 `"OrderQuantity"`」
 
@@ -159,7 +252,7 @@ ID 慣例：沿用 plan 既有的模式（例如前面是 `R1`–`R9` 就用 `R1
 5. 在 Task Progress Table 附加 `R10` 列，`Status = Todo`、`Dependency = —`
 6. 回報：「✅ 已加入 R10 — 修正 `OrderQuantity.cs` 的 Trait typo」
 
-### 範例 2 — 違反 task
+### 範例 3 — Mode B：違反 task
 
 **使用者**：「在 `task_refactor.md` 加一個 task 改 `CalculateDiscountService` 加新功能 X」
 
@@ -182,7 +275,7 @@ ID 慣例：沿用 plan 既有的模式（例如前面是 `R1`–`R9` 就用 `R1
 
 5. 等使用者決定。不修改任何檔案。
 
-### 範例 3 — 模糊 task
+### 範例 4 — Mode B：模糊 task
 
 **使用者**：「在 `task_refactor.md` 加一個 task：對 `CheckPromoteCondition` 補一個測試覆蓋 `null` 輸入的邊界 case」
 

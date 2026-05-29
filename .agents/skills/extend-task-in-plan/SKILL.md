@@ -1,6 +1,6 @@
 ---
 name: extend-task-in-plan
-description: Append a derivative task to an existing plan, after verifying it doesn't violate the plan's original Req. Trigger when the user asks to add follow-up work (補測試 / refactor / typo fix / 改風格 / 樣式調整 / 補欄位 / 補例外處理) to an established plan — typical phrasings: 「在 {plan} 加 task / 補 task / 衍生 task / 順手改 / 順便加」. When in doubt about triggering, prefer this skill — its core value is the Req-violation check, which silently degrades if skipped.
+description: "Append a derivative task to an existing plan, after verifying it doesn't violate the plan's original Req. Trigger when the user asks to add follow-up work (補測試 / refactor / typo fix / 改風格 / 樣式調整 / 補欄位 / 補例外處理) to an established plan. Typical phrasings — 「在 {plan} 加 task / 補 task / 衍生 task / 順手改 / 順便加」. When in doubt about triggering, prefer this skill; its core value is the Req-violation check, which silently degrades if skipped."
 ---
 
 # extend-task-in-plan

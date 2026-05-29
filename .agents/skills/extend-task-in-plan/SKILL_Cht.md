@@ -1,6 +1,6 @@
 ---
 name: extend-task-in-plan
-description: 在既有 plan 上附加一個衍生 task，附加前先驗證它不違反 plan 原本的 Req。當使用者要求在已建立的 plan 上加入後續工作（補測試 / refactor / typo fix / 改風格 / 樣式調整 / 補欄位 / 補例外處理）時觸發 —— 典型說法：「在 {plan} 加 task / 補 task / 衍生 task / 順手改 / 順便加」。不確定是否該觸發時，傾向觸發本 skill —— 它的核心價值是 Req 違反檢查，跳過的話會無聲失效。
+description: "在既有 plan 上附加一個衍生 task，附加前先驗證它不違反 plan 原本的 Req。當使用者要求在已建立的 plan 上加入後續工作（補測試 / refactor / typo fix / 改風格 / 樣式調整 / 補欄位 / 補例外處理）時觸發。典型說法 —— 「在 {plan} 加 task / 補 task / 衍生 task / 順手改 / 順便加」。不確定是否該觸發時，傾向觸發本 skill；它的核心價值是 Req 違反檢查，跳過的話會無聲失效。"
 ---
 
 > **注意**：本檔為 `SKILL.md` 的繁體中文對照參考，**非執行用檔案**。skill router 實際載入的是英文版 `SKILL.md`；本檔僅供閱讀理解。兩者內容需保持同步。

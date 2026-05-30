@@ -271,6 +271,23 @@ Mode B 的 task ID 一律使用 `FT` 前綴（例如 `FT01`、`FT02`），不論
 
 ---
 
+## 進度表 (Progress Table)
+
+### 狀態定義
+
+| 狀態 | 說明 |
+| :--- | :--- |
+| `Todo` | 尚未進行 |
+| `InProgress` | 進行中 |
+| `Review` | 等待使用者確認（Req / Design 項目初始狀態） |
+| `Done` | 完成 |
+| `Cancel` | 取消不做 |
+| `Pending` | 暫時擱置 |
+
+T 項目與 FT 項目使用相同的狀態值。所有生成 task 的初始狀態為 `Todo`。
+
+---
+
 ## 範例
 
 ### 範例 1 — Mode A：生成初始 Task 列表

@@ -269,6 +269,23 @@ Report back to the user:
 
 ---
 
+## Progress Table
+
+### Status Definitions
+
+| Status | 說明 |
+| :--- | :--- |
+| `Todo` | 尚未進行 |
+| `InProgress` | 進行中 |
+| `Review` | 等待使用者確認（Req / Design 項目初始狀態） |
+| `Done` | 完成 |
+| `Cancel` | 取消不做 |
+| `Pending` | 暫時擱置 |
+
+T items and FT items both use the same status values. Initial status for all generated tasks is `Todo`.
+
+---
+
 ## Examples
 
 ### Example 1 — Mode A: Generate initial Task list

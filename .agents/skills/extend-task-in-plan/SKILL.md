@@ -77,6 +77,7 @@ Task constraints:
 **Self-check before notifying the user:**
 - Every non-Cancelled Design item is covered by ≥ 1 Task
 - Every Task references a valid Design ID
+- No Task content contradicts any Design content
 - Dependencies are acyclic and correct
 Fix any gaps silently before presenting. Only notify the user once the self-check passes.
 

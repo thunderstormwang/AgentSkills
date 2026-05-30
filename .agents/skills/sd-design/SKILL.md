@@ -21,12 +21,12 @@ Output the Req section. End the section with a **Req 進度表** listing each su
 ### Req 進度表
 | ID | 項目 | 狀態 |
 | :--- | :--- | :--- |
-| R1 | Objective | Review |
-| R2 | Current State | Review |
-| R3 | Proposed Changes | Review |
-| R4 | Constraints | Review |
-| R5 | Technical Impact Analysis | Review |
-| R6 | Acceptance Criteria | Review |
+| R01 | Objective | Review |
+| R02 | Current State | Review |
+| R03 | Proposed Changes | Review |
+| R04 | Constraints | Review |
+| R05 | Technical Impact Analysis | Review |
+| R06 | Acceptance Criteria | Review |
 ```
 Wait for user to confirm all R items (`Done`) before proceeding to Phase 2.
 
@@ -46,8 +46,8 @@ List **all questions** that need to be resolved before design can begin under a 
 ### Pre Design Sync 進度表
 | ID | 項目 | 結論 | 狀態 |
 | :--- | :--- | :--- | :--- |
-| Q1 | [問題標題] |  | Todo |
-| Q2 | [問題標題] |  | Todo |
+| Q01 | [問題標題] |  | Todo |
+| Q02 | [問題標題] |  | Todo |
 ```
 - As the user answers each Q: fill in 結論 both within the specific Q item's description in the body of the `## Pre Design Sync` section (detailed) and in the **Pre Design Sync 進度表** (concise, 1-2 sentences), and flip status to `Done` / `Cancel`.
 - **Conclusion handling by question type:**
@@ -73,8 +73,8 @@ Append the `## Design` section after `## Pre Design Sync`. **Do NOT modify or re
 ### Design 進度表
 | ID | 項目 | 狀態 |
 | :--- | :--- | :--- |
-| D1 | [子章節名稱] | Review |
-| D2 | [子章節名稱] | Review |
+| D01 | [子章節名稱] | Review |
+| D02 | [子章節名稱] | Review |
 ```
 - **Self-check before notifying the user:** After drafting the Design, verify that every Design item aligns with the Pre Design Sync conclusions and does not contradict any of them. Fix any inconsistency silently before presenting the result. Only notify the user once the self-check passes.
 - Wait for user to confirm each D item (`Done` / `Cancel` / `Pending`). Once all D items are confirmed, Design is complete — proceed to Task generation with **extend-task-in-plan**.
@@ -177,7 +177,7 @@ Each section ends with its **own** progress table.
 - **Traditional Chinese:** Communicate and produce reports in Traditional Chinese.
 - **Response Header:** At the start of **every response**, provide a brief status indicator: `Current Phase: [Req | Pre Design Sync | Design]`.
 - **Comparison tables & Recommendations:** For Q items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body, followed by a **recommended solution** and **rationale**, before recording the final conclusion.
-- **Decision Lineage & Root Cause Tracing:** If a proposal is questioned, AI MUST explain the lineage (e.g., `Task T1` <- `Design D1` <- `Sync Conclusion Q1` <- `Req R1`). Help identify the earliest upstream point for correction.
+- **Decision Lineage & Root Cause Tracing:** If a proposal is questioned, AI MUST explain the lineage (e.g., `Task T01` <- `Design D01` <- `Sync Conclusion Q01` <- `Req R01`). Help identify the earliest upstream point for correction.
 - **Recursive Modification Impact:** If an item in Phase N is modified, automatically re-evaluate and reset status of all dependent items in Phases > N to `Review` or `Todo`. Summarize these changes for the user.
 - **Conflict detection & self-correction:** Actively check for contradictions: (a) between AC and TC (e.g., a TC case contradicts an AC rule), or between AC/TC and other Req content (Objective, Proposed Changes, Constraints) — fix silently before presenting; if a genuine spec ambiguity cannot be resolved, surface to user; (b) between Q conclusions within Pre Design Sync OR between a Q conclusion and the Req section — surface to user immediately; (c) between Design items, or between Design and Pre Design Sync — fix silently before notifying user; (d) between Task and Design — fix silently before notifying user.
 - **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).

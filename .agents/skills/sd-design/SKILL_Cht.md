@@ -21,12 +21,12 @@ description: 專業的需求分析 (Req) 與技術設計 (Design) 助手。當�
 ### Req 進度表
 | ID | 項目 | 狀態 |
 | :--- | :--- | :--- |
-| R1 | Objective | Review |
-| R2 | Current State | Review |
-| R3 | Proposed Changes | Review |
-| R4 | Constraints | Review |
-| R5 | Technical Impact Analysis | Review |
-| R6 | Acceptance Criteria | Review |
+| R01 | Objective | Review |
+| R02 | Current State | Review |
+| R03 | Proposed Changes | Review |
+| R04 | Constraints | Review |
+| R05 | Technical Impact Analysis | Review |
+| R06 | Acceptance Criteria | Review |
 ```
 等待使用者確認所有 R 項目（狀態變更為 `Done`）後，再進入第二階段。
 
@@ -46,8 +46,8 @@ description: 專業的需求分析 (Req) 與技術設計 (Design) 助手。當�
 ### Pre Design Sync 進度表
 | ID | 項目 | 結論 | 狀態 |
 | :--- | :--- | :--- | :--- |
-| Q1 | [問題標題] |  | Todo |
-| Q2 | [問題標題] |  | Todo |
+| Q01 | [問題標題] |  | Todo |
+| Q02 | [問題標題] |  | Todo |
 ```
 - 當使用者回答每個 Q 時：在 `## Pre Design Sync` 章節正文的特定 Q 項目描述中填寫詳細結論，並在 **Pre Design Sync 進度表**中填寫簡要結論（1-2 句話），並將狀態切換為 `Done` / `Cancel`。
 - **依問題類型處理結論：**
@@ -73,8 +73,8 @@ description: 專業的需求分析 (Req) 與技術設計 (Design) 助手。當�
 ### Design 進度表
 | ID | 項目 | 狀態 |
 | :--- | :--- | :--- |
-| D1 | [子章節名稱] | Review |
-| D2 | [子章節名稱] | Review |
+| D01 | [子章節名稱] | Review |
+| D02 | [子章節名稱] | Review |
 ```
 - **通知使用者前的自我檢查：** 草擬完 Design 後，驗證每個 Design 項目是否符合 Pre Design Sync 的結論且不與其衝突，同時確保 Design 項目之間亦不互相矛盾。如有不一致之處，請在呈現結果前自行修正。只有在通過自我檢查後才通知使用者。
 - 等待使用者確認每個 D 項目（`Done` / `Cancel` / `Pending`）。所有 D 項目確認後，Design 即完成 —— 接續使用 **extend-task-in-plan** 進行 Task 生成。
@@ -177,7 +177,7 @@ description: 專業的需求分析 (Req) 與技術設計 (Design) 助手。當�
 - **繁體中文：** 以繁體中文進行溝通並產生報告。
 - **回應標頭：** 在**每次回應**的開頭，提供簡短的狀態指示：`目前階段：[Req | Pre Design Sync | Design]`。
 - **比較表與建議：** 對於有多種候選方案的 Q 項目，務必在 Pre Design Sync 章節正文中包含比較表，接著提供**建議方案**與**理據**，最後記錄最終結論。
-- **決策脈絡與根因追溯：** 如果提案受到質疑，AI 必須解釋脈絡（例如：`Task T1` <- `Design D1` <- `Sync 結論 Q1` <- `Req R1`）。協助識別最早的開發上游修正點。
+- **決策脈絡與根因追溯：** 如果提案受到質疑，AI 必須解釋脈絡（例如：`Task T01` <- `Design D01` <- `Sync 結論 Q01` <- `Req R01`）。協助識別最早的開發上游修正點。
 - **遞迴修改影響：** 如果修改了第 N 階段的項目，則自動重新評估並重置所有在階段 > N 的相依項目狀態為 `Review` 或 `Todo`。為使用者摘要這些變更。
 - **衝突偵測與自我修正：** 主動檢查矛盾：(a) AC 與 TC 之間（例如某 TC case 與對應 AC 規則衝突），或是 AC/TC 與 Req 其他內容（Objective、Proposed Changes、Constraints）之間 —— 在呈現前自行修正；若涉及真正的 spec 歧義無法自行裁決，則提出給使用者；(b) Pre Design Sync 內部的 Q 結論之間，或是 Q 結論與 Req 章節之間 —— 立即向使用者提出；(c) Design 項目之間，或是 Design 與 Pre Design Sync 之間 —— 在通知使用者前自行修正；(d) Task 與 Design 之間 —— 在通知使用者前自行修正。
 - **精確性：** 使用準確的技術術語（例如：Entity、Repository、CacheRepo）。

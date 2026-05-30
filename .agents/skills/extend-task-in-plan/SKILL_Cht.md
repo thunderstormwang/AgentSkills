@@ -56,7 +56,7 @@ Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不�
 
 ### Step 3 — 讀取並理解 Design
 
-- 完整讀取所有 Design 子章節（D1、D2……）
+- 完整讀取所有 Design 子章節（D01、D02……）
 - 不可僅依賴 TIA —— 此階段 Design 段落是權威規格
 - 對 Design 有引用但未完整說明的區域，需重新讀實際程式碼
 
@@ -92,8 +92,8 @@ Task 限制：
 ### Task 進度表
 | ID | 項目 | 引用 | 依賴 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
-| T1 | [Task 名稱] | D1 | None | Todo |
-| T2 | [Task 名稱] | D1, D2 | T1 | Todo |
+| T01 | [Task 名稱] | D01 | None | Todo |
+| T02 | [Task 名稱] | D01, D02 | T01 | Todo |
 ```
 
 ### Step 6 — 確認回報
@@ -196,7 +196,7 @@ Task 限制：
 - **Dependency**: {前置 Task ID 或 `—`}
 ```
 
-ID 慣例：沿用 plan 既有的模式（例如前面是 `R1`–`R9` 就用 `R10`；前面是 `T1`–`T14` 就用 `T15`）。
+ID 慣例：沿用 plan 既有的模式（例如前面是 `R01`–`R09` 就用 `R10`；前面是 `T01`–`T14` 就用 `T15`）。
 
 #### 5b. 在 `Task Progress Table`（plan 末尾）附加一列
 
@@ -232,11 +232,11 @@ ID 慣例：沿用 plan 既有的模式（例如前面是 `R1`–`R9` 就用 `R1
 **使用者**：「Design 都確認了，幫我生 Task」
 
 **Skill**：
-1. 讀 plan 的 Design 進度表 —— 所有 D1–D6 皆為 `Done`
-2. 完整讀取 D1–D6 內容
-3. 依 task 順序（DB → Entity → API → Test → Implementation）生成 T1–T18
+1. 讀 plan 的 Design 進度表 —— 所有 D01–D06 皆為 `Done`
+2. 完整讀取 D01–D06 內容
+3. 依 task 順序（DB → Entity → API → Test → Implementation）生成 T01–T18
 4. 附加 `## Task` 章節與 Task 進度表
-5. 回報：「✅ 已生成 18 個 Task (T1–T18)，進度表已附於 Design 之後」
+5. 回報：「✅ 已生成 18 個 Task (T01–T18)，進度表已附於 Design 之後」
 
 ---
 
@@ -248,7 +248,7 @@ ID 慣例：沿用 plan 既有的模式（例如前面是 `R1`–`R9` 就用 `R1
 1. 讀 `docs/pxbox-26324_task_refactor.md` Background 段
 2. 辨識意圖：「測試重組，零行為變更，零生產碼動到」
 3. 分類為 **相容**（typo 修正、只動測試檔屬性、無行為變更）
-4. 附加新 task `R10`（R9 之後的下一個 ID），含 Current state / Goal / Steps
+4. 附加新 task `R10`（R09 之後的下一個 ID），含 Current state / Goal / Steps
 5. 在 Task Progress Table 附加 `R10` 列，`Status = Todo`、`Dependency = —`
 6. 回報：「✅ 已加入 R10 — 修正 `OrderQuantity.cs` 的 Trait typo」
 

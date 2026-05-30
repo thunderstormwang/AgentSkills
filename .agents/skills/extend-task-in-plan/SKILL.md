@@ -54,7 +54,7 @@ The key invariant for Mode B: the new task must serve the plan's original purpos
 
 ### Step 3 — Read and internalize Design
 
-- Read all Design sub-sections (D1, D2, ...) in full
+- Read all Design sub-sections (D01, D02, ...) in full
 - Do NOT rely solely on TIA for scope — the Design section is the authoritative spec at this stage
 - Re-read actual code for any area that Design references but doesn't fully specify
 
@@ -90,8 +90,8 @@ End with **Task 進度表**:
 ### Task 進度表
 | ID | 項目 | 引用 | 依賴 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
-| T1 | [Task 名稱] | D1 | None | Todo |
-| T2 | [Task 名稱] | D1, D2 | T1 | Todo |
+| T01 | [Task 名稱] | D01 | None | Todo |
+| T02 | [Task 名稱] | D01, D02 | T01 | Todo |
 ```
 
 ### Step 6 — Confirm
@@ -194,7 +194,7 @@ Use this structure:
 - **Dependency**: {prerequisite Task ID or `—`}
 ```
 
-ID convention: follow the plan's existing pattern (e.g., `R10` if previous tasks are `R1`–`R9`; `T15` if `T1`–`T14`).
+ID convention: follow the plan's existing pattern (e.g., `R10` if previous tasks are `R01`–`R09`; `T15` if `T01`–`T14`).
 
 #### 5b. Append a row to the `Task Progress Table` (at the end of the plan)
 
@@ -230,11 +230,11 @@ Report back to the user:
 **User**: 「Design 都確認了，幫我生 Task」
 
 **Skill**:
-1. Reads the plan's Design 進度表 — all D1–D6 are `Done`
-2. Reads D1–D6 content in full
-3. Generates T1–T18 following task ordering (DB → Entity → API → Test → Implementation)
+1. Reads the plan's Design 進度表 — all D01–D06 are `Done`
+2. Reads D01–D06 content in full
+3. Generates T01–T18 following task ordering (DB → Entity → API → Test → Implementation)
 4. Appends `## Task` section with all tasks and Task 進度表
-5. Reports: 「✅ 已生成 18 個 Task (T1–T18)，進度表已附於 Design 之後」
+5. Reports: 「✅ 已生成 18 個 Task (T01–T18)，進度表已附於 Design 之後」
 
 ---
 
@@ -246,7 +246,7 @@ Report back to the user:
 1. Reads `docs/pxbox-26324_task_refactor.md` Background section
 2. Identifies intent: 「測試重組，零行為變更，零生產碼動到」
 3. Classifies as **Compatible** (typo fix, only test file attribute, no behavior change)
-4. Appends new task `R10` (next ID after R9) with Current state / Goal / Steps
+4. Appends new task `R10` (next ID after R09) with Current state / Goal / Steps
 5. Appends `R10` row to Task Progress Table with `Status = Todo`, `Dependency = —`
 6. Reports: 「✅ 已加入 R10 — 修正 `OrderQuantity.cs` 的 Trait typo」
 

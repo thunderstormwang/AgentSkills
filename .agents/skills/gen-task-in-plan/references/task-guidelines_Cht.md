@@ -1,6 +1,6 @@
 # Mode A —— Task 排序與類別規則 (Mode A Task Ordering & Category Rules)
 
-本指南適用於 `extend-task-in-plan` skill 的 **Mode A —— 初始 Task 生成**。涵蓋從 Design 生成 task 的排序與類別專屬規則。
+本指南適用於 `gen-task-in-plan` skill 的 **Mode A —— 初始 Task 生成**。涵蓋從 Design 生成 task 的排序與類別專屬規則。
 
 **Task 區塊格式**（欄位、範本、共用限制）請見 `task-format.md`。
 

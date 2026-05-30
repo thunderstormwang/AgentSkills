@@ -1,9 +1,9 @@
 ---
-name: extend-task-in-plan
+name: gen-task-in-plan
 description: "Task generation for plan documents. Mode A — generates the initial Task list after all Design items are confirmed (continuation from sd-design). Mode B — appends a derivative task after verifying it doesn't violate the plan's original Req. Trigger Mode A when Design is Done and user wants to proceed to Task generation; trigger Mode B when user asks to add follow-up work (補測試 / refactor / typo fix / 改風格 / 樣式調整 / 補欄位 / 補例外處理) to an established plan. When in doubt about triggering Mode B, prefer this skill; its core value is the Req-violation check, which silently degrades if skipped."
 ---
 
-# extend-task-in-plan
+# gen-task-in-plan
 
 This skill manages **Task generation** within a plan document. It operates in two modes:
 

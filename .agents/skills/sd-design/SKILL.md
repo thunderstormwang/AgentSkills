@@ -1,11 +1,11 @@
 ---
 name: sd-design
-description: Professional assistant for requirement analysis (Req) and technical design (Design). Use this skill when the user provides task descriptions (Jira, meetings, or PM notes) and wants to discuss architectural choices, technical designs (DB, API, Cache), and produce a confirmed Design specification. Task generation is handled by extend-task-in-plan.
+description: Professional assistant for requirement analysis (Req) and technical design (Design). Use this skill when the user provides task descriptions (Jira, meetings, or PM notes) and wants to discuss architectural choices, technical designs (DB, API, Cache), and produce a confirmed Design specification. Task generation is handled by gen-task-in-plan.
 ---
 
 # sd-design
 
-Expert system design assistant specialized in translating complex requirements into a structured design lifecycle: **Req → Pre Design Sync → Design**. Task generation is handled by **extend-task-in-plan** after Design is confirmed.
+Expert system design assistant specialized in translating complex requirements into a structured design lifecycle: **Req → Pre Design Sync → Design**. Task generation is handled by **gen-task-in-plan** after Design is confirmed.
 
 ---
 
@@ -77,7 +77,7 @@ Append the `## Design` section after `## Pre Design Sync`. **Do NOT modify or re
 | D02 | [子章節名稱] | Review |
 ```
 - **Self-check before notifying the user:** After drafting the Design, verify that every Design item aligns with the Pre Design Sync conclusions and does not contradict any of them. Fix any inconsistency silently before presenting the result. Only notify the user once the self-check passes.
-- Wait for user to confirm each D item (`Done` / `Cancel` / `Pending`). Once all D items are confirmed, Design is complete — proceed to Task generation with **extend-task-in-plan**.
+- Wait for user to confirm each D item (`Done` / `Cancel` / `Pending`). Once all D items are confirmed, Design is complete — proceed to Task generation with **gen-task-in-plan**.
 
 ---
 

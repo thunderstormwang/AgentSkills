@@ -1,6 +1,6 @@
 # Mode A — Task Ordering & Category Rules
 
-These guidelines apply to **Mode A — Initial Task Generation** of the `extend-task-in-plan` skill. They cover ordering and category-specific rules for tasks generated from Design.
+These guidelines apply to **Mode A — Initial Task Generation** of the `gen-task-in-plan` skill. They cover ordering and category-specific rules for tasks generated from Design.
 
 For the **task block format** (fields, templates, shared constraints), see `task-format.md`.
 

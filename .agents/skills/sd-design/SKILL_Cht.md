@@ -1,11 +1,11 @@
 ---
 name: sd-design
-description: 專業的需求分析 (Req) 與技術設計 (Design) 助手。當使用者提供任務描述（如 Jira、會議記錄或 PM 筆記），並希望討論架構選擇、技術設計（資料庫、API、快取）並產出確認的 Design 規格時，請使用此技能。Task 生成由 extend-task-in-plan 負責。
+description: 專業的需求分析 (Req) 與技術設計 (Design) 助手。當使用者提供任務描述（如 Jira、會議記錄或 PM 筆記），並希望討論架構選擇、技術設計（資料庫、API、快取）並產出確認的 Design 規格時，請使用此技能。Task 生成由 gen-task-in-plan 負責。
 ---
 
 # sd-design
 
-專家級系統設計助手，專門將複雜需求轉化為結構化的設計生命週期：**Req → Pre Design Sync → Design**。Design 確認後，Task 生成由 **extend-task-in-plan** 負責。
+專家級系統設計助手，專門將複雜需求轉化為結構化的設計生命週期：**Req → Pre Design Sync → Design**。Design 確認後，Task 生成由 **gen-task-in-plan** 負責。
 
 ---
 
@@ -77,7 +77,7 @@ description: 專業的需求分析 (Req) 與技術設計 (Design) 助手。當�
 | D02 | [子章節名稱] | Review |
 ```
 - **通知使用者前的自我檢查：** 草擬完 Design 後，驗證每個 Design 項目是否符合 Pre Design Sync 的結論且不與其衝突，同時確保 Design 項目之間亦不互相矛盾。如有不一致之處，請在呈現結果前自行修正。只有在通過自我檢查後才通知使用者。
-- 等待使用者確認每個 D 項目（`Done` / `Cancel` / `Pending`）。所有 D 項目確認後，Design 即完成 —— 接續使用 **extend-task-in-plan** 進行 Task 生成。
+- 等待使用者確認每個 D 項目（`Done` / `Cancel` / `Pending`）。所有 D 項目確認後，Design 即完成 —— 接續使用 **gen-task-in-plan** 進行 Task 生成。
 
 ---
 

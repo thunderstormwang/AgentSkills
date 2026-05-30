@@ -1,11 +1,11 @@
 ---
-name: extend-task-in-plan
+name: gen-task-in-plan
 description: "plan 文件的 Task 生成工具。Mode A —— 在所有 Design 項目確認後生成初始 Task 列表（sd-design 的延續）。Mode B —— 在驗證不違反 plan 原始 Req 後，附加衍生 task。當 Design 完成且使用者想進行 Task 生成時觸發 Mode A；當使用者要求在已建立的 plan 加入後續工作（補測試 / refactor / typo fix / 改風格 / 樣式調整 / 補欄位 / 補例外處理）時觸發 Mode B。不確定是否觸發 Mode B 時，傾向觸發本 skill；它的核心價值是 Req 違反檢查，跳過的話會無聲失效。"
 ---
 
 > **注意**：本檔為 `SKILL.md` 的繁體中文對照參考，**非執行用檔案**。skill router 實際載入的是英文版 `SKILL.md`；本檔僅供閱讀理解。兩者內容需保持同步。
 
-# extend-task-in-plan
+# gen-task-in-plan
 
 本 skill 管理 plan 文件內的 **Task 生成**，分為兩種模式：
 

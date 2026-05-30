@@ -177,6 +177,11 @@ Task 限制：
 
 Mode B 的 task 一律寫入**獨立的衍生檔案**，而不是原始 plan。這讓原始 plan 在接近 ~1000 行時仍保持可讀性。
 
+**Task 限制（與 Mode A 相同）：**
+- 每個 task = 一個邏輯 commit
+- 預設 ≤ 3 個檔案（機械式修改可超出）
+- 一次呼叫可生成**多個有依賴關係的 FT task**（例如 FT01 = 測試 task、FT02 = 實作 task 且 `Dependency: FT01`），透過 `Dependency` 欄位表達順序。
+
 #### 5a. 決定衍生 task 檔案路徑
 
 1. **擷取 Jira ticket 前綴**：從原始 plan 檔名去掉 `_plan.md` 尾綴：
@@ -205,7 +210,7 @@ Mode B 的 task ID 一律使用 `FT` 前綴（例如 `FT01`、`FT02`），不論
 #### 5d. 在衍生檔案末尾附加 task 細節區塊
 
 ```markdown
-### FT{NN} — {Short Title}
+### FT01 [任務名稱]
 
 - **Current state**: {現況 / 缺什麼 —— 1-2 行}
 - **Goal**: {這個 task 達成什麼 —— 1-2 行}
@@ -253,11 +258,11 @@ Mode B 的 task ID 一律使用 `FT` 前綴（例如 `FT01`、`FT02`），不論
 
 向使用者回報：
 
-- 新 Task ID（`FT{NN}`）
-- 一行摘要
+- 新 Task ID（例如 `FT01`，多個時可寫範圍如 `FT01`–`FT03`）
+- 每個 task 一行摘要
 - 寫入的衍生檔案路徑
 - 原始 plan 的 `## Follow-up Task` 章節是新建立還是已存在
-- Status 設為 `Todo`，待實作
+- 所有新 task 的 Status 設為 `Todo`，待實作
 
 ---
 
@@ -267,7 +272,7 @@ Mode B 的 task ID 一律使用 `FT` 前綴（例如 `FT01`、`FT02`），不論
 - **沿用既有風格**：若 plan 在既有 task 間有一致的格式 / 用詞，跟著走。
 - **冪等（Idempotent）**：若已存在範疇相似的 task，先詢問使用者再決定是否重複建立。
 - **不改程式碼**：本 skill 只編輯 plan 文件。程式碼實作之後交給 `implementation` skill 或 `implementation-agent`。
-- **Mode B — 每次呼叫一個 task（v1）**：若使用者一次要求多個 task，依序處理並逐一確認。
+- **Mode B — 允許一次新增多個 task**：一次呼叫可加入多個有依賴關係的 FT task。每個 task 都必須個別通過 Step 3 的分類檢查。
 
 ---
 

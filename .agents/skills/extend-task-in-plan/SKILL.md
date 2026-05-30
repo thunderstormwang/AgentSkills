@@ -175,6 +175,11 @@ Wait for the user's decision before proceeding.
 
 Mode B tasks are always written to a **separate follow-up file**, not the original plan. This keeps the original plan readable as it approaches ~1000 lines.
 
+**Task constraints (same as Mode A):**
+- Each task = one logical commit
+- Default ≤ 3 files per task (mechanical edits may span more)
+- One invocation may generate **multiple FT tasks** with dependencies (e.g., FT01 = test task, FT02 = implementation with `Dependency: FT01`). Express ordering via the `Dependency` field.
+
 #### 5a. Determine the follow-up file path
 
 1. **Extract the jira ticket prefix** by stripping `_plan.md` from the original plan filename:
@@ -203,7 +208,7 @@ Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the 
 #### 5d. Append the task detail block to the follow-up file
 
 ```markdown
-### FT{NN} — {Short Title}
+### FT01 [Task Name]
 
 - **Current state**: {what exists / what's missing — 1-2 lines}
 - **Goal**: {what this task achieves — 1-2 lines}
@@ -251,11 +256,11 @@ Section format:
 
 Report back to the user:
 
-- New Task ID (`FT{NN}`)
-- 1-line summary
+- New Task IDs (e.g., `FT01`, or a range like `FT01`–`FT03` when multiple)
+- 1-line summary per task
 - Follow-up file path that was written to
 - Whether the original plan's `## Follow-up Task` section was created or already existed
-- Status set to `Todo` pending implementation
+- Status set to `Todo` for all new tasks pending implementation
 
 ---
 
@@ -265,7 +270,7 @@ Report back to the user:
 - **Match existing style**: If the plan has consistent formatting / wording across existing tasks, follow them.
 - **Idempotent**: If a task with similar scope already exists, ask the user before duplicating.
 - **No code changes**: This skill only edits the plan document. Code implementation is delegated to `implementation` skill or `implementation-agent` later.
-- **Mode B — One task per invocation (v1)**: If the user requests multiple tasks, handle them sequentially and confirm each.
+- **Mode B — Multiple tasks allowed**: One invocation may add several FT tasks with dependencies. Each task must individually pass the Step 3 classification.
 
 ---
 

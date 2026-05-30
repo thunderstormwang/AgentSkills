@@ -181,6 +181,7 @@ Mode B 的 task 一律寫入**獨立的衍生檔案**，而不是原始 plan。�
 - 每個 task = 一個邏輯 commit
 - 預設 ≤ 3 個檔案（機械式修改可超出）
 - 一次呼叫可生成**多個有依賴關係的 FT task**（例如 FT01 = 測試 task、FT02 = 實作 task 且 `Dependency: FT01`），透過 `Dependency` 欄位表達順序。
+- **無預設排序規則** —— 不像 Mode A 有 DB → Entity → API → Test → Impl 的固定順序，Mode B 的後續工作太多樣化無法預先排序（補測試 / 改文件 / 純改生產碼…）。AI 依實際依賴關係逐案判斷順序並向使用者說明。
 
 #### 5a. 決定衍生 task 檔案路徑
 
@@ -214,15 +215,12 @@ Mode B 的 task ID 一律使用 `FT` 前綴（例如 `FT01`、`FT02`），不論
 
 - **Current state**: {現況 / 缺什麼 —— 1-2 行}
 - **Goal**: {這個 task 達成什麼 —— 1-2 行}
-- **Approach**: {如何實作 —— 2-4 行或條列}
-- **Steps**:
-  1. {步驟 1}
-  2. {步驟 2}
-  ...
-- **Affected Files**:
-  - `{path 1}`
-  - `{path 2}`
-- **Dependency**: {前置 FT ID 或 `—`}
+- **Dependency**: {前置 FT ID 或 `None`}
+- **Target**: `[專案名稱]` -> `[類別名稱]` -> `[方法名稱]`
+- **Implementation Details**:
+    - [步驟 1: 具體邏輯/指令]
+    - [步驟 2: 具體邏輯/指令]
+- **Affected Files**: (列出所有受影響檔案；遵循上方「檔案限制」規則)
 ```
 
 #### 5e. 在衍生檔案的 Follow-up Task 進度表中附加一列

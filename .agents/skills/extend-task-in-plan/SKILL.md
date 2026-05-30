@@ -179,6 +179,7 @@ Mode B tasks are always written to a **separate follow-up file**, not the origin
 - Each task = one logical commit
 - Default ≤ 3 files per task (mechanical edits may span more)
 - One invocation may generate **multiple FT tasks** with dependencies (e.g., FT01 = test task, FT02 = implementation with `Dependency: FT01`). Express ordering via the `Dependency` field.
+- **No preset ordering rule** — unlike Mode A's DB → Entity → API → Test → Impl flow, Mode B's follow-up work is too varied to pre-order (補測試 / 改文件 / 純改生產碼…). The AI decides order case by case based on actual dependencies and surfaces the proposed order to the user.
 
 #### 5a. Determine the follow-up file path
 
@@ -212,15 +213,12 @@ Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the 
 
 - **Current state**: {what exists / what's missing — 1-2 lines}
 - **Goal**: {what this task achieves — 1-2 lines}
-- **Approach**: {how to implement — 2-4 lines or bullet list}
-- **Steps**:
-  1. {step 1}
-  2. {step 2}
-  ...
-- **Affected Files**:
-  - `{path 1}`
-  - `{path 2}`
-- **Dependency**: {prerequisite FT ID or `—`}
+- **Dependency**: {prerequisite FT ID or `None`}
+- **Target**: `[Project Name]` -> `[Class Name]` -> `[Method Name]`
+- **Implementation Details**:
+    - [Step 1: Specific logic/instruction]
+    - [Step 2: Specific logic/instruction]
+- **Affected Files**: (List all affected files; respect the File Limit rule above)
 ```
 
 #### 5e. Append a row to the Follow-up Task 進度表 in the follow-up file

@@ -60,19 +60,12 @@ The key invariant for Mode B: the new task must serve the plan's original purpos
 
 ### Step 4 — Generate Task list
 
-Follow the ordering from `references/task-guidelines.md` (located at `.agents/skills/extend-task-in-plan/references/task-guidelines.md`):
+Follow:
+- **Task block format** from `references/task-format.md` (Mode A template + shared constraints: one commit per task, ≤ 3 files, implementation code belongs here)
+- **Ordering & category rules** from `references/task-guidelines.md` (DB → Entity → API → API Summary → Test → Impl; SQL filename; documentation-only API Summary)
 
-1. **DB Schema changes** — SQL script tasks first
-2. **Entity / Domain changes** — core business structures
-3. **API Contract changes** — Request/Response model tasks
-4. **API Summary** — documentation-only task immediately after API contracts
-5. **Test Tasks** — independent test tasks (Fail-First, placed before implementation)
-6. **Functional Implementation** — detailed logic, developed until tests pass
-
-Task constraints:
-- Each task = one logical commit
-- Default ≤ 3 files per task (mechanical edits may span more)
-- Each task MUST include a **Reference** field pointing to the Design ID(s) it implements
+**Mode A-specific rule:**
+- Each Task MUST include a **Reference** field pointing to the Design ID(s) it implements.
 
 **Self-check before notifying the user:**
 - Every non-Cancelled Design item is covered by ≥ 1 Task
@@ -175,9 +168,9 @@ Wait for the user's decision before proceeding.
 
 Mode B tasks are always written to a **separate follow-up file**, not the original plan. This keeps the original plan readable as it approaches ~1000 lines.
 
-**Task constraints (same as Mode A):**
-- Each task = one logical commit
-- Default ≤ 3 files per task (mechanical edits may span more)
+**Task block format:** Use the **Mode B template** in `references/task-format.md`. Shared constraints apply (one commit per task, ≤ 3 files per task).
+
+**Mode B-specific rules:**
 - One invocation may generate **multiple FT tasks** with dependencies (e.g., FT01 = test task, FT02 = implementation with `Dependency: FT01`). Express ordering via the `Dependency` field.
 - **No preset ordering rule** — unlike Mode A's DB → Entity → API → Test → Impl flow, Mode B's follow-up work is too varied to pre-order (補測試 / 改文件 / 純改生產碼…). The AI decides order case by case based on actual dependencies and surfaces the proposed order to the user.
 
@@ -208,18 +201,7 @@ Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the 
 
 #### 5d. Append the task detail block to the follow-up file
 
-```markdown
-### FT01 [Task Name]
-
-- **Current state**: {what exists / what's missing — 1-2 lines}
-- **Goal**: {what this task achieves — 1-2 lines}
-- **Dependency**: {prerequisite FT ID or `None`}
-- **Target**: `[Project Name]` -> `[Class Name]` -> `[Method Name]`
-- **Implementation Details**:
-    - [Step 1: Specific logic/instruction]
-    - [Step 2: Specific logic/instruction]
-- **Affected Files**: (List all affected files; respect the File Limit rule above)
-```
+Use the **Mode B template** from `references/task-format.md`. Field order: `Current state` → `Goal` → `Dependency` → `Target` → `Implementation Details` → `Affected Files`.
 
 #### 5e. Append a row to the Follow-up Task 進度表 in the follow-up file
 

@@ -62,19 +62,12 @@ Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不�
 
 ### Step 4 — 生成 Task 列表
 
-依 `references/task-guidelines.md` 的順序（位於 `.agents/skills/extend-task-in-plan/references/task-guidelines.md`）：
+依下列兩份 reference：
+- **Task 區塊格式**：見 `references/task-format.md`（Mode A 範本 + 共用限制：一 commit、≤ 3 檔、實作碼歸 Task）
+- **排序與類別規則**：見 `references/task-guidelines.md`（DB → Entity → API → API Summary → Test → Impl；SQL 檔名；API Summary 純文件 task）
 
-1. **DB Schema 變更** —— SQL script task 優先
-2. **Entity / Domain 變更** —— 核心業務結構
-3. **API 合約變更** —— Request/Response model task
-4. **API Summary** —— API 合約後立即附上的純文件 task
-5. **Test Task** —— 獨立測試任務（Fail-First，置於實作之前）
-6. **功能實作** —— 詳細邏輯，開發至測試通過
-
-Task 限制：
-- 每個 task = 一個邏輯 commit
-- 預設 ≤ 3 個檔案（機械式修改可超出）
-- 每個 task 必須包含 **Reference** 欄位，指向它所實作的 Design ID
+**Mode A 專屬規則：**
+- 每個 Task 必須包含 **Reference** 欄位，指向它所實作的 Design ID。
 
 **通知使用者前的自我檢查：**
 - 每個非取消的 Design 項目都被 ≥ 1 個 Task 覆蓋
@@ -177,9 +170,9 @@ Task 限制：
 
 Mode B 的 task 一律寫入**獨立的衍生檔案**，而不是原始 plan。這讓原始 plan 在接近 ~1000 行時仍保持可讀性。
 
-**Task 限制（與 Mode A 相同）：**
-- 每個 task = 一個邏輯 commit
-- 預設 ≤ 3 個檔案（機械式修改可超出）
+**Task 區塊格式：** 使用 `references/task-format.md` 的 **Mode B 範本**。共用限制適用（一 commit、≤ 3 檔）。
+
+**Mode B 專屬規則：**
 - 一次呼叫可生成**多個有依賴關係的 FT task**（例如 FT01 = 測試 task、FT02 = 實作 task 且 `Dependency: FT01`），透過 `Dependency` 欄位表達順序。
 - **無預設排序規則** —— 不像 Mode A 有 DB → Entity → API → Test → Impl 的固定順序，Mode B 的後續工作太多樣化無法預先排序（補測試 / 改文件 / 純改生產碼…）。AI 依實際依賴關係逐案判斷順序並向使用者說明。
 
@@ -210,18 +203,7 @@ Mode B 的 task ID 一律使用 `FT` 前綴（例如 `FT01`、`FT02`），不論
 
 #### 5d. 在衍生檔案末尾附加 task 細節區塊
 
-```markdown
-### FT01 [任務名稱]
-
-- **Current state**: {現況 / 缺什麼 —— 1-2 行}
-- **Goal**: {這個 task 達成什麼 —— 1-2 行}
-- **Dependency**: {前置 FT ID 或 `None`}
-- **Target**: `[專案名稱]` -> `[類別名稱]` -> `[方法名稱]`
-- **Implementation Details**:
-    - [步驟 1: 具體邏輯/指令]
-    - [步驟 2: 具體邏輯/指令]
-- **Affected Files**: (列出所有受影響檔案；遵循上方「檔案限制」規則)
-```
+使用 `references/task-format.md` 的 **Mode B 範本**。欄位順序：`Current state` → `Goal` → `Dependency` → `Target` → `Implementation Details` → `Affected Files`。
 
 #### 5e. 在衍生檔案的 Follow-up Task 進度表中附加一列
 

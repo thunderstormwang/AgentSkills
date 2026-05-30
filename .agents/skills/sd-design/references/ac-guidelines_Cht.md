@@ -16,7 +16,7 @@
      - 單筆下限保留（如「每件至少留 $1」）
      - 提早離開的分支（例如 `if (remainder == 0) break;`）
 
-  4. **AC ID 用 `AC-{案型}-{序號}`，不用全域連續編號**：在單一案型中新增或刪除 AC 時，不應該影響其他案型的編號。案型前綴也可以當作測試類別 / 方法命名的提示（例如 `AC-滿件金-1` 對應到 `OrderQuantity_Money_NoCumulate_Test`）。
+  4. **AC ID 用 `AC-{案型}-{序號}`，不用全域連續編號**：在單一案型中新增或刪除 AC 時，不應該影響其他案型的編號。案型前綴也可以當作測試類別 / 方法命名的提示（例如 `AC-滿件金-01` 對應到 `OrderQuantity_Money_NoCumulate_Test`）。
 
   5. **驗 observable behavior，不耦合 internal pipeline**：描述結果（達標 / 跳過 / 折扣）時，使用**外部可觀察的條件**（例如「首購商品 A 存在於購物車」），不要描述內部 pipeline 狀態（例如「checkItems 縮減後總件數 3」、「進入 CheckPromoteCondition 看到 itemQtyTotal=2」）。AC 應能在 pipeline 階段、helper 方法、或命名被重構後仍然有效。
      - 違反例：寫「總件數 3 ≥ 門檻 1 達標」，但 `3` 是 pipeline 前的件數，Handler 內部已把 `checkItems` 縮減為 2。改用觀察到的觸發條件（如「首購商品 A 存在於購物車 → 達標」），AC 才能在 `checkItems` 被移除/改名的重構中存活。
@@ -45,8 +45,8 @@
       **高階 AC**（`{topic}_ac.md`）：供 PM / stakeholder validate spec 的規則摘要。**主要讀者：PM** — 以平易的業務語言撰寫；避免類別 / 方法名稱、欄位名稱與實作術語；以功能性描述取代技術用詞（例如 "LINQ stable sort" →「依輸入順序取第一件」）；平手規則與排序方式明確以自然語言說明。**不含 Given/When/Then。**
       - 內容：規則陳述、公式（如 `折扣 = totalAmount × (100 − 折數) / 100`）
       - **不寫**具體數值、計算追蹤、商品攤提明細
-      - ID 格式：`AC-{group}-N`（例如：`AC-現折-1`、`AC-贈點-1`）
-      - 案型 heading 加 ID prefix（例如：`## AC-現折-1 訂單滿件 — 現折金額`）
+      - ID 格式：`AC-{group}-N`（例如：`AC-現折-01`、`AC-贈點-01`）
+      - 案型 heading 加 ID prefix（例如：`## AC-現折-01 訂單滿件 — 現折金額`）
       - 共用 fields 抽到頂層「共用欄位定義」，分子組（共通 / 案型群組）
       - 每個案型章節必須包含兩個子段：
         - **系統欄位定義**：將領域 / 中文欄位名稱對應到英文系統欄位名稱（例如：觸發上限 → `CumulateLimit`、折扣金額 → `DiscountAmount`）
@@ -57,8 +57,8 @@
 
       **詳細實例化 TC（Spec by Example）**（`{topic}_tc_{layer}.md` — 可拆多檔）：**主要讀者：RD / QA / 單元測試撰寫者。必須使用 Given/When/Then 格式並附具體數值。禁止使用 `$X`、`$Y` 或「視設定而定」等占位符 — 若值依情境而異，拆成多筆具體 case。**
       - 內容：具體 Given/When/Then 含實際數值、計算追蹤、商品攤提明細
-      - ID 格式：`TC-{case_type}-N`（例如：`TC-滿件金-1`、`TC-整合-排序-1`）
-      - 開頭引用對應的 AC 章節（例如：「對應 AC-現折-1」）
+      - ID 格式：`TC-{case_type}-N`（例如：`TC-滿件金-01`、`TC-整合-排序-01`）
+      - 開頭引用對應的 AC 章節（例如：「對應 AC-現折-01」）
       - **術語對照**：文件開頭加一張對照表，將領域術語映射到系統欄位名稱（例如：活動結果 → `DiscountPromotions`、達標 → `IsApplied = true`）。讓文件自給自足，AI 可直接生成測試程式碼，無需另查 spec。
       - **驗收欄位對照**：以短表格或列表說明 Then 段所斷言的可觀察輸出結構（例如：「活動結果（DiscountPromotion）：IsApplied、LackAmount、DiscountAmount」；「各商品折扣明細（DiscountDetail）：ProductId、DiscountAmount」）。避免測試斷言了錯誤欄位或遺漏欄位。
 

@@ -16,7 +16,7 @@
      - Per-element floor / minimum preservation
      - Early-exit branches (e.g., `if (remainder == 0) break;`)
 
-  4. **AC ID format: `AC-{案型}-{序號}`, not global sequential** — Adding or removing ACs in one case type must not cause renumbering across the whole document. The case-prefix also doubles as a test-class / method naming hint (e.g., `AC-滿件金-1` maps to `OrderQuantity_Money_NoCumulate_Test`).
+  4. **AC ID format: `AC-{案型}-{序號}`, not global sequential** — Adding or removing ACs in one case type must not cause renumbering across the whole document. The case-prefix also doubles as a test-class / method naming hint (e.g., `AC-滿件金-01` maps to `OrderQuantity_Money_NoCumulate_Test`).
 
   5. **Test observable behavior, not internal pipeline** — When describing outcomes (達標 / 跳過 / 折扣), use externally observable conditions (e.g., "首購商品 A 存在於購物車"), not internal pipeline state (e.g., "checkItems 縮減後總件數 3", "進入 CheckPromoteCondition 看到 itemQtyTotal=2"). The AC must survive internal refactors of pipeline stages, helper methods, or naming.
      - Violation example: writing 「總件數 3 ≥ 門檻 1 達標」 when `3` is the pre-pipeline count but the Handler reduces `checkItems` to 2 internally. State the observable trigger (e.g., 「首購商品 A 存在於購物車 → 達標」) instead, so the AC survives a refactor that removes or renames `checkItems`.
@@ -45,8 +45,8 @@
       **High-level AC** (`{topic}_ac.md`): rule summary for PM / stakeholder validation. **Primary reader: PM** — plain business language; avoid class / method names, field names, and implementation jargon; replace technical terms with functional descriptions (e.g., "LINQ stable sort" → "依輸入順序取第一件"); make tie-break and sort orders explicit in natural language. **No Given/When/Then.**
       - Content: rule statements, formulas (e.g., 折扣 = totalAmount × (100 − 折數) / 100)
       - **NO** concrete values, calculation traces, per-item attribution
-      - ID format: `AC-{group}-N` (e.g., `AC-現折-1`, `AC-贈點-1`)
-      - 案型 heading prefix with ID (e.g., `## AC-現折-1 訂單滿件 — 現折金額`)
+      - ID format: `AC-{group}-N` (e.g., `AC-現折-01`, `AC-贈點-01`)
+      - 案型 heading prefix with ID (e.g., `## AC-現折-01 訂單滿件 — 現折金額`)
       - 共用 fields 抽到頂層「共用欄位定義」，分子組（共通 / 案型群組）
       - Each 案型 chapter has two mandatory sub-sections:
         - **系統欄位定義**: maps domain / Chinese field names → English system field names (e.g., 觸發上限 → `CumulateLimit`, 折扣金額 → `DiscountAmount`)
@@ -57,8 +57,8 @@
 
       **Detailed TC / Spec by Example** (`{topic}_tc_{layer}.md` — 可拆多檔): **Primary reader: RD / QA / unit test writers. MUST use Given/When/Then format with concrete values. Placeholders such as `$X`, `$Y`, or "視設定而定" are forbidden — split into concrete cases instead.**
       - Content: concrete Given/When/Then with specific values, calculation traces, per-item attribution
-      - ID format: `TC-{case_type}-N` (e.g., `TC-滿件金-1`, `TC-整合-排序-1`)
-      - 開頭引用對應的 AC 章節（e.g., 「對應 AC-現折-1」）
+      - ID format: `TC-{case_type}-N` (e.g., `TC-滿件金-01`, `TC-整合-排序-01`)
+      - 開頭引用對應的 AC 章節（e.g., 「對應 AC-現折-01」）
       - **術語對照**: a mapping table at the start of each TC file — domain term → system field name (e.g., 活動結果 → `DiscountPromotions`, 達標 → `IsApplied = true`). Makes the TC self-contained; an AI test author can write test code without reading the spec separately.
       - **驗收欄位對照**: a short table or list explaining the observable output structure asserted in Then clauses (e.g., 「活動結果（DiscountPromotion）：IsApplied, LackAmount, DiscountAmount」; 「各商品折扣明細（DiscountDetail）：ProductId, DiscountAmount」). Prevents tests from asserting on wrong / missing fields.
 

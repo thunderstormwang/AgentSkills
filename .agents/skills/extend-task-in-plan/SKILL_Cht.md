@@ -172,16 +172,39 @@ Task 限制：
 
 等使用者決定後再繼續。
 
-### Step 5 — 附加 task
+### Step 5 — 寫入衍生 task 檔案
 
-在相容分類之後（或使用者選了選項 (b)）：
+Mode B 的 task 一律寫入**獨立的衍生檔案**，而不是原始 plan。這讓原始 plan 在接近 ~1000 行時仍保持可讀性。
 
-#### 5a. 在 `Task Implementation Details` 下附加一個細節區塊
+#### 5a. 決定衍生 task 檔案路徑
 
-使用以下結構：
+1. **擷取 Jira ticket 前綴**：從原始 plan 檔名去掉 `_plan.md` 尾綴：
+   - `docs/pxbox-26324_plan.md` → ticket 前綴：`pxbox-26324`
+2. **搜尋**同一目錄內是否有 `{ticket-prefix}_ft_*.md` 檔案。
+3. **若找到現有 FT 檔案** —— 列出後詢問使用者：附加到現有檔案，還是建立新檔？
+4. **若無 FT 檔案（或使用者選擇建立新檔）** —— 詢問使用者 `{XXX}` 標籤：
+   - 預設建議 `01`
+   - 使用者可改用描述性名稱（例如 `refactor`）
+   - 最終路徑：`{同一目錄}/{ticket-prefix}_ft_{XXX}.md`
+
+#### 5b. 若衍生檔案不存在 —— 建立它
+
+以此標題寫入檔案（使用指向原始 plan 的相對路徑）：
 
 ```markdown
-### {Next-ID} — {Short Title}
+# Follow-up Tasks
+
+> 本檔案為 [{原始 plan 檔名}](./{原始 plan 檔名}) 的衍生任務清單。
+```
+
+#### 5c. 指派下一個 FT ID
+
+Mode B 的 task ID 一律使用 `FT` 前綴（例如 `FT01`、`FT02`），不論原始 plan 採用何種 ID 模式。查看衍生檔案中現有的 Follow-up Task 進度表，取最大 `FT` 編號；若無，從 `FT01` 開始。
+
+#### 5d. 在衍生檔案末尾附加 task 細節區塊
+
+```markdown
+### FT{NN} — {Short Title}
 
 - **Current state**: {現況 / 缺什麼 —— 1-2 行}
 - **Goal**: {這個 task 達成什麼 —— 1-2 行}
@@ -193,24 +216,46 @@ Task 限制：
 - **Affected Files**:
   - `{path 1}`
   - `{path 2}`
-- **Dependency**: {前置 Task ID 或 `—`}
+- **Dependency**: {前置 FT ID 或 `—`}
 ```
 
-ID 慣例：沿用 plan 既有的模式（例如前面是 `R01`–`R09` 就用 `R10`；前面是 `T01`–`T14` 就用 `T15`）。
+#### 5e. 在衍生檔案的 Follow-up Task 進度表中附加一列
 
-#### 5b. 在 `Task Progress Table`（plan 末尾）附加一列
+若進度表尚不存在，在最後一個 task 區塊之後新增：
 
-附加一列，欄位為 `ID | Task Description | Status | Dependency`。Status 預設 `Todo`。
+```markdown
+### Follow-up Task 進度表
+| ID | 項目 | 引用 | 依賴 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| FT01 | [Task 名稱] | — | — | Todo |
+```
 
-若 plan 既有表格有額外欄位（例如 `引用`），沿用既有 schema，不要強加新結構。
+若進度表已存在，附加新的一列。
+
+#### 5f. 維護原始 plan 的 `## Follow-up Task` 章節
+
+- 若章節不存在：在 `## Task` 之後附加
+- 若存在但當前 FT 檔尚未列出：補上引用行
+- 若存在且 FT 檔已列出（附加到既有檔案）：不需更動
+
+章節格式：
+
+```markdown
+## Follow-up Task
+
+> 衍生任務清單：
+> - [{ticket-prefix}_ft_01.md](./{ticket-prefix}_ft_01.md)
+> - [{ticket-prefix}_ft_refactor.md](./{ticket-prefix}_ft_refactor.md)
+```
 
 ### Step 6 — 確認回報
 
 向使用者回報：
 
-- 新 Task ID
+- 新 Task ID（`FT{NN}`）
 - 一行摘要
-- 被修改的 plan 檔路徑
+- 寫入的衍生檔案路徑
+- 原始 plan 的 `## Follow-up Task` 章節是新建立還是已存在
 - Status 設為 `Todo`，待實作
 
 ---
@@ -248,9 +293,11 @@ ID 慣例：沿用 plan 既有的模式（例如前面是 `R01`–`R09` 就用 `
 1. 讀 `docs/pxbox-26324_task_refactor.md` Background 段
 2. 辨識意圖：「測試重組，零行為變更，零生產碼動到」
 3. 分類為 **相容**（typo 修正、只動測試檔屬性、無行為變更）
-4. 附加新 task `R10`（R09 之後的下一個 ID），含 Current state / Goal / Steps
-5. 在 Task Progress Table 附加 `R10` 列，`Status = Todo`、`Dependency = —`
-6. 回報：「✅ 已加入 R10 — 修正 `OrderQuantity.cs` 的 Trait typo」
+4. 找不到現有 `pxbox-26324_ft_*.md`，詢問使用者 `{XXX}` 標籤；使用者確認 `01` → 建立 `docs/pxbox-26324_ft_01.md` 並寫入引用原始 plan 的標題
+5. 在 `docs/pxbox-26324_ft_01.md` 附加 `FT01` task 細節區塊
+6. 在衍生檔案的 Follow-up Task 進度表附加 `FT01` 列
+7. 在原始 plan 附加 `## Follow-up Task` 章節，引用 `pxbox-26324_ft_01.md`
+8. 回報：「✅ 已加入 FT01 — 修正 `OrderQuantity.cs` 的 Trait typo（寫入 docs/pxbox-26324_ft_01.md）」
 
 ### 範例 3 — Mode B：違反 task
 

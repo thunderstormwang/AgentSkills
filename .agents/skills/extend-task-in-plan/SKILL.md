@@ -170,16 +170,39 @@ Wait for the user's decision before proceeding.
 
 Wait for the user's decision before proceeding.
 
-### Step 5 — Append the task
+### Step 5 — Write to the follow-up task file
 
-After compatible classification (or user chose option (b)):
+Mode B tasks are always written to a **separate follow-up file**, not the original plan. This keeps the original plan readable as it approaches ~1000 lines.
 
-#### 5a. Append a detail block under `Task Implementation Details`
+#### 5a. Determine the follow-up file path
 
-Use this structure:
+1. **Extract the jira ticket prefix** by stripping `_plan.md` from the original plan filename:
+   - `docs/pxbox-26324_plan.md` → ticket prefix: `pxbox-26324`
+2. **Search** the same directory for existing `{ticket-prefix}_ft_*.md` files.
+3. **If existing FT files are found** — list them and ask the user: append to an existing file, or create a new one?
+4. **If no FT files exist (or user chooses to create a new file)** — ask the user for the `{XXX}` label:
+   - Suggest `01` as the default
+   - User may provide a descriptive label instead (e.g., `refactor`)
+   - Final path: `{same-directory}/{ticket-prefix}_ft_{XXX}.md`
+
+#### 5b. If the follow-up file does not exist — create it
+
+Write the file with this header (use a relative path back to the original plan):
 
 ```markdown
-### {Next-ID} — {Short Title}
+# Follow-up Tasks
+
+> 本檔案為 [{original-plan-filename}](./{original-plan-filename}) 的衍生任務清單。
+```
+
+#### 5c. Assign the next FT ID
+
+Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the original plan's ID pattern. Check the existing Follow-up Task 進度表 in the follow-up file for the highest `FT` number; if none exists, start at `FT01`.
+
+#### 5d. Append the task detail block to the follow-up file
+
+```markdown
+### FT{NN} — {Short Title}
 
 - **Current state**: {what exists / what's missing — 1-2 lines}
 - **Goal**: {what this task achieves — 1-2 lines}
@@ -191,24 +214,46 @@ Use this structure:
 - **Affected Files**:
   - `{path 1}`
   - `{path 2}`
-- **Dependency**: {prerequisite Task ID or `—`}
+- **Dependency**: {prerequisite FT ID or `—`}
 ```
 
-ID convention: follow the plan's existing pattern (e.g., `R10` if previous tasks are `R01`–`R09`; `T15` if `T01`–`T14`).
+#### 5e. Append a row to the Follow-up Task 進度表 in the follow-up file
 
-#### 5b. Append a row to the `Task Progress Table` (at the end of the plan)
+If the table does not exist yet, add it after the last task block:
 
-Append a row with columns: `ID | Task Description | Status | Dependency`. Default Status to `Todo`.
+```markdown
+### Follow-up Task 進度表
+| ID | 項目 | 引用 | 依賴 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- |
+| FT01 | [Task 名稱] | — | — | Todo |
+```
 
-If the plan's existing table has additional columns (e.g., `引用`), match the existing schema rather than imposing a new one.
+If it already exists, append a new row.
+
+#### 5f. Keep the original plan's `## Follow-up Task` section up to date
+
+- If the section does not exist: append it after `## Task`
+- If it exists but the current FT file is not yet listed: add a reference line for it
+- If it exists and the current FT file is already listed (appending to existing): no change
+
+Section format:
+
+```markdown
+## Follow-up Task
+
+> 衍生任務清單：
+> - [{ticket-prefix}_ft_01.md](./{ticket-prefix}_ft_01.md)
+> - [{ticket-prefix}_ft_refactor.md](./{ticket-prefix}_ft_refactor.md)
+```
 
 ### Step 6 — Confirm
 
 Report back to the user:
 
-- New Task ID
+- New Task ID (`FT{NN}`)
 - 1-line summary
-- Plan file path that was modified
+- Follow-up file path that was written to
+- Whether the original plan's `## Follow-up Task` section was created or already existed
 - Status set to `Todo` pending implementation
 
 ---
@@ -246,9 +291,11 @@ Report back to the user:
 1. Reads `docs/pxbox-26324_task_refactor.md` Background section
 2. Identifies intent: 「測試重組，零行為變更，零生產碼動到」
 3. Classifies as **Compatible** (typo fix, only test file attribute, no behavior change)
-4. Appends new task `R10` (next ID after R09) with Current state / Goal / Steps
-5. Appends `R10` row to Task Progress Table with `Status = Todo`, `Dependency = —`
-6. Reports: 「✅ 已加入 R10 — 修正 `OrderQuantity.cs` 的 Trait typo」
+4. No existing `pxbox-26324_ft_*.md` found — asks user for `{XXX}` label; user confirms `01` → creates `docs/pxbox-26324_ft_01.md` with header referencing original plan
+5. Appends `FT01` task detail block to `docs/pxbox-26324_ft_01.md`
+6. Appends `FT01` row to Follow-up Task 進度表 in follow-up file
+7. Appends `## Follow-up Task` section to original plan, referencing `pxbox-26324_ft_01.md`
+8. Reports: 「✅ 已加入 FT01 — 修正 `OrderQuantity.cs` 的 Trait typo（寫入 docs/pxbox-26324_ft_01.md）」
 
 ### Example 3 — Mode B: Violating task
 

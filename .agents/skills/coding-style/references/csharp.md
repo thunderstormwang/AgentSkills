@@ -56,7 +56,7 @@ public void Configure(EntityTypeBuilder<Entity> builder)
 
 ### XML Documentation
 - **ALL public properties** in Entities MUST have `/// <summary>`.
-- Use **Full-width (全形)** for Chinese text, **Half-width (半形)** for everything else.
+- Chinese characters use **Full-width (全形)**; punctuation marks (`,`, `.`, `(`, `)`, `:`, `!`, `?`, etc.) MUST use **Half-width (半形)** — including when embedded in Chinese text.
 ```csharp
 /// <summary>
 /// 搜尋類型 (1: 純圖片搜尋, 2: 圖文搜尋)

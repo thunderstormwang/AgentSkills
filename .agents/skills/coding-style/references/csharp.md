@@ -19,6 +19,18 @@ public ProductRepository(
 ```csharp
 if (isFirstBuyMember) return GROUP_FIRST_BUY;
 ```
+- **Early Return / Early Continue**: Prefer inverting conditions to exit early rather than wrapping the happy path in a nested block. Apply to both methods (early `return`) and loops (early `continue`).
+```csharp
+// Prefer this:
+if (!res.IsPass) continue;
+DoWork(res);
+
+// Over this:
+if (res.IsPass)
+{
+    DoWork(res);
+}
+```
 
 ### SQL Strings
 - SQL must start from the **leftmost column** (ignore C# indentation).

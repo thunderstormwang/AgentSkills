@@ -19,6 +19,18 @@ public ProductRepository(
 ```csharp
 if (isFirstBuyMember) return GROUP_FIRST_BUY;
 ```
+- **Early Return / Early Continue**: 優先以反轉條件提早離開，而非將主要邏輯包在巢狀區塊內。方法中用 `return`，迴圈中用 `continue`。
+```csharp
+// 優先這樣寫:
+if (!res.IsPass) continue;
+DoWork(res);
+
+// 而非這樣:
+if (res.IsPass)
+{
+    DoWork(res);
+}
+```
 
 ### SQL 字串
 - SQL 必須從**最左欄**開始 (忽略 C# 縮排).

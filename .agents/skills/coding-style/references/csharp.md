@@ -34,6 +34,8 @@ if (res.IsPass)
 
 ### SQL Strings
 - SQL must start from the **leftmost column** (ignore C# indentation).
+- **Keywords UPPERCASE**: `SELECT`, `FROM`, `WHERE`, `AND`, `OR`, `JOIN`, `LEFT JOIN`, `ON`, `IS NULL`, `LIKE`, `AS`, `UNION ALL`, etc.
+- **Spaces around operators**: `r.is_delete = 0` (not `r.is_delete=0`); `x = @p` (not `x=@p`).
 - `SELECT` columns on separate lines, aligned with `AS`.
 - `WHERE` conditions start with `  AND` (two spaces).
 ```sql
@@ -42,6 +44,15 @@ SELECT psi.item_id          AS ProductId,
 FROM promotion_scope_items psi
 WHERE psi.item_type = 3
   AND psi.is_exclude = 0
+```
+- **No magic numbers for domain-coded columns**: when a column maps to a domain `Enumeration`, pass the value as a parameter sourced from `<Enum>.<Member>.Id` instead of a literal.
+```csharp
+// Prefer — parameter sourced from the domain Enumeration
+parameters.Add("@homeDeliveryType", DeliveryType.HomeDelivery.Id);
+// SQL:  WHERE delivery_type = @homeDeliveryType
+
+// Avoid — magic number in SQL
+// SQL:  WHERE delivery_type = 1
 ```
 
 ## Project Specific Patterns
@@ -59,6 +70,14 @@ public void Configure(EntityTypeBuilder<Entity> builder)
 }
 ```
 
+### Dapper Query Result Mapping
+- Read Dapper query results into a **dedicated query model** (e.g., `XxxQueryModel` under `Application/Models/<Audience>/`), then map it to the response ViewModel.
+- Do **NOT** `Read<>` directly into the API ViewModel — keep the DB read shape decoupled from the API contract.
+```csharp
+var rows = (await conn.QueryAsync<MemberReceiverQueryModel>(sql, p)).ToList();
+var vo = rows.Select(x => new MemberReceiverItemVo(x)).ToList();
+```
+
 ### Member Ordering
 1. Constants & Fields
 2. Constructors
@@ -74,7 +93,29 @@ public void Configure(EntityTypeBuilder<Entity> builder)
 /// 搜尋類型 (1: 純圖片搜尋, 2: 圖文搜尋)
 /// </summary>
 ```
+- When a member's meaning is **defined by another type/property** (e.g., an internal DTO/query-model field mirroring an entity property), reference it with `<see cref="..."/>` instead of restating the description — it stays accurate when the source changes.
+```csharp
+/// <summary>
+/// <see cref="MemberEntity.IsBlocked"/>
+/// </summary>
+public bool IsBlocked { get; set; }
+```
+- **Exception — API input/output models**: do **NOT** use `<see cref="..."/>` on Request/Response/ViewModel members exposed via Swagger. Swashbuckle does not resolve crefs into the OpenAPI schema description (the text is lost). For these, **spell out the description literally** — and for enum-coded fields, **list every value inline**.
+```csharp
+/// <summary>
+/// 地址類型 (1: 宅配, 2: 店取, 3: 超取)
+/// </summary>
+public int AddressType { get; set; }
+```
 
 ## API Design Standards
 - Use **ONLY GET and POST**.
 - **GET**: For queries. **POST**: For Create, Update, Delete.
+
+## Testing
+- Use **FluentAssertions** for assertions, not raw `Assert.*`.
+```csharp
+result.TotalCount.Should().Be(2);
+failed.Success.Should().BeFalse();
+result.Results.Should().ContainSingle(r => r.MemberId == 2);
+```

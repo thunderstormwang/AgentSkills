@@ -1,9 +1,9 @@
 ---
-name: code-review
+name: my-code-review
 description: Performs structured code review against a plan document (Req / Pre Design Sync / Design / Task). Use this skill when the user wants to review an implementation against a plan to verify correctness, intent alignment, and code quality.
 ---
 
-# code-review
+# my-code-review
 
 A structured code review engine that validates implementation against a plan document. It works top-down from intent to detail, ensuring the implementation not only matches the plan but is also correct, safe, and maintainable.
 

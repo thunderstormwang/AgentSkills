@@ -1,9 +1,9 @@
 ---
-name: code-review
+name: my-code-review
 description: 根據計畫文件 (Req / Pre Design Sync / Design / Task) 進行結構化程式碼審查。當使用者希望針對計畫審查實作內容，以驗證正確性、意圖對齊與程式碼品質時，請使用此技能。
 ---
 
-# code-review
+# my-code-review
 
 一個結構化的程式碼審查引擎，用於根據計畫文件驗證實作內容。它採取由上而下（從意圖到細節）的方式，確保實作不僅符合計畫，而且正確、安全且具備可維護性。
 

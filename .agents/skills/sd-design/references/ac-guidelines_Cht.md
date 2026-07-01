@@ -57,7 +57,7 @@
 
       **詳細實例化 TC（Spec by Example）**（`{topic}_tc_{layer}.md` — 可拆多檔）：**主要讀者：RD / QA / 單元測試撰寫者。必須使用 Given/When/Then 格式並附具體數值。禁止使用 `$X`、`$Y` 或「視設定而定」等占位符 — 若值依情境而異，拆成多筆具體 case。**
       - 內容：具體 Given/When/Then 含實際數值、計算追蹤、商品攤提明細
-      - ID 格式：`TC-{case_type}-N`（例如：`TC-滿件金-01`、`TC-整合-排序-01`）
+      - **Heading 格式：`{MethodUnderTest}_{Scenario}_{ExpectedBehavior}`**（例如：`Handle_MemberHasOldCard_DisablesOldCardAddsNewCardAndClearsCache`）— 可直接作為單元測試的方法名稱。Heading 下方緊接一行 blockquote（`> ...`）作為中文描述。
       - 開頭引用對應的 AC 章節（例如：「對應 AC-現折-01」）
       - **術語對照**：文件開頭加一張對照表，將領域術語映射到系統欄位名稱（例如：活動結果 → `DiscountPromotions`、達標 → `IsApplied = true`）。讓文件自給自足，AI 可直接生成測試程式碼，無需另查 spec。
       - **驗收欄位對照**：以短表格或列表說明 Then 段所斷言的可觀察輸出結構（例如：「活動結果（DiscountPromotion）：IsApplied、LackAmount、DiscountAmount」；「各商品折扣明細（DiscountDetail）：ProductId、DiscountAmount」）。避免測試斷言了錯誤欄位或遺漏欄位。

@@ -118,6 +118,7 @@ description: 專業的需求分析 (Req) 與技術設計 (Design) 助手。當�
      - 全新開發：建議的新檔案路徑或 namespace
   - 每個條目：一句話描述 現行（全新開發填 `N/A (new)`），一句話描述 調整（全新開發填 `新建：目的 + 職責`），以及代表性 路徑
   - ⚠️ **TIA 僅供參考，非最終定論。** Pre Design Sync 和 Design 階段必須重新閱讀實際程式碼（重構模式）或敲定詳細結構（全新開發模式）——不可將 TIA 視為完整或權威的規格
+  - **現行 / 調整欄位的語言規則：** 僅使用功能性/行為性描述——不得出現 method 名稱、class 名稱、field 名稱或 interface 名稱。若某句話點名了特定 class 或 method，該內容屬於 Design，而非 TIA。代表路徑欄位不受此規則限制。
 
 - **Acceptance Criteria（驗收標準）：** 需求被視為已實現所必須滿足的條件。**AC 的主要讀者為 PM / stakeholder** — 使用平易的業務語言，不得出現技術術語、類別名稱或方法名稱。Given/When/Then 格式屬於 TC，不屬於 AC（詳見原則 11）。
 
@@ -146,6 +147,13 @@ description: 專業的需求分析 (Req) 與技術設計 (Design) 助手。當�
 - **快取策略 (Caching Strategy)：** **Key 命名慣例**、TTL、資料結構以及介面/方法定義。
 - **核心邏輯規格 (Core Logic Spec)：** **行為轉變**的描述（例如：模式 A 與模式 B 之間的優先級邏輯、狀態轉移）。**必須明確處理並行性 (Concurrency)（例如：潛在的競態條件 Race Conditions）與錯誤處理（例如：外部 API 失敗時的回滾或補償機制）。**
 - **元件流程 (Component Flow)：** 模組之間的**呼叫序列**與副作用（例如：「儲存後，更新快取 X 然後發佈事件 Y」）。**務必提供圖表（例如：Mermaid 序列圖或流程圖）**來視覺化流程，而非僅依賴文字描述。
+- **Test Plan：** 識別需要測試的對象與位置。規則：
+  - TC 細節獨立放在**與 plan 同目錄的 `{ticket}_tc.md` 檔案**中——不得內嵌於 plan。
+  - Test Plan 章節內容包含：測試對象、測試框架、新測試檔路徑，以及 TC 檔連結（`[{ticket}_tc.md]({ticket}_tc.md)`）。
+  - Req 的 AC **不引用** TC 檔。Test Plan 章節是 Design 中唯一指向 TC 檔的入口。
+  - 若本次變更無任何需測試的新增或修改邏輯（例如純文件、僅設定變更），可省略此章節。
+
+  TC 撰寫原則（Given/When/Then 格式、ID 格式、術語對照、cross-reference 規則）詳見 `references/ac-guidelines_Cht.md`。
 
 
 ---

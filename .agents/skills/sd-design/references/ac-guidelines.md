@@ -57,7 +57,7 @@
 
       **Detailed TC / Spec by Example** (`{topic}_tc_{layer}.md` — 可拆多檔): **Primary reader: RD / QA / unit test writers. MUST use Given/When/Then format with concrete values. Placeholders such as `$X`, `$Y`, or "視設定而定" are forbidden — split into concrete cases instead.**
       - Content: concrete Given/When/Then with specific values, calculation traces, per-item attribution
-      - ID format: `TC-{case_type}-N` (e.g., `TC-滿件金-01`, `TC-整合-排序-01`)
+      - **Heading format: `{MethodUnderTest}_{Scenario}_{ExpectedBehavior}`** (e.g., `Handle_MemberHasOldCard_DisablesOldCardAddsNewCardAndClearsCache`) — directly usable as a unit test method name. Add a one-line Chinese description as a blockquote (`> ...`) immediately under the heading.
       - 開頭引用對應的 AC 章節（e.g., 「對應 AC-現折-01」）
       - **術語對照**: a mapping table at the start of each TC file — domain term → system field name (e.g., 活動結果 → `DiscountPromotions`, 達標 → `IsApplied = true`). Makes the TC self-contained; an AI test author can write test code without reading the spec separately.
       - **驗收欄位對照**: a short table or list explaining the observable output structure asserted in Then clauses (e.g., 「活動結果（DiscountPromotion）：IsApplied, LackAmount, DiscountAmount」; 「各商品折扣明細（DiscountDetail）：ProductId, DiscountAmount」). Prevents tests from asserting on wrong / missing fields.

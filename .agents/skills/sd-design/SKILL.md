@@ -118,6 +118,7 @@ Clearly define the business context:
      - Greenfield: suggested target file paths or namespaces for the new component
   - Each entry: one sentence for 現行 (or `N/A (new)` for greenfield), one sentence for 調整 (or `新建：目的 + 職責` for greenfield), and representative 路徑
   - ⚠️ **TIA is reference-level, not definitive.** Pre Design Sync and Design phases must re-read the actual code (refactor) or finalize the detailed structure (greenfield) — do not treat TIA as a complete or authoritative spec
+  - **Language rule for 現行 / 調整 columns:** Use functional/behavioral descriptions only — no method names, class names, field names, or interface names. If a sentence names a specific class or method, it belongs in Design, not TIA. File paths in the 代表路徑 column are exempt from this rule.
 
 - **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled. **Primary reader of AC is PM / stakeholder** — write in plain business language; technical jargon, class names, and method names are forbidden. Given/When/Then belongs in TC, not AC (see Principle 11).
 
@@ -146,6 +147,13 @@ Detail the **structural and behavioral definition** (the "What" and "Where"). Fo
 - **Caching Strategy:** **Key naming conventions**, TTL, data structures, and Interface/Method definitions.
 - **Core Logic Spec:** Description of **behavioral shifts** (e.g., priority logic between Mode A and Mode B, state transitions). **Explicitly address Concurrency (e.g., potential Race Conditions) and Error Handling (e.g., rollback or compensation for external API failures).**
 - **Component Flow:** **Sequence of calls** between modules and side effects (e.g., "After saving, update Cache X then publish Event Y"). **Always provide diagrams (e.g., Mermaid sequence diagrams or flowcharts)** to visualize the flow instead of relying solely on text descriptions.
+- **Test Plan:** Identify what needs to be tested and where. Rules:
+  - TC details go in a **separate `{ticket}_tc.md` file** in the same directory as the plan — never inline in the plan.
+  - The Test Plan section contains: test target, test framework, new test file path, and a link to the TC file (`[{ticket}_tc.md]({ticket}_tc.md)`).
+  - AC in Req does **NOT** reference the TC file. The Test Plan section in Design is the sole entry point to the TC file.
+  - Omit this section only if the change has no new or modified testable logic (e.g., pure documentation, config-only changes).
+
+  Refer to `references/ac-guidelines.md` for TC writing principles (Given/When/Then format, ID format, terminology mapping, and cross-reference rules).
 
 
 ---

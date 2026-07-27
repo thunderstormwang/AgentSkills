@@ -1,6 +1,6 @@
 ---
 name: my-code-review
-description: 根據計畫文件 (Req / Pre Design Sync / Design / Task) 進行結構化程式碼審查。當使用者希望針對計畫審查實作內容，以驗證正確性、意圖對齊與程式碼品質時，請使用此技能。
+description: 對整條 feature 分支、對照其基底 (main) 進行結構化的多 agent 程式碼審查。分支若有計畫文件 (Req / Pre Design Sync / Design / Task) 就一併對照計畫審；沒有就純看 code 審。當使用者想審一條分支／feature——合併前檢查、「看我改了什麼」、正確性／意圖／可維護性——即使未提到計畫、未明說「review」，都請使用此技能。變更來源以 git diff 取得（非 gh），適用任何 host（GitHub、Gitea、自建）。
 ---
 
 # my-code-review
@@ -17,11 +17,32 @@ description: 根據計畫文件 (Req / Pre Design Sync / Design / Task) 進行�
 
 ---
 
+## 工作流程 (Workflow)
+
+一律是「**對整條 feature 分支、對照其基底 (main)** 的多 agent fan-out 審查」。唯一變數是分支有沒有計畫：有計畫就一併對照計畫審（層次 0–2），沒有就純看 code 審（層次 3–6）。
+
+1. **取材（用 git，不透過 PR host）：** `git diff <base>...HEAD`（三點；base 預設 `origin/main`，退而取 `main`）。適用任何 host（GitHub、Gitea、自建）。審已提交的內容，非未提交的零星修改。
+2. **偵測計畫：** 自動探測 repo 內的計畫／feature 文件（例如 `docs/` 下的 `plan.md`）——別寫死路徑。
+   - **有計畫 → 對照計畫審：** 全部層次適用，含計畫層 0–2。
+   - **無計畫 → 純 code 審：** 略過層次 0–2；靠層次 3–6，並從 code＋commit message 推 Design 意圖。
+3. **層次 0 由 orchestrator 集中做一次（僅有計畫時）：** 你自己在 fan-out **之前**由上而下讀完計畫——尤其 Pre Design Sync（刻意決策不是 bug）。把相關 Task／Design 片段分給各 subagent，而非讓每個 subagent 各自重讀、各自解讀整份計畫。
+4. **Fan-out——唯讀 subagent：** 做完的分支可能動 100+ 檔，別一次審完。把變更檔依 目錄／層／aggregate 分群，每群開一個唯讀 review subagent（上限約 5–6；更多就分批）。每個 subagent：
+   - 載入涵蓋其範圍的專案 coding-convention／架構 skill——該 skill 是那些慣例的單一來源，故此處不重述；
+   - 對自己那塊套用層次 1–6（層次 1–2 僅在有計畫時）；
+   - **讀足夠的周邊脈絡再推理**——別只看 diff，只看 diff 會漏掉深層並發／資料流 bug；
+   - 對抗式自我覆核每條 finding，回報 `file:line`＋具體失敗情境＋信心（HIGH/MED/LOW）。
+5. **彙整：** 去重成單一報告，並在呈現前對每條 MED 以上／🔴 親自對照 code 覆核。
+6. **成本護欄：** diff 非常大時，先回報規模（檔數／粗略 token 量）並確認後再 fan-out。
+
+---
+
 ## 審查層次 (Review Layers)
 
 請依此順序執行審查。每一層都建立在上一層的基礎之上。
 
-### 第 0 層 — 載入上下文 (開始審查前)
+### 第 0 層 — 載入上下文 (開始審查前) — *僅對照計畫審時*
+
+> 分支無計畫時，連同第 1–2 層一併略過。有計畫時，由 orchestrator 在 fan-out 前集中做一次（見工作流程）。
 
 **在接觸任何程式碼之前**，請由上而下閱讀計畫文件：
 
@@ -34,7 +55,7 @@ description: 根據計畫文件 (Req / Pre Design Sync / Design / Task) 進行�
 
 ---
 
-### 第 1 層 — 完整性 (Task vs 實作)
+### 第 1 層 — 完整性 (Task vs 實作) — *僅對照計畫審時*
 
 針對每個 Task 項目，驗證：
 - 預期的檔案是否存在且已被修改。
@@ -46,7 +67,7 @@ description: 根據計畫文件 (Req / Pre Design Sync / Design / Task) 進行�
 
 ---
 
-### 第 2 層 — 意圖對齊 (Design & Req vs 實作)
+### 第 2 層 — 意圖對齊 (Design & Req vs 實作) — *僅對照計畫審時*
 
 超越 Task 檢查清單：
 
@@ -124,7 +145,9 @@ description: 根據計畫文件 (Req / Pre Design Sync / Design / Task) 進行�
 
 ## 輸出格式
 
-### 逐項任務摘要 (Per-Task Summary)
+分支有計畫時依 **Task** 組織；無計畫時依 **區域／檔案群** 組織。兩者最後都以最終摘要表收尾，並沿用下方嚴重程度。
+
+### 逐項任務摘要 (Per-Task Summary，對照計畫審時)
 
 針對每個 Task ID，輸出一個區塊：
 
@@ -141,6 +164,10 @@ description: 根據計畫文件 (Req / Pre Design Sync / Design / Task) 進行�
 **描述：** [哪裡錯了以及為何重要]
 **建議：** [具體的修正方案或建議]
 ```
+
+### 無對應 Task／無計畫的變更
+
+做完的分支通常會有沒有對應 Task 的變更——review 中發現的修正、後續重構、順手整理——而無計畫的分支整個都屬此類。**別**因為沒有 Task 就略過。把它們依區域歸類（`非 Task 變更`，完全無計畫時則依檔案群），逐項就層次 3–6（正確性、影響追蹤、可觀測性、code smell）審查，有計畫時再加 Design 意圖。凡是相對 main 改變了對外可觀察行為的，都要標出來，使它是有意識的決定、而非默默漂移。
 
 ### 嚴重程度定義
 

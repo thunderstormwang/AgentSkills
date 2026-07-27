@@ -1,6 +1,6 @@
 ---
 name: my-code-review
-description: Performs structured code review against a plan document (Req / Pre Design Sync / Design / Task). Use this skill when the user wants to review an implementation against a plan to verify correctness, intent alignment, and code quality.
+description: Performs structured, multi-agent code review of a whole feature branch against its base (main). If the branch has a plan document (Req / Pre Design Sync / Design / Task) it reviews against the plan too; if not, it reviews from the code alone. Use this skill whenever the user wants a branch / feature reviewed — before merge, "check what I changed", correctness / intent / maintainability — even if they don't mention a plan or explicitly say "review". Sources the change via git diff (not gh), so it works on any host (GitHub, Gitea, self-hosted).
 ---
 
 # my-code-review
@@ -17,11 +17,32 @@ Matching the Task checklist only tells you *what was done*. The real review vali
 
 ---
 
+## Workflow
+
+You always review a **whole feature branch against its base**, with multi-agent fan-out. The only variable is whether the branch has a plan: with a plan you review against it too (Layers 0–2); without one you review from code alone (Layers 3–6).
+
+1. **Source the change (git, not a PR host).** `git diff <base>...HEAD` (three-dot; base defaults to `origin/main`, fall back to `main`). Works on any host (GitHub, Gitea, self-hosted). Review committed work, not uncommitted local tinkering.
+2. **Detect a plan.** Discover a plan / feature doc in the repo (e.g. a `plan.md` / feature doc under `docs/`) — don't hardcode a path.
+   - **Plan found → plan-based review:** all layers apply, including the plan layers (0–2).
+   - **No plan → code-only review:** skip Layers 0–2; rely on Layers 3–6 and infer Design intent from the code and commit messages.
+3. **Load Layer 0 once, in the orchestrator (plan only).** Read the plan top-down yourself *before* fanning out — especially Pre Design Sync (deliberate decisions are not bugs). Pass the relevant Task / Design excerpts down to each subagent rather than having all of them re-read and re-interpret the whole plan.
+4. **Fan out — read-only subagents.** A finished branch can touch 100+ files; don't review it in one pass. Cluster the changed files by directory / layer / aggregate and spawn one read-only review subagent per cluster (cap ~5–6; batch if more). Each subagent:
+   - loads any project coding-convention / architecture skill covering its slice — that skill is the single source of those conventions, so do not restate them here;
+   - applies Layers 1–6 to its slice (Layers 1–2 only when a plan exists);
+   - reads enough surrounding context to reason — **not diff-only**, which is what misses the deep concurrency / data-flow bugs;
+   - adversarially self-checks each finding, and returns `file:line` + concrete failure scenario + confidence (HIGH/MED/LOW).
+5. **Synthesize.** Dedupe into one report and verify every MED+/🔴 finding against the code yourself before presenting.
+6. **Cost guard.** If the diff is very large, report its size first (files / rough token estimate) and confirm before fanning out.
+
+---
+
 ## Review Layers
 
 Execute review in this order. Each layer builds on the previous.
 
-### Layer 0 — Context Loading (Before Reviewing Anything)
+### Layer 0 — Context Loading (Before Reviewing Anything) — *plan-based review only*
+
+> Skip this and Layers 1–2 entirely when the branch has no plan. When it does, the orchestrator does this once before fan-out (see Workflow).
 
 Read the plan document top-down **before touching any code**:
 
@@ -34,7 +55,7 @@ Read the plan document top-down **before touching any code**:
 
 ---
 
-### Layer 1 — Completeness (Task vs Implementation)
+### Layer 1 — Completeness (Task vs Implementation) — *plan-based review only*
 
 For each Task item, verify:
 - The expected files exist and were modified
@@ -46,7 +67,7 @@ For each Task item, verify:
 
 ---
 
-### Layer 2 — Intent Alignment (Design & Req vs Implementation)
+### Layer 2 — Intent Alignment (Design & Req vs Implementation) — *plan-based review only*
 
 Go beyond the Task checklist:
 
@@ -124,7 +145,9 @@ Check for quality issues beyond correctness:
 
 ## Output Format
 
-### Per-Task Summary
+Organize by **Task** when the branch has a plan; organize by **area / file cluster** when it has none. Either way, end with the Final Summary Table and keep the severity scheme below.
+
+### Per-Task Summary (plan-based review)
 
 For each Task ID, output one block:
 
@@ -141,6 +164,10 @@ For each Task ID, output one block:
 **Description:** [What is wrong and why it matters]
 **Suggestion:** [Concrete fix or recommendation]
 ```
+
+### Changes with no owning Task / no plan
+
+A finished branch usually contains changes with no owning Task — review-driven fixes, follow-up refactors, tidy-ups — and a branch with no plan is entirely this case. Do **not** skip them for lack of a Task. Group them by area (`Non-Task changes`, or by file cluster when there is no plan at all) and review each on Layers 3–6 (correctness, impact tracing, observability, smell), plus Design intent where a plan exists. Flag anything that changes observable behavior versus main, so it is a conscious decision rather than a silent drift.
 
 ### Severity Definitions
 

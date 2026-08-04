@@ -42,3 +42,14 @@
 
 - **一律**使用 `git-commit` skill 進行提交。
 - **禁止**直接透過 Bash 執行 `git commit`。
+
+<!-- CODEGRAPH_START -->
+## CodeGraph
+
+在已由 CodeGraph 建立索引的儲存庫中（repo 根目錄存在 `.codegraph/` 目錄），當你需要理解或定位程式碼時，請**優先**使用它，而非 grep/find 或直接讀取檔案：
+
+- **MCP 工具**（可用時）：`codegraph_explore` 一次呼叫即可回答大多數程式碼問題——包含相關符號的逐字原始碼，以及它們之間的呼叫路徑，甚至涵蓋 grep 無法追蹤的動態分派（dynamic-dispatch）跳轉。在查詢中指名檔案或符號，即可讀取其當前帶行號的原始碼。若它已列出但處於延遲載入狀態，請透過 tool search 以名稱載入。
+- **Shell**（一律可用）：`codegraph explore "<symbol names or question>"` 會輸出相同內容。
+
+若不存在 `.codegraph/` 目錄，請完全略過 CodeGraph——是否建立索引由使用者決定。
+<!-- CODEGRAPH_END -->

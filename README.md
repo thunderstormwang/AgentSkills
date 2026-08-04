@@ -11,17 +11,15 @@
 ## 將 Repo 內的 instruction 放到全域
 
 對於 Mac Book Pro(macOS):  
-> 請幫我建立一個軟連結(Symbolic Link)，將全域設定檔 ~/.gemini/gemini.md 指向目前目錄的 GEMINI.md。
+> 請幫我建立一個軟連結(Symbolic Link)，將全域設定檔 ~/.claude/CLAUDE.md 指向目前目錄的 CLAUDE.md。
 
 > 建立軟連結，讓全域 ~/.copilot/copilot-instructions.md 指向 目前 repo 的 .github/copilot-instructions.md
 
 對於 Windows:
-> 將全域路徑 $HOME\.gemini\gemini.md 建立一個軟連結到當前 Repo 的 GEMINI.md。  
+> 將全域路徑 $HOME\.claude\CLAUDE.md 建立一個軟連結到當前 Repo 的 CLAUDE.md。  
 
 然後生出類似以下語法，但可能因為權限問題，需要手動在管理者模式的 power shell 下執行:  
 > New-Item -ItemType SymbolicLink -Path "{$home}\.copilot\copilot-instructions.md" -Value "{RepoPath}\AgentSkills\.github\copilot-instructions.md"
-
-> New-Item -ItemType SymbolicLink -Path "{$home}\.gemini\GEMINI.md" -Value "{RepoPath}\GitRepositories\AgentSkills\GEMINI.md"
 
 > New-Item -ItemType SymbolicLink -Path "{$home}\.claude\CLAUDE.md" -Value  "{RepoPath}\GitRepositories\AgentSkills\CLAUDE.md"
 

@@ -2,7 +2,7 @@
 
 ## 語言與溝通
 - **主要語言：** 與使用者溝通、討論需求、產出系統文件時，一律使用**繁體中文**。
-- **例外：** 撰寫 skill 檔案（例如 SKILL.md）與 instruction 檔案（例如 copilot-instructions.md、GEMINI.md、CLAUDE.md）時，一律使用**英文**。
+- **例外：** 撰寫 skill 檔案（例如 SKILL.md）與 instruction 檔案（例如 copilot-instructions.md、CLAUDE.md）時，一律使用**英文**。
 
 ## 回應風格
 - 簡潔且技術性。

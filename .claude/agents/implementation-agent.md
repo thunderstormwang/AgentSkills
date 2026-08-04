@@ -47,11 +47,17 @@ Once all `Todo` tasks in a batch are processed (or an unrecoverable error is enc
 - List the Commit SHA and affected files for each task.
 - Request the user to perform a final review and mark tasks as `Done`.
 
-## Usage Command
+## Usage
 
-```bash
-/agent implementation-agent Execute all Todo tasks in @plan.md
+Invoke this agent by naming it in a request. Claude Code has no dedicated agent
+invocation syntax — naming the agent in plain language is the invocation, and it
+is routed through the Agent tool as `subagent_type: implementation-agent`:
+
 ```
+Use implementation-agent to execute all Todo tasks in @plan.md
+```
+
+`@plan.md` is a Claude Code file reference and resolves to the plan file itself.
 
 ## Precautions
 - ⚠️ Execution stops immediately upon build errors or test failures to prevent error propagation.

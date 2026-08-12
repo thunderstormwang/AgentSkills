@@ -5,6 +5,11 @@
 .DESCRIPTION
     預設清理目前使用者的 %LOCALAPPDATA%\Temp。
 
+    判斷項目新舊時，取 LastWriteTime 與 CreationTime 兩者較新的一個。複製
+    檔案時 Windows 只保留 LastWriteTime，CreationTime 會是複製當下的時間，
+    因此單看 LastWriteTime 會把剛複製進來、但內容時間戳很舊的檔案誤判為
+    過期項目。
+
     若舊資料夾內的所有項目都早於日期門檻，腳本會將整個資料夾一次移到
     資源回收筒，以減少逐檔操作。含有較新項目的資料夾會保留，只有其中
     符合日期條件的檔案會逐一移到資源回收筒。
@@ -60,11 +65,14 @@ if (-not (Test-Path -LiteralPath $resolvedPath -PathType Container)) {
     throw "指定的路徑不是資料夾：$resolvedPath"
 }
 
+# 項目是否過期，看 LastWriteTime 與 CreationTime 較新的那一個是否早於門檻。
+# 「較新者早於門檻」等價於「兩個時間戳都早於門檻」，因此以下各處判斷都同時
+# 檢查兩個時間戳，不必額外計算最大值。
 $cutoff = $startTime.AddDays(-$OlderThanDays)
 
 Write-Host "開始時間：$($startTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 Write-Host "清理路徑：$resolvedPath"
-Write-Host "清理條件：$OlderThanDays 天以前未修改"
+Write-Host "清理條件：建立時間與修改時間都早於 $OlderThanDays 天前"
 Write-Host "日期門檻：$($cutoff.ToString('yyyy-MM-dd HH:mm:ss'))"
 Write-Host '執行模式：移到資源回收筒'
 Write-Host ''
@@ -83,6 +91,7 @@ $files = @(
     $items | Where-Object {
         -not $_.PSIsContainer -and
         $_.LastWriteTime -lt $cutoff -and
+        $_.CreationTime -lt $cutoff -and
         -not ($_.Attributes -band [System.IO.FileAttributes]::ReparsePoint)
     }
 )
@@ -95,7 +104,11 @@ $rootPrefix = $resolvedPath.TrimEnd('\') + '\'
 foreach ($item in $items) {
     $isReparsePoint = $item.Attributes -band [System.IO.FileAttributes]::ReparsePoint
 
-    if ($item.LastWriteTime -lt $cutoff -and -not $isReparsePoint) {
+    if (
+        $item.LastWriteTime -lt $cutoff -and
+        $item.CreationTime -lt $cutoff -and
+        -not $isReparsePoint
+    ) {
         continue
     }
 
@@ -134,6 +147,7 @@ foreach (
         $directories |
             Where-Object {
                 $_.LastWriteTime -lt $cutoff -and
+                $_.CreationTime -lt $cutoff -and
                 -not $unsafeDirectoryPaths.ContainsKey($_.FullName)
             } |
             Sort-Object -Property { $_.FullName.Length }
@@ -230,7 +244,10 @@ foreach ($file in $files) {
 foreach (
     $directory in (
         $directories |
-            Where-Object { $_.LastWriteTime -lt $cutoff } |
+            Where-Object {
+                $_.LastWriteTime -lt $cutoff -and
+                $_.CreationTime -lt $cutoff
+            } |
             Sort-Object -Property { $_.FullName.Length } -Descending
     )
 ) {

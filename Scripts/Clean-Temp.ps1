@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    將 Windows 使用者暫存資料夾中，一年以上未修改的檔案移到資源回收筒。
+    將 Windows 使用者暫存資料夾中，超過指定天數未修改的項目移到資源回收筒。
 
 .DESCRIPTION
     預設清理目前使用者的 %LOCALAPPDATA%\Temp。
@@ -20,7 +20,12 @@
 .EXAMPLE
     pwsh.exe -ExecutionPolicy Bypass -File .\Scripts\Clean-Temp.ps1
 
-    使用 PowerShell 7 正式執行清理。
+    使用 PowerShell 7 清理 365 天以前的項目。
+
+.EXAMPLE
+    pwsh.exe -ExecutionPolicy Bypass -File .\Scripts\Clean-Temp.ps1 -OlderThanDays 30
+
+    使用 PowerShell 7 清理 30 天以前的項目。
 #>
 
 [CmdletBinding()]
@@ -29,14 +34,15 @@ param(
     [Parameter()]
     [string]$Path = (Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Temp'),
 
-    # 項目最後修改時間必須早於這個年數，才會被處理。
+    # 項目最後修改時間必須早於這個天數，才會被處理；預設為 365 天。
     [Parameter()]
-    [ValidateRange(1, 100)]
-    [int]$OlderThanYears = 1
+    [ValidateRange(1, 36500)]
+    [int]$OlderThanDays = 365
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+$startTime = Get-Date
 
 # Windows PowerShell 5.1 沒有內建「移到資源回收筒」指令，
 # 因此使用隨 Windows 提供的 Microsoft.VisualBasic 元件。
@@ -54,9 +60,11 @@ if (-not (Test-Path -LiteralPath $resolvedPath -PathType Container)) {
     throw "指定的路徑不是資料夾：$resolvedPath"
 }
 
-$cutoff = (Get-Date).AddYears(-$OlderThanYears)
+$cutoff = $startTime.AddDays(-$OlderThanDays)
 
+Write-Host "開始時間：$($startTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 Write-Host "清理路徑：$resolvedPath"
+Write-Host "清理條件：$OlderThanDays 天以前未修改"
 Write-Host "日期門檻：$($cutoff.ToString('yyyy-MM-dd HH:mm:ss'))"
 Write-Host '執行模式：移到資源回收筒'
 Write-Host ''
@@ -270,3 +278,9 @@ Write-Host (
     "個別檔案 $fileCount 個，空資料夾 $emptyDirectoryCount 個，" +
     "失敗 $failureCount 個。"
 )
+
+$endTime = Get-Date
+$elapsed = $endTime - $startTime
+
+Write-Host "結束時間：$($endTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+Write-Host "執行耗時：$($elapsed.ToString('d\.hh\:mm\:ss'))（天.時:分:秒）"

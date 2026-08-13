@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: 使用符合 Conventional Commits 規範的格式建立 Commit 訊息，支援最多 3 行的內文描述。當使用者要求提交變更、撰寫 Commit 訊息，或需要協助建立具備意義的變更描述與 Ticket 引用時，請使用此技能。
+description: 使用符合 Conventional Commits 規範的格式建立 Commit 訊息，支援最多 5 行的內文描述。當使用者要求提交變更、撰寫 Commit 訊息，或需要協助建立具備意義的變更描述與 Ticket 引用時，請使用此技能。
 ---
 
 # Git Commit 助手技能
@@ -14,9 +14,9 @@ description: 使用符合 Conventional Commits 規範的格式建立 Commit 訊�
 <type>[optional scope]: <description> #<jira ticket no>
 ```
 
-**Body (選填，最多 3 行)：**
+**Body (選填，最多 5 行)：**
 - 當需要額外的背景資訊或細節時使用。
-- 最多 3 行。
+- 最多 5 行。
 - 若標題已足以描述變更，則可省略。
 
 若未提供 Jira Ticket 編號，請省略 `#<jira ticket no>` 部分。
@@ -76,7 +76,7 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
     - **合成準則 (Synthesis Rule)**：內文必須精確描述在 `git diff` 中發現的物理變更。
     - 若 `git diff` 包含對話或任務中未提到的邏輯或優化，AI **必須**在內文中技術性地摘要這些額外變更。
     - **禁令**：嚴禁產出僅遵循任務描述但與實際 `git diff` 內容矛盾的訊息。
-    - 最多 3 行，每行應簡潔且具備意義。
+    - 最多 5 行，每行應簡潔且具備意義。
 9.  **破壞性變更偵測**：
     - 偵測變更是否涉及：
         * 移除或修改 API 簽章
@@ -89,10 +89,16 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
 10. **處理頁腳標記**：
     - 若存在破壞性變更，加入 `BREAKING CHANGE: <描述>` 頁腳。
     - 所有 Commit 皆須附加 `Co-authored-by:` 頁腳，依「你目前運行的 AI agent 產品家族」（Claude / Gemini / Copilot）選擇對應值 — 一個品牌共用一個 trailer，不分介面（對照表見上方「強制標記」）。並將解析出的 `<exact-model-id>` 內嵌在 name 括號內（乾淨 family ID，不帶 context 變體後綴）。若品牌已知但 model ID 未知，括號內填 `(Unknown)`；若連 agent 品牌都無法判斷，則用 `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>`。
-11. **在執行 Git Commit 指令前，務必將提議的訊息呈現給使用者核准。在使用者明確確認前，嚴禁執行 Git Commit。**
-    - 無論使用者說「commit」、「幫我 commit」或任何直接指令，此規則皆無條件適用。
-    - 流程必須始終為：**提議訊息 → 等待確認 → 執行提交**。
-    - 嚴禁跳過確認步驟。
+11. **先提交，再回報 — 不要事前徵求核准。**
+    - 訊息組完後立即執行 `git commit`，不要停下來詢問「要提交這個嗎？」。
+    - 流程必須為：**組出訊息 → 提交 → 顯示實際提交的訊息給使用者**。
+    - 提交後務必完整顯示 Commit 訊息（標題、內文、頁腳標記），讓使用者可以檢視被記錄的內容。
+    - 唯一允許在提交前詢問的是 Jira Ticket 編號（步驟 6）與 BREAKING CHANGE 確認（步驟 9）。
+12. **依要求修訂 (Amend)**：
+    - 若使用者在看到已提交的訊息後要求任何文字調整，請使用 `git commit --amend` 修訂，而非另建新的 Commit。
+    - 不要主動修訂；僅在使用者明確要求變更時才執行。
+    - 除非使用者明確要求，否則嚴禁修訂已推送 (pushed) 的 Commit。
+    - 修訂完成後，請再次顯示更新後的訊息。
 
 ## 範例 (Examples)
 

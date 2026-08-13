@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Create and format git commit messages following Conventional Commits with up to 3-line body. Use this when the user asks to commit changes, write a commit message, or needs help structuring commits with meaningful descriptions and ticket references.
+description: Create and format git commit messages following Conventional Commits with up to 5-line body. Use this when the user asks to commit changes, write a commit message, or needs help structuring commits with meaningful descriptions and ticket references.
 ---
 
 # Git Commit Helper Skill
@@ -14,9 +14,9 @@ A skill for creating well-structured git commit messages following Conventional 
 <type>[optional scope]: <description> #<jira ticket no>
 ```
 
-**Body (optional, max 3 lines):**
+**Body (optional, max 5 lines):**
 - Use when additional context or details are needed
-- Maximum of 3 lines
+- Maximum of 5 lines
 - Omit if the header alone sufficiently describes the change
 
 If no Jira ticket number is provided, omit the `#<jira ticket no>` part.
@@ -76,7 +76,7 @@ AI must follow this **Dual-Source Synthesis Flow** to generate the commit messag
     - **Synthesis Rule**: The body MUST accurately describe the physical changes found in `git diff`.
     - If `git diff` contains logic or refinements NOT mentioned in the conversation/task, AI MUST technically summarize these additional changes in the body.
     - **Prohibition**: NEVER output a message that purely follows the task description but contradicts the actual `git diff`.
-    - Maximum of 3 lines. Each line should be concise and meaningful.
+    - Maximum of 5 lines. Each line should be concise and meaningful.
 9.  **Breaking Changes Detection**:
     - Detect if changes involve:
         * API signature removal or modification
@@ -89,10 +89,16 @@ AI must follow this **Dual-Source Synthesis Flow** to generate the commit messag
 10. **Handle trailers**:
     - If breaking changes exist, add `BREAKING CHANGE: <description>` footer (see Trailers section).
     - Always append a `Co-authored-by:` trailer. Choose the value based on which AI agent product family you are running as (Claude / Gemini / Copilot) — one trailer per brand regardless of surface — per the mapping in Required Trailers above. Embed your resolved `<exact-model-id>` in the name parentheses (clean family ID, no context-variant suffix). If the brand is known but the model ID is not, use `(Unknown)` as the model part; if the agent brand cannot be determined, use `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>`.
-11. **Always show the proposed commit message to the user for approval BEFORE executing the git commit command. Do NOT run git commit until the user explicitly confirms.**
-    - This rule applies unconditionally — even if the user says "commit", "幫我 commit", "commit 吧", or any other direct commit instruction.
-    - The required flow is always: **propose message → wait for confirmation → then commit**.
-    - Never skip the confirmation step, regardless of how direct the user's instruction is.
+11. **Commit first, then report — do NOT ask for approval beforehand.**
+    - Once the message is composed, run `git commit` immediately. Do not pause to ask "shall I commit this?".
+    - The required flow is: **compose message → commit → show the exact committed message to the user**.
+    - After committing, always display the full commit message (header, body, trailers) so the user can review what was recorded.
+    - The only pre-commit question allowed is the Jira ticket number (step 6) and BREAKING CHANGE confirmation (step 9).
+12. **Amend on request**:
+    - If the user asks for any wording change after seeing the committed message, revise it with `git commit --amend` instead of creating a new commit.
+    - Do not amend proactively; only when the user explicitly asks for a change.
+    - Never amend a commit that has already been pushed unless the user explicitly asks for it.
+    - After amending, show the updated message again.
 
 ## Examples
 

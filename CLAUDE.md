@@ -3,7 +3,22 @@
 ## Language and Communication
 
 - **Primary Language:** Always communicate with the user and produce system documents in **Traditional Chinese (繁體中文)**.
-- **Exception:** Skill files (e.g., `SKILL.md`) and instruction files (e.g., `CLAUDE.md`, `copilot-instructions.md`) must be written in **English**.
+
+### Skill and Instruction Files
+
+The language depends on **who reads the file**, not on its filename:
+
+| Scope | Examples | Language |
+| :--- | :--- | :--- |
+| **User-level** (`~/.claude/`) | `CLAUDE.md`, `skills/*/SKILL.md` | **English** — read only by the user and the AI |
+| **Project-level — company projects** (repo name starts with `PXBox` or `PXEC`, case-insensitive) | `CLAUDE.md`, `.claude/skills/*/SKILL.md`, `.github/copilot-instructions.md` | **Traditional Chinese** — teammates read these |
+| **Project-level — personal projects** (any other repo, e.g. `AgentSkills`) | same files as above | **English** — no audience beyond the user and the AI |
+
+Rationale: the language follows the audience, not the file's location. Company repos are shared with
+teammates, so their instruction files are team documentation and English forces every teammate to
+translate while reading. Personal repos have no such audience, even though the files are committed.
+
+**When it is unclear whether a repo counts as a company project, ask before writing** — switching language later means rewriting the whole file.
 
 ## Response Style
 

@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Create and format git commit messages following Conventional Commits with up to 5-line body. Use this when the user asks to commit changes, write a commit message, or needs help structuring commits with meaningful descriptions and ticket references.
+description: Create and format git commit messages following Conventional Commits with up to 5-line body. Use this when the user asks to commit changes, write a commit message, or needs help structuring commits with meaningful descriptions and ticket references. Also use when rewriting history — squash, rebase, amend, fixup, reword — and a message for the resulting commit must be composed.
 ---
 
 # Git Commit Helper Skill
@@ -63,6 +63,7 @@ Trailers are key-value pairs placed at the end of the commit message footer (aft
 AI must follow this **Dual-Source Synthesis Flow** to generate the commit message:
 
 1.  **Verify Physical Changes (Source of Truth)**: ALWAYS run `git status` and `git diff` first. This establishes the absolute reality of what changed (files, methods, logic).
+    - When rewriting history (squash / rebase / amend), the source of truth is the **net range diff** instead — see [History Rewriting](#history-rewriting-squash--rebase--amend).
 2.  **Contextualize Intent**: Refer to recent conversations or planned tasks (e.g., T[x]) to understand "Why" these changes were made.
 3.  **Analyze the changes to determine the primary `type`**: Based on the synthesis of intent and diff.
 4.  **Identify the `scope` if applicable** (e.g., specific component or file).
@@ -99,6 +100,27 @@ AI must follow this **Dual-Source Synthesis Flow** to generate the commit messag
     - Do not amend proactively; only when the user explicitly asks for a change.
     - Never amend a commit that has already been pushed unless the user explicitly asks for it.
     - After amending, show the updated message again.
+
+## History Rewriting (Squash / Rebase / Amend)
+
+When several commits collapse into one, the resulting message must describe the **net end state**, not the path taken to reach it. Once squashed, the intermediate back-and-forth is no longer visible in the tree — describing it makes the message contradict what `git show` actually displays.
+
+1.  **Source of truth is the net range diff, NOT the old messages.**
+    - Determine the base: the parent of the earliest commit being collapsed (`<base>`). For a rebase onto a branch, use `git merge-base HEAD <target-branch>`.
+    - Run `git diff <base>..HEAD` and compose the message from **that diff only**.
+    - `git log <base>..HEAD` may be read for *intent* context ("why") only. NEVER copy, concatenate, or bullet-list the old commit messages into the new body.
+2.  **The net-effect test** — apply to every body line before writing it:
+    - Would a reader who runs `git show` on this single commit see the change this line claims? If no, delete the line.
+    - Code added and later removed within the range → mention **neither**. It is not in the net diff.
+    - A value/name/approach changed repeatedly within the range → state only the **final** value.
+    - A bug introduced and fixed within the range → mention neither the bug nor its fix.
+3.  **Prohibited body content**:
+    - Self-referential or process wording: "修正前一版…", "調整上述…", "改回…", "再次修正…", "依 review 意見調整…".
+    - Enumerating the collapsed commits ("包含 3 個 commit：…") or preserving their headers as body lines.
+    - Any line whose only purpose is describing a step that was later superseded.
+4.  **Header reflects the whole range's purpose**, not the first or last commit's header. Re-derive `type` and `scope` from the net diff — a range of `fix` commits refining a new feature is a `feat`, not a `fix`.
+5.  **Trailers**: keep exactly one `Co-authored-by:` per distinct identity — deduplicate the ones inherited from the collapsed commits rather than stacking them. Keep a `BREAKING CHANGE:` footer only if the breaking change still exists in the net diff.
+6.  **Pushed history requires explicit confirmation**: if any commit in the range has already been pushed, ask the user before rewriting. This extends step 12's rule to squash and rebase, which are more destructive than `--amend`.
 
 ## Examples
 
@@ -146,4 +168,35 @@ fix(payment): 修正支付流程逾時錯誤 #28451
 改進錯誤訊息提示。
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
+
+**Example 6: Squashing 4 commits — net end state only**
+
+Collapsed commits (`git log <base>..HEAD`):
+```
+feat(cache): 新增 Redis 快取層
+fix(cache): 修正 TTL 單位錯誤
+refactor(cache): timeout 由 10 秒改為 30 秒
+fix(cache): 移除誤加的 debug log
+```
+
+❌ WRONG — preserves the intermediate process, contradicts `git show`:
+```
+feat(cache): 新增 Redis 快取層 #26739
+
+新增 Redis 快取層。
+修正 TTL 單位錯誤。
+timeout 由 10 秒改為 30 秒。
+移除誤加的 debug log。
+```
+The TTL bug, the 10-second value, and the debug log never exist in the net diff — a reader cannot find any of them.
+
+✅ CORRECT — describes only what the net diff contains:
+```
+feat(cache): 新增 Redis 快取層 #26739
+
+以 IMemoryCache 介面封裝讀寫，TTL 以毫秒為單位設定。
+連線 timeout 設為 30 秒。
+
+Co-authored-by: Claude (claude-opus-5) <noreply@anthropic.com>
 ```

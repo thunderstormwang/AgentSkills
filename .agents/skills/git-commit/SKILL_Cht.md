@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: 使用符合 Conventional Commits 規範的格式建立 Commit 訊息，支援最多 5 行的內文描述。當使用者要求提交變更、撰寫 Commit 訊息，或需要協助建立具備意義的變更描述與 Ticket 引用時，請使用此技能。
+description: 使用符合 Conventional Commits 規範的格式建立 Commit 訊息，支援最多 5 行的內文描述。當使用者要求提交變更、撰寫 Commit 訊息，或需要協助建立具備意義的變更描述與 Ticket 引用時，請使用此技能。當改寫歷史（squash、rebase、amend、fixup、reword）且必須為產生的 Commit 組出訊息時，亦請使用此技能。
 ---
 
 # Git Commit 助手技能
@@ -63,6 +63,7 @@ description: 使用符合 Conventional Commits 規範的格式建立 Commit 訊�
 AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 來生成 Commit 訊息：
 
 1.  **驗證實體變更 (唯一真相)**：務必**先執行** `git status` 與 `git diff`。這建立了變更內容（檔案、方法、邏輯）的絕對現實。
+    - 當在改寫歷史（squash / rebase / amend）時，唯一真相改為**範圍淨差異 (net range diff)** — 詳見 [歷史改寫](#歷史改寫-squash--rebase--amend)。
 2.  **對齊對話意圖**：參考最近的對話或計畫任務（如 T[x]），以理解「為什麼」進行這些變更。
 3.  **分析變更以決定主要類型 (`type`)**：根據意圖與實體差異的綜合分析。
 4.  **識別範圍 (`scope`)**：若適用（例如特定組件或檔案）。
@@ -99,6 +100,27 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
     - 不要主動修訂；僅在使用者明確要求變更時才執行。
     - 除非使用者明確要求，否則嚴禁修訂已推送 (pushed) 的 Commit。
     - 修訂完成後，請再次顯示更新後的訊息。
+
+## 歷史改寫 (Squash / Rebase / Amend)
+
+當多個 Commit 被壓縮為一個時，產生的訊息必須描述**最終淨結果 (net end state)**，而非抵達該結果的過程。一旦 squash 完成，中間反覆修改的過程在提交樹中已不再可見；描述這些過程會使訊息與 `git show` 實際顯示的內容互相矛盾。
+
+1.  **唯一真相是範圍淨差異，而非舊的 Commit 訊息。**
+    - 確定基準點 (base)：被壓縮的最早一個 Commit 的父節點（`<base>`）。若是 rebase 到某個分支，請使用 `git merge-base HEAD <target-branch>`。
+    - 執行 `git diff <base>..HEAD`，並**僅依據該差異**組出訊息。
+    - `git log <base>..HEAD` 僅可用於閱讀*意圖*背景（「為什麼」）。**嚴禁**將舊的 Commit 訊息複製、串接或列點寫進新的內文。
+2.  **淨效果測試 (net-effect test)** — 寫下每一行內文前都要套用：
+    - 一位只針對這個 Commit 執行 `git show` 的讀者，能否看到這行所聲稱的變更？若否，刪除該行。
+    - 在範圍內被加入、之後又被移除的程式碼 → **兩者皆不提**。它不存在於淨差異中。
+    - 在範圍內被反覆更動的數值/命名/做法 → 僅陳述**最終**的版本。
+    - 在範圍內被引入又被修正的 Bug → 該 Bug 與其修正皆不提。
+3.  **禁止出現的內文內容**：
+    - 自我指涉或描述過程的用詞：「修正前一版…」、「調整上述…」、「改回…」、「再次修正…」、「依 review 意見調整…」。
+    - 逐一列舉被壓縮的 Commit（「包含 3 個 commit：…」），或將它們的標題保留為內文行。
+    - 任何目的僅在描述「之後已被取代的步驟」的行。
+4.  **標題應反映整個範圍的目的**，而非第一個或最後一個 Commit 的標題。請從淨差異重新推導 `type` 與 `scope` — 一連串用來打磨新功能的 `fix` Commit，整體應為 `feat` 而非 `fix`。
+5.  **頁腳標記**：每個不同身份僅保留**一個** `Co-authored-by:` — 請將自被壓縮 Commit 繼承而來的重複項去除，而非層層堆疊。僅當破壞性變更仍存在於淨差異中時，才保留 `BREAKING CHANGE:` 頁腳。
+6.  **改寫已推送的歷史須先明確確認**：若範圍內任何 Commit 已被推送，改寫前必須先詢問使用者。此規則將步驟 12 的限制延伸至 squash 與 rebase — 它們的破壞性高於 `--amend`。
 
 ## 範例 (Examples)
 
@@ -146,4 +168,35 @@ fix(payment): 修正支付流程逾時錯誤 #28451
 改進錯誤訊息提示。
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
+
+**範例 6：壓縮 4 個 Commit — 僅呈現最終淨結果**
+
+被壓縮的 Commit（`git log <base>..HEAD`）：
+```
+feat(cache): 新增 Redis 快取層
+fix(cache): 修正 TTL 單位錯誤
+refactor(cache): timeout 由 10 秒改為 30 秒
+fix(cache): 移除誤加的 debug log
+```
+
+❌ 錯誤 — 保留了中間過程，與 `git show` 內容矛盾：
+```
+feat(cache): 新增 Redis 快取層 #26739
+
+新增 Redis 快取層。
+修正 TTL 單位錯誤。
+timeout 由 10 秒改為 30 秒。
+移除誤加的 debug log。
+```
+TTL 的 Bug、10 秒這個數值、以及 debug log，全都不存在於淨差異中 — 讀者無法找到其中任何一項。
+
+✅ 正確 — 僅描述淨差異實際包含的內容：
+```
+feat(cache): 新增 Redis 快取層 #26739
+
+以 IMemoryCache 介面封裝讀寫，TTL 以毫秒為單位設定。
+連線 timeout 設為 30 秒。
+
+Co-authored-by: Claude (claude-opus-5) <noreply@anthropic.com>
 ```

@@ -54,8 +54,20 @@
 
 ## Git Commit
 
-- **一律**使用 `git-commit` skill 進行提交。
-- **禁止**直接透過 Bash 執行 `git commit`。
+**觸發規則：** 若某項操作將會「產生或變更 commit 訊息」，則必須在該操作執行**之前**先載入
+`git-commit` skill。觸發依據是「結果」而非「指令名稱」— 不要去推敲這個操作「算不算提交」。
+
+- **先載入 skill**，才可執行以下任一指令：`git commit`（含或不含 `--amend`）、任何形式的
+  `git rebase`（`-i`、`--autosquash`、會開啟編輯器的 `--continue`）、`git merge --squash`、
+  `git cherry-pick`、`git revert`、`git filter-branch`，或任何帶有 `-m`、`-F`、`--fixup`、
+  `--squash`、`--reuse-message`、`--reedit-message` 參數的 git 指令。
+- **有疑慮時，一律假設會產出訊息並載入 skill。** 多載一次的成本為零；漏載的成本是訊息要重寫。
+- **禁止**直接透過 Bash 執行 `git commit`。這涵蓋所有繞過 skill 提供訊息的方式：`-m`、`-F -`、
+  heredoc、`--no-edit`、`GIT_EDITOR=true`。
+- **禁止先自行組好訊息，再去找指令把它送進去。** skill 的流程（驗證差異 → 組出訊息 → 提交 →
+  顯示已提交的訊息）是通往 commit 的唯一路徑。先組好訊息、事後才叫 skill 來蓋章，違反本規則。
+- 改寫歷史有專屬的訊息規則 — skill 的「歷史改寫」章節對 squash / rebase / amend 屬強制閱讀，
+  不是選讀的背景資訊。
 
 <!-- CODEGRAPH_START -->
 ## CodeGraph

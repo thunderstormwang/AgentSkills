@@ -105,22 +105,36 @@ AI must follow this **Dual-Source Synthesis Flow** to generate the commit messag
 
 When several commits collapse into one, the resulting message must describe the **net end state**, not the path taken to reach it. Once squashed, the intermediate back-and-forth is no longer visible in the tree — describing it makes the message contradict what `git show` actually displays.
 
-1.  **Source of truth is the net range diff, NOT the old messages.**
-    - Determine the base: the parent of the earliest commit being collapsed (`<base>`). For a rebase onto a branch, use `git merge-base HEAD <target-branch>`.
-    - Run `git diff <base>..HEAD` and compose the message from **that diff only**.
-    - `git log <base>..HEAD` may be read for *intent* context ("why") only. NEVER copy, concatenate, or bullet-list the old commit messages into the new body.
-2.  **The net-effect test** — apply to every body line before writing it:
+1.  **Source of truth is the net diff of the rewritten range, NOT the old messages.**
+    - **Resolve the base and capture the net diff BEFORE the rewrite starts.** Once an interactive rebase is in flight, `HEAD` is detached at a partially-applied state, and once it finishes the old base is no longer reachable from `HEAD` — a range computed at either moment is wrong.
+    - Each operation has a different net diff. `--amend` has no range at all:
+
+      | Operation | Net diff to read |
+      |---|---|
+      | Squash / fixup of N commits | `git diff <parent-of-earliest-collapsed-commit>..HEAD` |
+      | Rebase a branch onto `<target>` | resolve `git merge-base <branch> <target>` **first**, then `git diff <that-sha>..<branch>` |
+      | `--amend` | `git diff HEAD~1..HEAD` **plus** `git diff --cached` and `git diff` — the net effect is the existing commit's diff combined with whatever is newly staged or unstaged |
+
+    - Compose the message from that diff only.
+2.  **Read the old commit messages LAST, if at all.**
+    - Draft every body line from the diff first. Only then may `git log <base>..HEAD` be read, only to recover *why* a change was made, and only to reword a line that already exists — never to add one.
+    - Reading the old headers before drafting is the direct cause of process-flavoured bodies: the headers *are* the process, and paraphrasing them is the path of least resistance. Do not open them early.
+    - NEVER copy, concatenate, or bullet-list the old messages into the new body.
+3.  **The net-effect test** — apply to every body line before writing it:
     - Would a reader who runs `git show` on this single commit see the change this line claims? If no, delete the line.
     - Code added and later removed within the range → mention **neither**. It is not in the net diff.
     - A value/name/approach changed repeatedly within the range → state only the **final** value.
     - A bug introduced and fixed within the range → mention neither the bug nor its fix.
-3.  **Prohibited body content**:
-    - Self-referential or process wording: "修正前一版…", "調整上述…", "改回…", "再次修正…", "依 review 意見調整…".
+4.  **Prohibited body content.** The net-effect test in step 3 is the actual rule; the items below are recognisable symptoms of failing it, not an exhaustive blacklist. A rephrasing that avoids these exact words but still describes a superseded step is equally prohibited.
+    - Self-referential or process wording: "修正前一版…", "調整上述…", "改回…", "再次修正…", "依 review 意見調整…", or any equivalent.
     - Enumerating the collapsed commits ("包含 3 個 commit：…") or preserving their headers as body lines.
     - Any line whose only purpose is describing a step that was later superseded.
-4.  **Header reflects the whole range's purpose**, not the first or last commit's header. Re-derive `type` and `scope` from the net diff — a range of `fix` commits refining a new feature is a `feat`, not a `fix`.
-5.  **Trailers**: keep exactly one `Co-authored-by:` per distinct identity — deduplicate the ones inherited from the collapsed commits rather than stacking them. Keep a `BREAKING CHANGE:` footer only if the breaking change still exists in the net diff.
-6.  **Pushed history requires explicit confirmation**: if any commit in the range has already been pushed, ask the user before rewriting. This extends step 12's rule to squash and rebase, which are more destructive than `--amend`.
+5.  **Header reflects the whole range's purpose**, not the first or last commit's header. Re-derive `type` and `scope` from the net diff — a range of `fix` commits refining a new feature is a `feat`, not a `fix`.
+6.  **Trailers**: keep exactly one `Co-authored-by:` per distinct identity — deduplicate the ones inherited from the collapsed commits rather than stacking them. Keep a `BREAKING CHANGE:` footer only if the breaking change still exists in the net diff.
+7.  **Pushed history requires explicit confirmation**: if any commit in the range has already been pushed, ask the user before rewriting. This extends step 12's rule to squash and rebase, which are more destructive than `--amend`.
+8.  **Show the resulting message once the rewrite completes** — the same obligation step 11 imposes on a normal commit. The user must see what was actually recorded, not what was intended.
+    - Read it back from git and display it verbatim, including trailers: `git log -1 --format=%B` for a single collapsed commit, or `git log <base>..HEAD --format=%B` when a rebase rewrote several.
+    - Never report a rewrite as finished without showing the message. A message can be silently truncated, left as the editor's template, or inherited unchanged from the old commit — none of which is visible unless it is read back.
 
 ## Examples
 
@@ -172,7 +186,14 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 **Example 6: Squashing 4 commits — net end state only**
 
-Collapsed commits (`git log <base>..HEAD`):
+The net diff (`git diff <base>..HEAD`) — the only valid source for the body:
+```
+CacheService.cs   + Redis get/set wrapped behind IDistributedCache, TTL expressed in milliseconds
+appsettings.json  + Redis:ConnectTimeout = 30s
+```
+No TTL bug, no 10-second value and no debug log appear anywhere in it — they were introduced and cancelled out inside the range.
+
+Collapsed commits (`git log <base>..HEAD` — read only AFTER drafting, for "why" context):
 ```
 feat(cache): 新增 Redis 快取層
 fix(cache): 修正 TTL 單位錯誤
@@ -180,7 +201,7 @@ refactor(cache): timeout 由 10 秒改為 30 秒
 fix(cache): 移除誤加的 debug log
 ```
 
-❌ WRONG — preserves the intermediate process, contradicts `git show`:
+❌ WRONG — reuses those four headers as body lines, contradicts `git show`:
 ```
 feat(cache): 新增 Redis 快取層 #26739
 
@@ -191,12 +212,12 @@ timeout 由 10 秒改為 30 秒。
 ```
 The TTL bug, the 10-second value, and the debug log never exist in the net diff — a reader cannot find any of them.
 
-✅ CORRECT — describes only what the net diff contains:
+✅ CORRECT — every line traceable to a line of the net diff above:
 ```
 feat(cache): 新增 Redis 快取層 #26739
 
-以 IMemoryCache 介面封裝讀寫，TTL 以毫秒為單位設定。
-連線 timeout 設為 30 秒。
+以 IDistributedCache 封裝 Redis 讀寫，TTL 以毫秒為單位設定。
+Redis 連線 timeout 設為 30 秒。
 
 Co-authored-by: Claude (claude-opus-5) <noreply@anthropic.com>
 ```

@@ -55,8 +55,23 @@ Ask the user where to save the plan file if no path is specified.
 
 ## Git Commit
 
-- **Always** use the `git-commit` skill when committing.
-- **Never** run `git commit` directly via Bash.
+**Trigger rule:** if an operation will create or change a commit message, the `git-commit` skill
+must be loaded **before** the operation runs. The trigger is the outcome, not the command name — do
+not reason about whether the operation "counts as committing".
+
+- **Load the skill first** before running any of: `git commit` (with or without `--amend`),
+  `git rebase` in any form (`-i`, `--autosquash`, `--continue` that opens an editor),
+  `git merge --squash`, `git cherry-pick`, `git revert`, `git filter-branch`, or any git command
+  carrying `-m`, `-F`, `--fixup`, `--squash`, `--reuse-message`, or `--reedit-message`.
+- **When in doubt, assume a message will be authored and load the skill.** The cost of loading it
+  unnecessarily is nil; the cost of skipping it is a message that has to be rewritten.
+- **Never** run `git commit` directly via Bash. This covers every way of supplying the message
+  without the skill: `-m`, `-F -`, heredocs, `--no-edit`, and `GIT_EDITOR=true`.
+- **Never pre-compose a message and then look for a command to feed it to.** The skill's flow
+  (verify the diff → compose → commit → show the committed message) is the only path to a commit.
+  Composing first and invoking the skill afterwards to rubber-stamp the result violates this rule.
+- Rewriting history has its own message rules — the skill's History Rewriting section is mandatory
+  reading for squash / rebase / amend, not optional background.
 
 <!-- CODEGRAPH_START -->
 ## CodeGraph

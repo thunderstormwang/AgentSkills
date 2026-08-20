@@ -105,22 +105,36 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
 
 當多個 Commit 被壓縮為一個時，產生的訊息必須描述**最終淨結果 (net end state)**，而非抵達該結果的過程。一旦 squash 完成，中間反覆修改的過程在提交樹中已不再可見；描述這些過程會使訊息與 `git show` 實際顯示的內容互相矛盾。
 
-1.  **唯一真相是範圍淨差異，而非舊的 Commit 訊息。**
-    - 確定基準點 (base)：被壓縮的最早一個 Commit 的父節點（`<base>`）。若是 rebase 到某個分支，請使用 `git merge-base HEAD <target-branch>`。
-    - 執行 `git diff <base>..HEAD`，並**僅依據該差異**組出訊息。
-    - `git log <base>..HEAD` 僅可用於閱讀*意圖*背景（「為什麼」）。**嚴禁**將舊的 Commit 訊息複製、串接或列點寫進新的內文。
-2.  **淨效果測試 (net-effect test)** — 寫下每一行內文前都要套用：
+1.  **唯一真相是被改寫範圍的淨差異，而非舊的 Commit 訊息。**
+    - **在開始改寫之前就先解析出基準點並取得淨差異。** 一旦 interactive rebase 進行中，`HEAD` 會停在 detached 的半套用狀態；而 rebase 完成後，舊的基準點已無法從 `HEAD` 追溯 — 在這兩個時機點計算出的範圍都是錯的。
+    - 每種操作的淨差異都不同，`--amend` 甚至根本沒有「範圍」：
+
+      | 操作 | 應讀取的淨差異 |
+      |---|---|
+      | 壓縮 (squash / fixup) N 個 Commit | `git diff <被壓縮最早 Commit 的父節點>..HEAD` |
+      | 將分支 rebase 到 `<target>` | **先**解析 `git merge-base <branch> <target>`，再執行 `git diff <該 sha>..<branch>` |
+      | `--amend` | `git diff HEAD~1..HEAD` **再加上** `git diff --cached` 與 `git diff` — 其淨效果為「原 Commit 的差異」結合「本次新加入的已暫存/未暫存變更」 |
+
+    - 僅依據該差異組出訊息。
+2.  **舊的 Commit 訊息要最後才讀，甚至可以不讀。**
+    - 先僅憑淨差異草擬完所有內文行。之後才可讀取 `git log <base>..HEAD`，且僅用於補回某項變更的*原因*，也僅能用來改寫「已經存在的行」— 絕不可據此新增任何一行。
+    - 在草擬前先去讀舊標題，正是內文帶有「過程感」的直接原因：那些舊標題本身就是過程，而改寫它們是最省力的路徑。不要提早打開它們。
+    - **嚴禁**將舊訊息複製、串接或列點寫進新的內文。
+3.  **淨效果測試 (net-effect test)** — 寫下每一行內文前都要套用：
     - 一位只針對這個 Commit 執行 `git show` 的讀者，能否看到這行所聲稱的變更？若否，刪除該行。
     - 在範圍內被加入、之後又被移除的程式碼 → **兩者皆不提**。它不存在於淨差異中。
     - 在範圍內被反覆更動的數值/命名/做法 → 僅陳述**最終**的版本。
     - 在範圍內被引入又被修正的 Bug → 該 Bug 與其修正皆不提。
-3.  **禁止出現的內文內容**：
-    - 自我指涉或描述過程的用詞：「修正前一版…」、「調整上述…」、「改回…」、「再次修正…」、「依 review 意見調整…」。
+4.  **禁止出現的內文內容。** 真正的規則是步驟 3 的淨效果測試；下列項目只是「未通過該測試」的可辨識症狀，並非窮舉的黑名單。改用其他措辭避開這些字眼、但仍在描述已被取代的步驟，同樣禁止。
+    - 自我指涉或描述過程的用詞：「修正前一版…」、「調整上述…」、「改回…」、「再次修正…」、「依 review 意見調整…」，以及任何同義說法。
     - 逐一列舉被壓縮的 Commit（「包含 3 個 commit：…」），或將它們的標題保留為內文行。
     - 任何目的僅在描述「之後已被取代的步驟」的行。
-4.  **標題應反映整個範圍的目的**，而非第一個或最後一個 Commit 的標題。請從淨差異重新推導 `type` 與 `scope` — 一連串用來打磨新功能的 `fix` Commit，整體應為 `feat` 而非 `fix`。
-5.  **頁腳標記**：每個不同身份僅保留**一個** `Co-authored-by:` — 請將自被壓縮 Commit 繼承而來的重複項去除，而非層層堆疊。僅當破壞性變更仍存在於淨差異中時，才保留 `BREAKING CHANGE:` 頁腳。
-6.  **改寫已推送的歷史須先明確確認**：若範圍內任何 Commit 已被推送，改寫前必須先詢問使用者。此規則將步驟 12 的限制延伸至 squash 與 rebase — 它們的破壞性高於 `--amend`。
+5.  **標題應反映整個範圍的目的**，而非第一個或最後一個 Commit 的標題。請從淨差異重新推導 `type` 與 `scope` — 一連串用來打磨新功能的 `fix` Commit，整體應為 `feat` 而非 `fix`。
+6.  **頁腳標記**：每個不同身份僅保留**一個** `Co-authored-by:` — 請將自被壓縮 Commit 繼承而來的重複項去除，而非層層堆疊。僅當破壞性變更仍存在於淨差異中時，才保留 `BREAKING CHANGE:` 頁腳。
+7.  **改寫已推送的歷史須先明確確認**：若範圍內任何 Commit 已被推送，改寫前必須先詢問使用者。此規則將步驟 12 的限制延伸至 squash 與 rebase — 它們的破壞性高於 `--amend`。
+8.  **改寫完成後必須顯示產生的訊息** — 與步驟 11 對一般 Commit 的要求相同。使用者必須看到「實際被記錄下來的內容」，而非「原本打算寫的內容」。
+    - 從 git 讀回來並原文顯示，含頁腳標記：單一壓縮結果用 `git log -1 --format=%B`；若 rebase 改寫了多個 Commit，則用 `git log <base>..HEAD --format=%B`。
+    - **嚴禁在未顯示訊息的情況下回報改寫已完成。** 訊息可能被無聲截斷、停留在編輯器的樣板狀態、或原封不動地沿用舊 Commit 的內容 — 這些狀況除非讀回來，否則完全看不出來。
 
 ## 範例 (Examples)
 
@@ -172,7 +186,14 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 **範例 6：壓縮 4 個 Commit — 僅呈現最終淨結果**
 
-被壓縮的 Commit（`git log <base>..HEAD`）：
+淨差異（`git diff <base>..HEAD`）— 內文唯一的合法來源：
+```
+CacheService.cs   + 以 IDistributedCache 封裝 Redis 讀寫，TTL 以毫秒表示
+appsettings.json  + Redis:ConnectTimeout = 30s
+```
+其中完全不存在 TTL 的 Bug、10 秒這個數值、以及 debug log — 它們在範圍內被引入後又互相抵銷掉了。
+
+被壓縮的 Commit（`git log <base>..HEAD` — 僅在草擬完成「之後」才讀，用於補「為什麼」）：
 ```
 feat(cache): 新增 Redis 快取層
 fix(cache): 修正 TTL 單位錯誤
@@ -180,7 +201,7 @@ refactor(cache): timeout 由 10 秒改為 30 秒
 fix(cache): 移除誤加的 debug log
 ```
 
-❌ 錯誤 — 保留了中間過程，與 `git show` 內容矛盾：
+❌ 錯誤 — 把那四個舊標題直接當成內文行，與 `git show` 內容矛盾：
 ```
 feat(cache): 新增 Redis 快取層 #26739
 
@@ -191,12 +212,12 @@ timeout 由 10 秒改為 30 秒。
 ```
 TTL 的 Bug、10 秒這個數值、以及 debug log，全都不存在於淨差異中 — 讀者無法找到其中任何一項。
 
-✅ 正確 — 僅描述淨差異實際包含的內容：
+✅ 正確 — 每一行都可回溯到上方淨差異的某一行：
 ```
 feat(cache): 新增 Redis 快取層 #26739
 
-以 IMemoryCache 介面封裝讀寫，TTL 以毫秒為單位設定。
-連線 timeout 設為 30 秒。
+以 IDistributedCache 封裝 Redis 讀寫，TTL 以毫秒為單位設定。
+Redis 連線 timeout 設為 30 秒。
 
 Co-authored-by: Claude (claude-opus-5) <noreply@anthropic.com>
 ```

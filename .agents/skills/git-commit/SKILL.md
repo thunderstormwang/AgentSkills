@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Create and format git commit messages following Conventional Commits with up to 5-line body. Use this when the user asks to commit changes, write a commit message, or needs help structuring commits with meaningful descriptions and ticket references. Also use when rewriting history — squash, rebase, amend, fixup, reword — and a message for the resulting commit must be composed.
+description: Create and format git commit messages following Conventional Commits, with a wrapped body of an opening paragraph plus up to 5 bulleted items. Use this when the user asks to commit changes, write a commit message, or needs help structuring commits with meaningful descriptions and ticket references. Also use when rewriting history — squash, rebase, amend, fixup, reword — and a message for the resulting commit must be composed.
 ---
 
 # Git Commit Helper Skill
@@ -13,11 +13,32 @@ A skill for creating well-structured git commit messages following Conventional 
 ```
 <type>[optional scope]: <description> #<jira ticket no>
 ```
+- Aim for 50 display columns, 72 at the absolute most. Never wrap the header.
+- The ticket number appears **only** in the trailing `#<no>`. Do not also embed it
+  in the description (`feat(refund): PXBOX-27492 … #27492` repeats itself).
 
-**Body (optional, max 5 lines):**
-- Use when additional context or details are needed
-- Maximum of 5 lines
-- Omit if the header alone sufficiently describes the change
+**Body (optional):**
+```
+<opening paragraph: what changed and why, in aggregate>
+                                      ← blank line
+- <item>
+- <item, whose continuation lines are
+  indented two spaces>
+- <item>
+                                      ← blank line
+<closing line: verification facts>
+```
+- **Up to 5 items**, counted as bullets — not as lines. A bullet wrapped over
+  three lines is still one item.
+- The opening paragraph and the closing line do not count toward the 5.
+- **Wrap every line at 72 display columns.** A CJK character occupies 2 columns,
+  so a Traditional Chinese line holds roughly 36 characters.
+- **Blank lines** separate the opening paragraph, the bullet block, and the
+  closing line. Do **not** put blank lines between the bullets themselves.
+- **One idea per item.** If a bullet needs `；`, `——`, or `，故` to join two
+  independent statements, it is two items — split it, or drop the weaker half.
+- Drop the parts that carry no weight: with a single item, write the paragraph
+  alone and omit the bullets; omit the body entirely when the header suffices.
 
 If no Jira ticket number is provided, omit the `#<jira ticket no>` part.
 
@@ -77,7 +98,9 @@ AI must follow this **Dual-Source Synthesis Flow** to generate the commit messag
     - **Synthesis Rule**: The body MUST accurately describe the physical changes found in `git diff`.
     - If `git diff` contains logic or refinements NOT mentioned in the conversation/task, AI MUST technically summarize these additional changes in the body.
     - **Prohibition**: NEVER output a message that purely follows the task description but contradicts the actual `git diff`.
-    - Maximum of 5 lines. Each line should be concise and meaningful.
+    - Follow the body shape defined in [Format](#format): opening paragraph → up to 5 bullets → closing line, every line wrapped at 72 display columns.
+    - **The 5-item cap limits content, not density.** It must never be satisfied by packing several statements into one long bullet — that is the failure it exists to prevent. If the change genuinely has more than 5 points, promote the shared theme into the opening paragraph and keep only the 5 that a reviewer could not infer from the diff; if it still does not fit, the commit is doing too much and should be split.
+    - The closing line carries verification facts only — build result, test counts, base branch. Omit it when there is nothing to verify.
 9.  **Breaking Changes Detection**:
     - Detect if changes involve:
         * API signature removal or modification
@@ -117,18 +140,18 @@ When several commits collapse into one, the resulting message must describe the 
 
     - Compose the message from that diff only.
 2.  **Read the old commit messages LAST, if at all.**
-    - Draft every body line from the diff first. Only then may `git log <base>..HEAD` be read, only to recover *why* a change was made, and only to reword a line that already exists — never to add one.
+    - Draft every body item from the diff first. Only then may `git log <base>..HEAD` be read, only to recover *why* a change was made, and only to reword an item that already exists — never to add one.
     - Reading the old headers before drafting is the direct cause of process-flavoured bodies: the headers *are* the process, and paraphrasing them is the path of least resistance. Do not open them early.
     - NEVER copy, concatenate, or bullet-list the old messages into the new body.
-3.  **The net-effect test** — apply to every body line before writing it:
-    - Would a reader who runs `git show` on this single commit see the change this line claims? If no, delete the line.
+3.  **The net-effect test** — apply to every body item before writing it:
+    - Would a reader who runs `git show` on this single commit see the change this item claims? If no, delete the item.
     - Code added and later removed within the range → mention **neither**. It is not in the net diff.
     - A value/name/approach changed repeatedly within the range → state only the **final** value.
     - A bug introduced and fixed within the range → mention neither the bug nor its fix.
 4.  **Prohibited body content.** The net-effect test in step 3 is the actual rule; the items below are recognisable symptoms of failing it, not an exhaustive blacklist. A rephrasing that avoids these exact words but still describes a superseded step is equally prohibited.
     - Self-referential or process wording: "修正前一版…", "調整上述…", "改回…", "再次修正…", "依 review 意見調整…", or any equivalent.
-    - Enumerating the collapsed commits ("包含 3 個 commit：…") or preserving their headers as body lines.
-    - Any line whose only purpose is describing a step that was later superseded.
+    - Enumerating the collapsed commits ("包含 3 個 commit：…") or preserving their headers as bullets.
+    - Any item whose only purpose is describing a step that was later superseded.
 5.  **Header reflects the whole range's purpose**, not the first or last commit's header. Re-derive `type` and `scope` from the net diff — a range of `fix` commits refining a new feature is a `feat`, not a `fix`.
 6.  **Trailers**: keep exactly one `Co-authored-by:` per distinct identity — deduplicate the ones inherited from the collapsed commits rather than stacking them. Keep a `BREAKING CHANGE:` footer only if the breaking change still exists in the net diff.
 7.  **Pushed history requires explicit confirmation**: if any commit in the range has already been pushed, ask the user before rewriting. This extends step 12's rule to squash and rebase, which are more destructive than `--amend`.
@@ -139,13 +162,22 @@ When several commits collapse into one, the resulting message must describe the 
 
 ## Examples
 
-**Example 1: Header + 3-line body with Jira ticket**
+**Example 1: The full shape — paragraph, bullets, closing line**
 ```
-feat(auth): 實作 Google 登入 #26739
+test(payment): code review 衍生任務與 Q05 定案 #27492
 
-新增 OAuth 2.0 認證流程。
-整合 Google Identity 服務。
-支援自動帳號建立。
+補強兩處測試的防呆與可讀性，並結案 Q05；僅動測試檔，
+生產碼零 diff。
+
+- FT01 補上第三方退款 mock，讓守衛回歸時以斷言失敗，
+  而非 NullReferenceException 加 18 秒重試。
+- FT02 抽離 Get_Payment_Created_With_ChargeType，消除
+  5 引數呼叫靜默綁到 nonDeductionAmount 的歧義。
+- Q05 定案：訂單服務不需為 3282 調整，自動重送只認 3270。
+
+建置 0 錯誤、測試 239 通過。
+
+Co-authored-by: Claude (claude-opus-5) <noreply@anthropic.com>
 ```
 
 **Example 2: Header only, no Jira ticket (user confirmed not needed)**
@@ -153,11 +185,11 @@ feat(auth): 實作 Google 登入 #26739
 fix(coupon): 修正折扣計算錯誤
 ```
 
-**Example 3: Header with 1-line body**
+**Example 3: Single item — paragraph alone, no bullets**
 ```
 refactor(api): 優化 API 響應時間 #25841
 
-改用快取層減少資料庫查詢。
+改用快取層減少資料庫查詢，命中時不再往 DB 取價。
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 ```
@@ -166,8 +198,10 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 ```
 feat(auth)!: 移除舊版 token 認證方式 #26739
 
-新增 OAuth 2.0 認證流程。
-保留向後兼容層 (deprecated)。
+改用 OAuth 2.0 為唯一認證入口，舊版 token 端點下線。
+
+- 新增授權碼流程與 refresh token 輪替。
+- 保留向後兼容層並標記 deprecated，下一個主版本移除。
 
 BREAKING CHANGE: Legacy token authentication has been removed.
 Migrate to OAuth 2.0 using the new authentication endpoint.
@@ -175,12 +209,26 @@ Migrate to OAuth 2.0 using the new authentication endpoint.
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 ```
 
-**Example 5: Standard fix with all trailers**
+**Example 5: One idea per item — splitting a packed bullet**
+
+❌ WRONG — one bullet, three statements welded together:
 ```
 fix(payment): 修正支付流程逾時錯誤 #28451
 
-調整 timeout 設置為 30 秒。
-改進錯誤訊息提示。
+- 調整 timeout 設置為 30 秒；改進錯誤訊息提示——原本逾時會回傳空白訊息故前端無法判斷，另補上重試計數。
+```
+The line runs past 72 display columns, and `；`, `——`, `故` are each welding
+a separate point onto it.
+
+✅ CORRECT — one idea per bullet, each wrapped:
+```
+fix(payment): 修正支付流程逾時錯誤 #28451
+
+拉長金流閘道的等待上限並補齊逾時後的可觀測性。
+
+- timeout 由 10 秒調整為 30 秒。
+- 逾時改回傳明確錯誤訊息，前端不再收到空白 body。
+- 補上重試計數，供 slow-log 判斷是否為閘道端壅塞。
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 ```
@@ -202,23 +250,25 @@ refactor(cache): timeout 由 10 秒改為 30 秒
 fix(cache): 移除誤加的 debug log
 ```
 
-❌ WRONG — reuses those four headers as body lines, contradicts `git show`:
+❌ WRONG — reuses those four headers as bullets, contradicts `git show`:
 ```
 feat(cache): 新增 Redis 快取層 #26739
 
-新增 Redis 快取層。
-修正 TTL 單位錯誤。
-timeout 由 10 秒改為 30 秒。
-移除誤加的 debug log。
+- 新增 Redis 快取層。
+- 修正 TTL 單位錯誤。
+- timeout 由 10 秒改為 30 秒。
+- 移除誤加的 debug log。
 ```
 The TTL bug, the 10-second value, and the debug log never exist in the net diff — a reader cannot find any of them.
 
-✅ CORRECT — every line traceable to a line of the net diff above:
+✅ CORRECT — every item traceable to a line of the net diff above:
 ```
 feat(cache): 新增 Redis 快取層 #26739
 
-以 IDistributedCache 封裝 Redis 讀寫，TTL 以毫秒為單位設定。
-Redis 連線 timeout 設為 30 秒。
+為商品價格查詢加入分散式快取，減少尖峰時段的 DB 讀取。
+
+- 以 IDistributedCache 封裝 Redis 讀寫，TTL 以毫秒為單位設定。
+- Redis 連線 timeout 設為 30 秒。
 
 Co-authored-by: Claude (claude-opus-5) <noreply@anthropic.com>
 ```

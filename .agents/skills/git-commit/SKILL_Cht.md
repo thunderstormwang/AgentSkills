@@ -113,7 +113,7 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
       |---|---|
       | 壓縮 (squash / fixup) N 個 Commit | `git diff <被壓縮最早 Commit 的父節點>..HEAD` |
       | 將分支 rebase 到 `<target>` | **先**解析 `git merge-base <branch> <target>`，再執行 `git diff <該 sha>..<branch>` |
-      | `--amend` | `git diff HEAD~1..HEAD` **再加上** `git diff --cached` 與 `git diff` — 其淨效果為「原 Commit 的差異」結合「本次新加入的已暫存/未暫存變更」 |
+      | `--amend` | `git diff HEAD~1..HEAD` **再加上** `git diff --cached` — 其淨效果為「原 Commit 的差異」結合「**已暫存**的內容」。未暫存的變更不會被 amend 進去，因此必須排除 `git diff`；僅當該次 amend 會帶 `-a` 執行時才納入 |
 
     - 僅依據該差異組出訊息。
 2.  **舊的 Commit 訊息要最後才讀，甚至可以不讀。**
@@ -133,7 +133,8 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
 6.  **頁腳標記**：每個不同身份僅保留**一個** `Co-authored-by:` — 請將自被壓縮 Commit 繼承而來的重複項去除，而非層層堆疊。僅當破壞性變更仍存在於淨差異中時，才保留 `BREAKING CHANGE:` 頁腳。
 7.  **改寫已推送的歷史須先明確確認**：若範圍內任何 Commit 已被推送，改寫前必須先詢問使用者。此規則將步驟 12 的限制延伸至 squash 與 rebase — 它們的破壞性高於 `--amend`。
 8.  **改寫完成後必須顯示產生的訊息** — 與步驟 11 對一般 Commit 的要求相同。使用者必須看到「實際被記錄下來的內容」，而非「原本打算寫的內容」。
-    - 從 git 讀回來並原文顯示，含頁腳標記：單一壓縮結果用 `git log -1 --format=%B`；若 rebase 改寫了多個 Commit，則用 `git log <base>..HEAD --format=%B`。
+    - 從 git 讀回來並原文顯示，含頁腳標記：單一壓縮結果用 `git log -1 --format=%B`；若 rebase 改寫了多個 Commit，則用 `git log <target>..HEAD --format=%B`。
+    - 多個 Commit 的讀回，範圍必須以**改寫後**的基準點界定（`<target>`，或 `ORIG_HEAD`），絕不可用步驟 1 解析出的基準點。rebase 之後那個舊基準點已不再是 `HEAD` 的祖先，因此 `<舊基準點>..HEAD` 會以集合差的方式解析，連 target 自身的 Commit 一併列出 — 那些訊息並非本次改寫所撰寫。
     - **嚴禁在未顯示訊息的情況下回報改寫已完成。** 訊息可能被無聲截斷、停留在編輯器的樣板狀態、或原封不動地沿用舊 Commit 的內容 — 這些狀況除非讀回來，否則完全看不出來。
 
 ## 範例 (Examples)

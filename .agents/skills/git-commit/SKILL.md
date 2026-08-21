@@ -113,7 +113,7 @@ When several commits collapse into one, the resulting message must describe the 
       |---|---|
       | Squash / fixup of N commits | `git diff <parent-of-earliest-collapsed-commit>..HEAD` |
       | Rebase a branch onto `<target>` | resolve `git merge-base <branch> <target>` **first**, then `git diff <that-sha>..<branch>` |
-      | `--amend` | `git diff HEAD~1..HEAD` **plus** `git diff --cached` and `git diff` — the net effect is the existing commit's diff combined with whatever is newly staged or unstaged |
+      | `--amend` | `git diff HEAD~1..HEAD` **plus** `git diff --cached` — the net effect is the existing commit's diff combined with what is **staged**. Unstaged changes are NOT amended in, so `git diff` must be excluded; include it only when the amend will run with `-a` |
 
     - Compose the message from that diff only.
 2.  **Read the old commit messages LAST, if at all.**
@@ -133,7 +133,8 @@ When several commits collapse into one, the resulting message must describe the 
 6.  **Trailers**: keep exactly one `Co-authored-by:` per distinct identity — deduplicate the ones inherited from the collapsed commits rather than stacking them. Keep a `BREAKING CHANGE:` footer only if the breaking change still exists in the net diff.
 7.  **Pushed history requires explicit confirmation**: if any commit in the range has already been pushed, ask the user before rewriting. This extends step 12's rule to squash and rebase, which are more destructive than `--amend`.
 8.  **Show the resulting message once the rewrite completes** — the same obligation step 11 imposes on a normal commit. The user must see what was actually recorded, not what was intended.
-    - Read it back from git and display it verbatim, including trailers: `git log -1 --format=%B` for a single collapsed commit, or `git log <base>..HEAD --format=%B` when a rebase rewrote several.
+    - Read it back from git and display it verbatim, including trailers: `git log -1 --format=%B` for a single collapsed commit, or `git log <target>..HEAD --format=%B` when a rebase rewrote several.
+    - For the multi-commit readback, bound the range by the **post-rewrite** base (`<target>`, or `ORIG_HEAD`), never by the base resolved in step 1. After a rebase that old base is no longer an ancestor of `HEAD`, so `<old-base>..HEAD` resolves as a set difference and also lists the target's own commits — messages this rewrite never authored.
     - Never report a rewrite as finished without showing the message. A message can be silently truncated, left as the editor's template, or inherited unchanged from the old commit — none of which is visible unless it is read back.
 
 ## Examples

@@ -29,7 +29,9 @@ translate while reading. Personal repos have no such audience, even though the f
 
 ### When a Plan Is Required
 
-A plan is **only required for source code changes**. Documentation, instruction files, and skill files do **not** require a plan — proceed directly.
+A plan is **only required for source code changes**. Documentation, instruction files, and skill files do **not** require a plan — make the change and commit it directly, without asking first.
+
+This waives the approval step, not the `git-commit` skill — that skill's flow still governs the commit itself. History rewriting (squash / rebase / amend) always needs explicit confirmation, documentation included.
 
 **Skip the plan entirely if:**
 - The user explicitly says no plan is needed, or

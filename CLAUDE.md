@@ -6,17 +6,13 @@
 
 ### Skill and Instruction Files
 
-The language depends on **who reads the file**, not on its filename:
+Default (user-level and personal-project repos): **English** — these files are read only by the
+user and the AI, so there's no audience to write for in Chinese.
 
-| Scope | Examples | Language |
-| :--- | :--- | :--- |
-| **User-level** (`~/.claude/`) | `CLAUDE.md`, `skills/*/SKILL.md` | **English** — read only by the user and the AI |
-| **Project-level — company projects** (repo name starts with `PXBox` or `PXEC`, case-insensitive) | `CLAUDE.md`, `.claude/skills/*/SKILL.md`, `.github/copilot-instructions.md` | **Traditional Chinese** — teammates read these |
-| **Project-level — personal projects** (any other repo, e.g. `AgentSkills`) | same files as above | **English** — no audience beyond the user and the AI |
-
-Rationale: the language follows the audience, not the file's location. Company repos are shared with
-teammates, so their instruction files are team documentation and English forces every teammate to
-translate while reading. Personal repos have no such audience, even though the files are committed.
+**Trigger rule:** the first time in a session you operate on a repo whose name starts with `PXBox`
+or `PXEC` (case-insensitive), load the `pxbox-conventions` skill before writing any code, docs,
+instruction files, or commits in it. That skill overrides the file-language default above for
+such repos, and holds further team conventions and tacit knowledge as they're added.
 
 **When it is unclear whether a repo counts as a company project, ask before writing** — switching language later means rewriting the whole file.
 

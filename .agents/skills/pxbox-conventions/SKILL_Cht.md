@@ -35,6 +35,11 @@ description: 使用者公司 repo（repo 名稱以 PXBox 或 PXEC 開頭，不�
 | `backend` | 後台（內部管理）畫面 |
 | `service` | 其他後端微服務 |
 
+## API HTTP 方法
+
+API endpoint 只使用 `GET` 與 `POST`。唯讀操作使用 `GET`；新增、更新、刪除或其他會改變狀態的
+操作使用 `POST`。不要新增 `PUT`、`PATCH` 或 `DELETE` endpoint。
+
 ## 資料庫讀寫分離
 
 Prod MySQL 採主從式架構：主要 DB 負責寫入，次要 DB 負責讀取。UAT 與 SIT 各自只有單一 DB（沒有

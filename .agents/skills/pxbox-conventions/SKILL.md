@@ -36,6 +36,12 @@ Route pattern is `<prefix>/<version>/<name>`. The prefix tells you who calls the
 | `backend` | Back-office (internal admin) screens |
 | `service` | Other backend microservices |
 
+## API HTTP methods
+
+Expose API endpoints using only `GET` and `POST`. Use `GET` for read-only operations and `POST`
+for operations that create, update, delete, or otherwise change state. Do not introduce `PUT`,
+`PATCH`, or `DELETE` endpoints.
+
 ## Database read/write split
 
 Prod MySQL is master/replica: a main DB for writes, a secondary DB for reads. UAT and SIT each

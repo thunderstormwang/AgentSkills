@@ -27,13 +27,24 @@ description: 使用者公司 repo（repo 名稱以 PXBox 或 PXEC 開頭，不�
 
 ## API 路由前綴
 
-路由格式為 `<prefix>/<version>/<name>`。前綴代表呼叫方是誰：
+路由格式為 `<prefix>/<version>/<service name>/<name>`，其中 `<service name>` 是該 endpoint 所屬的
+微服務。前綴代表呼叫方是誰：
 
 | Prefix | 呼叫方 |
 | :--- | :--- |
 | `app` | 前台（面向顧客）畫面 |
 | `backend` | 後台（內部管理）畫面 |
 | `service` | 其他後端微服務 |
+
+`<service name>` 多半取自專案名稱 `PXBox.<Name>.Service`，將 `<Name>` 轉為全小寫並以底線
+分隔單字：
+
+| 專案 | `<service name>` |
+| :--- | :--- |
+| `PXBox.Spu.Service` | `spu` |
+| `PXBox.Coupon.Service` | `coupon` |
+| `PXBox.ShoppingCart.Service` | `shopping_cart` |
+| `PXBox.MarketingOperate.Service` | `marketing_operate` |
 
 ## API HTTP 方法
 

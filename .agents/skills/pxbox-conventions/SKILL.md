@@ -28,13 +28,24 @@ This does not apply to `~/.claude/` files — those stay English per the global 
 
 ## API route prefix
 
-Route pattern is `<prefix>/<version>/<name>`. The prefix tells you who calls the endpoint:
+Route pattern is `<prefix>/<version>/<service name>/<name>`, where `<service name>` is the
+microservice that owns the endpoint. The prefix tells you who calls the endpoint:
 
 | Prefix | Caller |
 | :--- | :--- |
 | `app` | Front-end (customer-facing) screens |
 | `backend` | Back-office (internal admin) screens |
 | `service` | Other backend microservices |
+
+`<service name>` usually comes from the project name `PXBox.<Name>.Service`, with `<Name>`
+lowercased and word-separated by underscores:
+
+| Project | `<service name>` |
+| :--- | :--- |
+| `PXBox.Spu.Service` | `spu` |
+| `PXBox.Coupon.Service` | `coupon` |
+| `PXBox.ShoppingCart.Service` | `shopping_cart` |
+| `PXBox.MarketingOperate.Service` | `marketing_operate` |
 
 ## API HTTP methods
 

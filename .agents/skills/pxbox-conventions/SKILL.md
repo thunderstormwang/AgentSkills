@@ -65,3 +65,19 @@ Prod Redis runs as a **cluster of 3 nodes** (hash-slot sharding). UAT and SIT ea
 single Redis instance (no cluster, no slots). Some keys use `{...}` hash tags so related keys
 land on the same slot — on UAT/SIT this has no effect, since there's no slot routing at all;
 keys just live on that one instance as normal strings.
+
+## Invoice issuance: per sub-order → per parent order
+
+Originally invoices were issued **per sub-order**: an order split into N sub-orders produced N
+invoices. The tax authority warned that this misrepresented the transaction — the customer paid
+once but received several invoices. In mid-January 2014 the system switched to issuing **per
+parent order**: one payment, one invoice.
+
+- `PXBox.Invoice.Service` is deprecated; `PXBox.InvoiceUnifier.Service` replaces it.
+- The per-sub-order path was fully removed **only at order creation**, so no newly created order
+  can ever reach it again. Everywhere else the per-sub-order logic is still in the codebase and
+  still runs.
+
+So when reading code that issues or handles invoices per sub-order: it is live code, not dead
+code, but it is only reachable for orders created before the switch. Do not treat it as the
+current behaviour, and do not assume it is unreachable either.

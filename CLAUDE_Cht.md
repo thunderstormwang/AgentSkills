@@ -67,6 +67,35 @@
 - 改寫歷史有專屬的訊息規則 — skill 的「歷史改寫」章節對 squash / rebase / amend 屬強制閱讀，
   不是選讀的背景資訊。
 
+## 跨 Repo 工作
+
+一項需求常橫跨數個 repo，而 session 只會跑在其中一個裡面。
+
+**觸發規則：** 在某個 session 中首次討論、檢視或針對「非主要工作目錄」的 repo 進行設計時，
+**須先讀取該 repo 的 `.claude/CLAUDE.md`** — 即使當下的任務看起來用不到也一樣。該檔案所承載
+的，正是無法從程式碼推導出來的默會知識，太晚讀等於已經先用錯誤的假設推理過一輪。
+
+`/add-dir` 做得到與做不到的事（2026-09-02 實測）：
+
+| | 行為 |
+|---|---|
+| 檔案工具（Read / Edit / Write / Glob / Grep） | 取得該加入目錄的存取權 |
+| 該 repo 的 `.claude/skills/` | **會載入**，在 `/context` 中以 `Project` 來源列出 |
+| 該 repo 的 `.claude/CLAUDE.md` | **不會載入** — 故有上述觸發規則 |
+| 主要工作目錄 | 仍然只有一個 |
+| 加入的目錄在哪裡看得到 | `/permissions` — 僅存在於該 session，不會寫入任何設定檔 |
+
+只有在確實需要**寫入**該目錄中的檔案時才加入目錄；唯讀的探索不需要加。
+
+**跨 repo 使用 CodeGraph：** `codegraph explore` 依 shell 的 cwd 解析，因此
+`cd <其他 repo> && codegraph explore "<query>"` 會查詢該 repo 的索引，並在過程中自動同步。
+`UserPromptSubmit` 這個 prompt-hook 永遠只涵蓋主要 repo，所以其他 repo 的上下文不會自己出現
+— 得自己去取。
+
+**計畫維持一個 repo 一份，各自 commit 在自己的 repo 裡。** 工作起始的那個 repo，其計畫會帶一
+節簡短的「對外契約」— 只寫契約形狀與部署順序，不含 Task 項目 — 而該節就是其他 repo 的 session
+開始時的輸入，如此需求便不必從頭重新解釋一遍。
+
 <!-- CODEGRAPH_START -->
 ## CodeGraph
 

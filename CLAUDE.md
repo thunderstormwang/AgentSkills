@@ -71,6 +71,39 @@ not reason about whether the operation "counts as committing".
 - Rewriting history has its own message rules — the skill's History Rewriting section is mandatory
   reading for squash / rebase / amend, not optional background.
 
+## Multi-Repo Work
+
+A requirement often spans several repos while the session runs in only one of them.
+
+**Trigger rule:** the first time in a session you discuss, inspect, or design against a repo
+other than the primary working directory, **Read that repo's `.claude/CLAUDE.md` first** —
+even when the current task looks unlikely to need it. That file holds exactly the tacit
+knowledge that cannot be inferred from the code, so reading it late means having already
+reasoned from wrong assumptions.
+
+What `/add-dir` does and does not do (verified 2026-09-02):
+
+| | Behavior |
+|---|---|
+| File tools (Read / Edit / Write / Glob / Grep) | Gain access to the added directory |
+| That repo's `.claude/skills/` | **Loaded**, listed under a `Project` source in `/context` |
+| That repo's `.claude/CLAUDE.md` | **NOT loaded** — hence the trigger rule above |
+| Primary working directory | Still exactly one |
+| Where added dirs are listed | `/permissions` — session-only state, written to no settings file |
+
+Add a directory only when files in it must actually be **written**; read-only exploration
+needs none.
+
+**CodeGraph across repos:** `codegraph explore` resolves by the shell's cwd, so
+`cd <other repo> && codegraph explore "<query>"` queries that repo's index and auto-syncs it
+on the way. The `UserPromptSubmit` prompt-hook only ever covers the primary repo, so context
+for other repos never arrives on its own — go fetch it.
+
+**Plans stay one per repo, each committed inside its own repo.** The plan for the repo the
+work starts in carries a short 對外契約 section — contract shape and deployment order only,
+no Task items — and that section is the input when the other repos' sessions begin, so the
+requirement never has to be re-explained from scratch.
+
 <!-- CODEGRAPH_START -->
 ## CodeGraph
 

@@ -18,13 +18,15 @@ teammate to translate while reading.
 
 This does not apply to `~/.claude/` files — those stay English per the global CLAUDE.md default.
 
-## Git branch → environment mapping
+## Deployment environment mapping
 
-| Branch | Environment |
-| :--- | :--- |
-| `main` | Prod |
-| `release` | UAT |
-| `develop` | SIT |
+Environment variable values are case-sensitive; use the exact lowercase values shown.
+
+| Environment | Branch | environment variable value |
+| :--- | :--- | :--- |
+| Prod | `main` | `prod` |
+| UAT | `release` | `uat` |
+| SIT | `develop` | `sit` |
 
 ## API route prefix
 

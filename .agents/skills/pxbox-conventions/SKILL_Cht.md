@@ -17,13 +17,15 @@ description: 使用者公司 repo（repo 名稱以 PXBox 或 PXEC 開頭，不�
 
 此規則不適用於 `~/.claude/` 下的檔案——那些檔案仍依全域 CLAUDE.md 的預設維持英文。
 
-## Git branch 對應環境
+## 部署環境對應
 
-| Branch | 環境 |
-| :--- | :--- |
-| `main` | Prod |
-| `release` | UAT |
-| `develop` | SIT |
+環境變數值有大小寫之分，請使用表中所列的全小寫值。
+
+| 環境 | Branch | 環境變數值 |
+| :--- | :--- | :--- |
+| Prod | `main` | `prod` |
+| UAT | `release` | `uat` |
+| SIT | `develop` | `sit` |
 
 ## API 路由前綴
 

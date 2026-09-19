@@ -18,6 +18,21 @@ teammate to translate while reading.
 
 This does not apply to `~/.claude/` files — those stay English per the global CLAUDE.md default.
 
+## Company and system context
+
+全聯 is the parent company of 全電商, an e-commerce platform comprising three systems owned by
+separate departments:
+
+- **B2C** — The user's department; its system uses a microservice architecture.
+- **B2E**
+- **3PL**
+
+Other 全聯 units and systems work with 全電商 but are not part of it:
+
+- **PXPay** — Payment service provider.
+- **全支付** — Payment service provider.
+- **資訊部** — Responsible for accounting, member data, and the intermediary database.
+
 ## Deployment environment mapping
 
 Environment variable values are case-sensitive; use the exact lowercase values shown.

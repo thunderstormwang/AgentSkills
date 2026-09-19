@@ -56,8 +56,13 @@ description: 使用符合 Conventional Commits 規範的格式建立 Commit 訊�
 頁腳標記是位於 Commit 訊息末尾（內文或標題之後）的鍵值對。
 
 ### 強制標記
-- **Co-authored-by**: 自動加入所有 Commit；無論內文是否為空皆須存在。
-  - 依「你目前運行的 AI agent 產品家族」（從自身的 system prompt / 執行身份得知）選擇對應的標記值。**一個品牌共用一個 trailer**，不分介面（CLI、桌面 app、Web、IDE 擴充）。模型 ID 內嵌在 name 的括號內（GitHub 仍以 email 歸戶 co-author，括號不影響歸戶）：
+- **Co-authored-by**: 每個 Commit **恰好一行**；無論內文是否為空皆須存在。
+  - **一行就是一行。** 絕不輸出兩行 `Co-authored-by:`。常見情況是同時有多個候選寫法——由下方對照表組出的值、由 harness 注入本次工作階段的署名指示、以及被壓縮的 Commit 繼承而來的舊 trailer。它們是**同一位 co-author 的不同寫法，不是不同的 co-author**，所以挑一個、其餘捨棄。即使各候選指向不同產品或不同模型，仍然只留一行。
+  - **如何挑選**（由上而下，先符合者勝出）：
+    1. **本次工作階段由 harness 提供的署名指示**——任何要求你在 Commit 訊息結尾加上特定 `Co-authored-by:` / `Co-Authored-By:` 行的系統指示。**原文照抄**，包含大小寫。它是對「實際運行為何」最即時的陳述，照抄也讓本 skill 永遠不與 harness 牴觸。
+    2. **否則**，依自身執行身份用下方對照表組出。
+    - 自被壓縮 Commit 繼承的 trailer 永遠不會勝出——它們是歷史，不是當下的身份（見「歷史改寫」）。
+  - 對照表依「你目前運行的 AI agent 產品家族」（從自身的 system prompt / 執行身份得知）選擇，不分介面（CLI、桌面 app、Web、IDE 擴充）。模型 ID 內嵌在 name 的括號內（GitHub 仍以 email 歸戶 co-author，括號不影響歸戶）：
     | Agent 產品家族 | 涵蓋介面範例 | Trailer |
     |---|---|---|
     | Claude / Claude Code | Claude Code CLI、桌面 app、claude.ai/code Web、VS Code / JetBrains 擴充 | `Co-authored-by: Claude (<exact-model-id>) <noreply@anthropic.com>` |
@@ -66,6 +71,18 @@ description: 使用符合 Conventional Commits 規範的格式建立 Commit 訊�
     | 無法判斷 | — | `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>` |
   - 以「agent 產品家族」為準，而非底層模型或介面。例如 Claude 模型若是透過 Copilot CLI 執行，應使用 Copilot 的 trailer。
   - **解析 `<exact-model-id>`**：取自你自身的執行身份 / system prompt（你目前運行的模型）。使用乾淨的 model family ID — 例如 `claude-opus-4-7` — 並去除任何 context 變體後綴（如 `[1m]`）。若品牌已知但無法判斷確切 model ID，則括號內填 `(Unknown)`（例如 `Co-authored-by: Claude (Unknown) <noreply@anthropic.com>`）。若連 agent 品牌都無法判斷，則用 `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>`。
+  - 工作階段自帶署名指示，而對照表會組出另一種寫法時：
+
+    ❌ 錯誤 — 為求保險兩行都留：
+    ```
+    Co-authored-by: Claude (claude-opus-5) <noreply@anthropic.com>
+    Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+    ```
+
+    ✅ 正確 — 只留 harness 提供的那一行：
+    ```
+    Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+    ```
 
 ### 選填標記
 - **BREAKING CHANGE**: 用於標示破壞性變更或重大版本影響。
@@ -111,7 +128,8 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
     - 加入前請先徵詢使用者確認。
 10. **處理頁腳標記**：
     - 若存在破壞性變更，加入 `BREAKING CHANGE: <描述>` 頁腳。
-    - 所有 Commit 皆須附加 `Co-authored-by:` 頁腳，依「你目前運行的 AI agent 產品家族」（Claude / Gemini / Copilot）選擇對應值 — 一個品牌共用一個 trailer，不分介面（對照表見上方「強制標記」）。並將解析出的 `<exact-model-id>` 內嵌在 name 括號內（乾淨 family ID，不帶 context 變體後綴）。若品牌已知但 model ID 未知，括號內填 `(Unknown)`；若連 agent 品牌都無法判斷，則用 `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>`。
+    - 所有 Commit 皆須附加**恰好一行** `Co-authored-by:` 頁腳，依上方「強制標記」的優先順序挑選：若有 harness 提供的署名指示就原文照抄，否則依「你目前運行的 AI agent 產品家族」（Claude / Gemini / Copilot）用對照表組出，不分介面。組出時將解析出的 `<exact-model-id>` 內嵌在 name 括號內（乾淨 family ID，不帶 context 變體後綴）。若品牌已知但 model ID 未知，括號內填 `(Unknown)`；若連 agent 品牌都無法判斷，則用 `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>`。
+    - **執行 Commit 前，先數一下即將交給 git 的訊息中有幾行 `Co-authored-by:`。** 超過一行就代表你把多個候選寫法疊在一起了——只保留優先順序選中的那一行，其餘刪除。
 11. **先提交，再回報 — 不要事前徵求核准。**
     - 訊息組完後立即執行 `git commit`，不要停下來詢問「要提交這個嗎？」。
     - 流程必須為：**組出訊息 → 提交 → 顯示實際提交的訊息給使用者**。
@@ -152,7 +170,7 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
     - 逐一列舉被壓縮的 Commit（「包含 3 個 commit：…」），或將它們的標題保留為條列項。
     - 任何目的僅在描述「之後已被取代的步驟」的項目。
 5.  **標題應反映整個範圍的目的**，而非第一個或最後一個 Commit 的標題。請從淨差異重新推導 `type` 與 `scope` — 一連串用來打磨新功能的 `fix` Commit，整體應為 `feat` 而非 `fix`。
-6.  **頁腳標記**：每個不同身份僅保留**一個** `Co-authored-by:` — 請將自被壓縮 Commit 繼承而來的重複項去除，而非層層堆疊。僅當破壞性變更仍存在於淨差異中時，才保留 `BREAKING CHANGE:` 頁腳。
+6.  **頁腳標記**：結果只帶**恰好一行** `Co-authored-by:` — 不是「每個身份各留一行」。請將被壓縮 Commit 繼承而來的 trailer 全部捨棄，依「強制標記」的優先順序重新推導出那一行，做法與全新 Commit 相同。即使該區間的 Commit 帶有三種不同寫法，壓縮後仍只有一行。僅當破壞性變更仍存在於淨差異中時，才保留 `BREAKING CHANGE:` 頁腳。
 7.  **改寫已推送的歷史須先明確確認**：若範圍內任何 Commit 已被推送，改寫前必須先詢問使用者。此規則將步驟 12 的限制延伸至 squash 與 rebase — 它們的破壞性高於 `--amend`。
 8.  **改寫完成後必須顯示產生的訊息** — 與步驟 11 對一般 Commit 的要求相同。使用者必須看到「實際被記錄下來的內容」，而非「原本打算寫的內容」。
     - 從 git 讀回來並原文顯示，含頁腳標記：單一壓縮結果用 `git log -1 --format=%B`；若 rebase 改寫了多個 Commit，則用 `git log <target>..HEAD --format=%B`。

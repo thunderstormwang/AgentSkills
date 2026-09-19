@@ -57,8 +57,13 @@ If no Jira ticket number is provided, omit the `#<jira ticket no>` part.
 Trailers are key-value pairs placed at the end of the commit message footer (after body or header).
 
 ### Required Trailers
-- **Co-authored-by**: Automatically added to all commits. Always present, even if body is empty.
-  - Select the trailer value based on which AI agent product family you are running as (known from your own system prompt / runtime identity). One trailer per brand, regardless of surface (CLI, desktop, web, IDE extension). The exact model ID is embedded in parentheses inside the name part (GitHub still attributes the co-author by email, so the parenthetical does not break attribution):
+- **Co-authored-by**: **exactly one line**, on every commit, even when the body is empty.
+  - **One means one.** Never emit two `Co-authored-by:` lines. Several candidate spellings are often in play at once — a value composed from the table below, an attribution line the host injected into the session, trailers inherited from commits being squashed. They are **competing spellings of the same co-author, not different co-authors**, so pick one and drop the rest. This holds even when the candidates name different products or different models: still one line.
+  - **How to pick the one** (first match wins):
+    1. **A host-supplied attribution line for this session** — any instruction from the harness/system telling you to end commit messages with a specific `Co-authored-by:` / `Co-Authored-By:` line. Use it **verbatim**, casing included. It is the most current statement of what is actually running, and following it verbatim means the skill never contradicts the host.
+    2. **Otherwise, compose from the mapping table below** using your own runtime identity.
+    - Trailers inherited from collapsed commits never win — they are history, not the current identity (see History Rewriting).
+  - Compose from the table based on which AI agent product family you are running as (known from your own system prompt / runtime identity), regardless of surface (CLI, desktop, web, IDE extension). The exact model ID is embedded in parentheses inside the name part (GitHub still attributes the co-author by email, so the parenthetical does not break attribution):
     | Agent product family | Example surfaces | Trailer |
     |---|---|---|
     | Claude / Claude Code | Claude Code CLI, desktop app, claude.ai/code web, VS Code / JetBrains extension | `Co-authored-by: Claude (<exact-model-id>) <noreply@anthropic.com>` |
@@ -67,6 +72,18 @@ Trailers are key-value pairs placed at the end of the commit message footer (aft
     | Unknown / cannot determine | — | `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>` |
   - Identify by the agent product family, not the underlying model or surface. E.g., if a Claude model is invoked inside Copilot CLI, use the Copilot trailer.
   - **Resolving `<exact-model-id>`**: take it from your own runtime identity / system prompt (the model you are currently running as). Use the clean model family ID — e.g. `claude-opus-4-7` — and strip any context-variant suffix such as `[1m]`. If the brand is known but the exact model ID cannot be determined, use `(Unknown)` as the model part (e.g. `Co-authored-by: Claude (Unknown) <noreply@anthropic.com>`). If the agent brand itself cannot be determined, use `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>`.
+  - The session supplies its own attribution line, and the table would produce a different spelling:
+
+    ❌ WRONG — both kept, "to be safe":
+    ```
+    Co-authored-by: Claude (claude-opus-5) <noreply@anthropic.com>
+    Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+    ```
+
+    ✅ CORRECT — the host-supplied line alone:
+    ```
+    Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+    ```
 
 ### Optional Trailers
 - **BREAKING CHANGE**: Used to indicate breaking changes or major version impacts
@@ -112,7 +129,8 @@ AI must follow this **Dual-Source Synthesis Flow** to generate the commit messag
     - Offer user confirmation before inclusion
 10. **Handle trailers**:
     - If breaking changes exist, add `BREAKING CHANGE: <description>` footer (see Trailers section).
-    - Always append a `Co-authored-by:` trailer. Choose the value based on which AI agent product family you are running as (Claude / Gemini / Copilot) — one trailer per brand regardless of surface — per the mapping in Required Trailers above. Embed your resolved `<exact-model-id>` in the name parentheses (clean family ID, no context-variant suffix). If the brand is known but the model ID is not, use `(Unknown)` as the model part; if the agent brand cannot be determined, use `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>`.
+    - Append **exactly one** `Co-authored-by:` trailer, picked by the precedence in Required Trailers above: a host-supplied attribution line verbatim if there is one, otherwise composed from the mapping table for the product family you are running as (Claude / Gemini / Copilot), regardless of surface. When composing, embed your resolved `<exact-model-id>` in the name parentheses (clean family ID, no context-variant suffix). If the brand is known but the model ID is not, use `(Unknown)` as the model part; if the agent brand cannot be determined, use `Co-authored-by: Unknown (Unknown) <noreply@unknown.local>`.
+    - **Before running the commit, count the `Co-authored-by:` lines in the message you are about to pass to git.** More than one means you stacked competing spellings — delete all but the one the precedence selects.
 11. **Commit first, then report — do NOT ask for approval beforehand.**
     - Once the message is composed, run `git commit` immediately. Do not pause to ask "shall I commit this?".
     - The required flow is: **compose message → commit → show the exact committed message to the user**.
@@ -153,7 +171,7 @@ When several commits collapse into one, the resulting message must describe the 
     - Enumerating the collapsed commits ("包含 3 個 commit：…") or preserving their headers as bullets.
     - Any item whose only purpose is describing a step that was later superseded.
 5.  **Header reflects the whole range's purpose**, not the first or last commit's header. Re-derive `type` and `scope` from the net diff — a range of `fix` commits refining a new feature is a `feat`, not a `fix`.
-6.  **Trailers**: keep exactly one `Co-authored-by:` per distinct identity — deduplicate the ones inherited from the collapsed commits rather than stacking them. Keep a `BREAKING CHANGE:` footer only if the breaking change still exists in the net diff.
+6.  **Trailers**: the result carries **exactly one** `Co-authored-by:` line — not one per identity found in the collapsed commits. Discard every inherited trailer and re-derive the single line by the precedence in Required Trailers, the same way a fresh commit would. A range whose commits carry three different spellings still collapses to one line. Keep a `BREAKING CHANGE:` footer only if the breaking change still exists in the net diff.
 7.  **Pushed history requires explicit confirmation**: if any commit in the range has already been pushed, ask the user before rewriting. This extends step 12's rule to squash and rebase, which are more destructive than `--amend`.
 8.  **Show the resulting message once the rewrite completes** — the same obligation step 11 imposes on a normal commit. The user must see what was actually recorded, not what was intended.
     - Read it back from git and display it verbatim, including trailers: `git log -1 --format=%B` for a single collapsed commit, or `git log <target>..HEAD --format=%B` when a rebase rewrote several.

@@ -30,7 +30,7 @@
 
   8. **No "📝 待釐清" placeholders inside AC sections** — AC chapters must contain only finalized, executable AC items. Handle pending items elsewhere:
      - Resolved → rewrite as a concrete rule statement
-     - Unresolved → file under Pre Design Sync as a Q item
+     - Unresolved → file under Req as an RQ item
      - Future scope → move to a follow-up note in plan.md (or the relevant ticket), not the AC chapter
      - An AC chapter with `📝 待釐清` paragraphs signals incomplete work and tends to get skipped by reviewers.
 

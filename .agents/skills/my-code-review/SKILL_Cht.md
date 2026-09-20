@@ -25,7 +25,7 @@ description: 對整條 feature 分支、對照其基底 (main) 進行結構化�
 2. **偵測計畫：** 自動探測 repo 內的計畫／feature 文件（例如 `docs/` 下的 `plan.md`）——別寫死路徑。
    - **有計畫 → 對照計畫審：** 全部層次適用，含計畫層 0–2。
    - **無計畫 → 純 code 審：** 略過層次 0–2；靠層次 3–6，並從 code＋commit message 推 Design 意圖。
-3. **層次 0 由 orchestrator 集中做一次（僅有計畫時）：** 你自己在 fan-out **之前**由上而下讀完計畫——尤其 Pre Design Sync（刻意決策不是 bug）。把相關 Task／Design 片段分給各 subagent，而非讓每個 subagent 各自重讀、各自解讀整份計畫。
+3. **層次 0 由 orchestrator 集中做一次（僅有計畫時）：** 你自己在 fan-out **之前**由上而下讀完計畫——尤其 Pre Design Sync（刻意決策不是 bug）。跟隨 plan 內指向 Pre Design Sync 支援文件的連結，並將其中的 DQ 詳細內容視為層次 0 的一部分。把相關 Task／Design 片段分給各 subagent，而非讓每個 subagent 各自重讀、各自解讀整份計畫。
 4. **Fan-out——唯讀 subagent：** 做完的分支可能動 100+ 檔，別一次審完。把變更檔依 目錄／層／aggregate 分群，每群開一個唯讀 review subagent（上限約 5–6；更多就分批）。每個 subagent：
    - 載入涵蓋其範圍的專案 coding-convention／架構 skill——該 skill 是那些慣例的單一來源，故此處不重述；
    - 對自己那塊套用層次 1–6（層次 1–2 僅在有計畫時）；
@@ -47,7 +47,7 @@ description: 對整條 feature 分支、對照其基底 (main) 進行結構化�
 **在接觸任何程式碼之前**，請由上而下閱讀計畫文件：
 
 1. **Req** — 了解變更的「原因」。正在解決什麼問題？
-2. **Pre Design Sync** — 了解「設計為何如此」。每個 Q 的結論都是深思熟慮的決定。請勿將已記錄的設計決策誤判為 Bug。
+2. **Pre Design Sync** — 了解「設計為何如此」。同時閱讀主 plan 的 DQ 索引／結論，以及任何連結的 Pre Design Sync 支援文件。每個 DQ 的結論都是深思熟慮的決定。請勿將已記錄的設計決策誤判為 Bug。
 3. **Design** — 了解結構與合約應有的樣貌。
 4. **Task** — 作為預期變更的檢查清單。
 

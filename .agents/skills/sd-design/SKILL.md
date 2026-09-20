@@ -16,19 +16,42 @@ The document is produced **incrementally** in three phases. Each phase is **gate
 **Dynamic Adjustment:** This process is non-linear. If a gap or error is discovered in a later phase, the AI will assist in tracing the root cause back to an earlier phase, applying the necessary corrections, and recursively updating all dependent downstream items to maintain consistency.
 
 ### Phase 1 — Req
-Output the Req section. End the section with a **Req 進度表** listing each sub-item individually:
+Req may begin from incomplete input. Do not manufacture a complete specification from an objective or a few task bullets.
+
+1. **Build the draft from confirmed information.**
+   - Preserve the user's source wording and distinguish confirmed facts from assumptions.
+   - Investigate what code and data can answer, especially Current State and the initial Technical Impact Analysis.
+   - When the investigation is substantial, keep the evidence in supporting documents such as `{ticket}_現況查核.md` or `{ticket}_落差與待確認.md`, then link them from Req.
+2. **Clarify requirement gaps inside Req.**
+   - Add a `### Req 待確認事項` subsection when an unknown affects scope, target behavior, constraints, or acceptance criteria.
+   - Give each question an `RQ` ID (`RQ01`, `RQ02`, ...). Do not move requirement ambiguity into Pre Design Sync.
+   - When the user answers an RQ, record the conclusion and immediately update every affected Req item. Remove tentative wording that the answer has resolved.
+   - If the answer must come from a PM, stakeholder, or external team, provide a forwardable Given/When/Then clarification draft.
+3. **Establish the Req baseline.**
+   - An incomplete R item stays `Todo` or `InProgress`; set it to `Review` only when its content is complete enough for user confirmation.
+   - When all blocking RQs are resolved and all six R items are ready, ask the user to confirm the complete Req. Only confirmed R items become `Done`.
+
+When RQs exist, include a progress table for them:
+```markdown
+### Req 待確認事項進度表
+| ID | 項目 | 結論 | 狀態 |
+| :--- | :--- | :--- | :--- |
+| RQ01 | [需求問題] |  | Todo |
+```
+
+End the Req section with a **Req 進度表** listing each sub-item individually. Status reflects actual completeness; do not initialize every item to `Review` automatically:
 ```markdown
 ### Req 進度表
 | ID | 項目 | 狀態 |
 | :--- | :--- | :--- |
 | R01 | Objective | Review |
-| R02 | Current State | Review |
-| R03 | Proposed Changes | Review |
-| R04 | Constraints | Review |
-| R05 | Technical Impact Analysis | Review |
-| R06 | Acceptance Criteria | Review |
+| R02 | Current State | InProgress |
+| R03 | Proposed Changes | InProgress |
+| R04 | Constraints | Todo |
+| R05 | Technical Impact Analysis | Todo |
+| R06 | Acceptance Criteria | Todo |
 ```
-Wait for user to confirm all R items (`Done`) before proceeding to Phase 2.
+The statuses above are illustrative, not fixed defaults. Do not proceed to Phase 2 until all blocking RQs are resolved and all R items are `Done`.
 
 ---
 
@@ -36,25 +59,27 @@ Wait for user to confirm all R items (`Done`) before proceeding to Phase 2.
 > **Gate:** Phase 1 must be Done before starting Phase 2.
 > **Note:** TIA in Req is reference-level. Re-read the actual code when formulating design questions — do not assume TIA is complete or accurate at the file/method level.
 
-List **all questions** that need to be resolved before design can begin under a `## Pre Design Sync` section. Questions fall into two categories:
-1. **Req 理解確認** — Ambiguities or assumptions in the Req that need alignment with the user (e.g., scope boundaries, implicit behaviors, terms that could be interpreted differently)
-2. **設計決策** — Open questions that directly affect architecture, data model, caching strategy, API contract, or external integrations
-- One question per `Q` item. Do not produce Design content yet.
+List all unresolved **design decisions** under a `## Pre Design Sync` section. These questions directly affect architecture, data model, caching strategy, API contract, internal component structure, or external integrations.
+- Do not use Pre Design Sync to complete requirement understanding. Scope boundaries, intended behavior, terminology, and acceptance expectations must already have been resolved as RQs in Phase 1.
+- If code investigation exposes a new requirement ambiguity, stop the design discussion, add or reopen the corresponding RQ and Req items, resolve and reconfirm Req, then resume Pre Design Sync. This is backward correction, not a normal Pre Design Sync question.
+- One question per `DQ` item (`DQ01`, `DQ02`, ...). Do not produce Design content yet.
 - For questions with multiple candidate solutions, provide a **comparison table**, and explicitly state the **recommended solution** with a clear **reasoning/justification**.
+- **Pre Design Sync artifact routing:**
+  - Keep the main plan's `## Pre Design Sync` section as the authoritative index for DQ IDs, concise conclusions, statuses, and the Phase 2 gate.
+  - When numerous DQs, investigation evidence, comparison tables, or discussion history would make the main plan difficult to navigate, move the detailed DQ bodies into `{ticket}_pre_design_sync.md` in the same directory.
+  - In the main plan, retain every DQ ID and title, its concise conclusion and status, and a link to the supporting document. In the supporting document, preserve the same DQ IDs and record each question's context, evidence, options, recommendation, discussion, and detailed conclusion.
+  - The supporting document is not a separate lifecycle phase. Do not split merely to reduce line count; split when it improves readability while preserving decision lineage.
 - End the section with a **Pre Design Sync 進度表** (includes 結論 column, initially empty):
 ```markdown
 ### Pre Design Sync 進度表
 | ID | 項目 | 結論 | 狀態 |
 | :--- | :--- | :--- | :--- |
-| Q01 | [問題標題] |  | Todo |
-| Q02 | [問題標題] |  | Todo |
+| DQ01 | [問題標題] |  | Todo |
+| DQ02 | [問題標題] |  | Todo |
 ```
-- As the user answers each Q: fill in 結論 both within the specific Q item's description in the body of the `## Pre Design Sync` section (detailed) and in the **Pre Design Sync 進度表** (concise, 1-2 sentences), and flip status to `Done` / `Cancel`.
-- **Conclusion handling by question type:**
-  - **Req 理解確認 (Req clarification):** in addition to recording 結論, **update the corresponding Req section** to incorporate the clarified understanding (rewrite ambiguous wording, add a clarifying clause, or split a vague statement into specific ones). Treat this as a Req modification — the **Recursive Modification Impact** rule applies: any dependent Design / Task items downstream must be reset to `Review` / `Todo`.
-  - **設計決策 (Design choice):** record 結論 in the Q item only; the decision feeds the Design phase. No Req section change is needed.
-- **Conflict check:** Whenever a Q is resolved, verify its conclusion does not contradict any already-resolved Q items or any content in the Req section. If a conflict is found, surface it immediately for user resolution.
-- Wait until **all Q items** are `Done` / `Cancel` / `Pending` before proceeding to Phase 3.
+- As the user answers each DQ: fill in 結論 both within the specific DQ item's detailed body (in the main plan or the supporting document) and in the main plan's **Pre Design Sync 進度表** (concise, 1-2 sentences), and flip status to `Done` / `Cancel`.
+- **Conflict check:** Whenever a DQ is resolved, verify its conclusion does not contradict any already-resolved DQ items or any content in the Req section. If a conflict is found, surface it immediately for user resolution.
+- Wait until **all DQ items** are `Done` / `Cancel` / `Pending` before proceeding to Phase 3.
 
 ---
 
@@ -124,12 +149,21 @@ Clearly define the business context:
 
   Refer to `references/ac-guidelines.md` for AC writing principles, artifact structure (high-level AC vs detailed TC), and cross-reference rules.
 
+#### Req Clarification
+
+When the supplied information cannot support a complete and trustworthy Req, keep the uncertainty in Phase 1:
+- Investigate questions answerable from code, data, or existing documents instead of asking the user to restate discoverable facts.
+- Create one `RQ` item per requirement ambiguity that needs human confirmation.
+- State which R items each RQ blocks or may change.
+- After resolution, record the conclusion and rewrite the affected R items so the Req contains the final understanding rather than a history of uncertainty.
+- Do not advance to Pre Design Sync while a blocking RQ remains unresolved. A `Pending` RQ may remain only when it is explicitly non-blocking and its exclusion or assumption is recorded in Req.
+
 ### 2. Pre Design Sync (Questions)
-List every question that must be resolved before design can begin. Two categories:
-- **Req 理解確認** — Ambiguities or implicit assumptions in the Req that need alignment (scope, edge cases, terms)
-- **設計決策** — Questions that affect architecture, data model, caching strategy, API contract, or external integrations
+List every **design decision** that must be resolved before design can begin. These questions affect architecture, data model, caching strategy, API contract, internal component structure, or external integrations.
+- Requirement ambiguities do not belong here. If one is discovered, return it to Req as an `RQ`, update the affected R items, and reconfirm the Req baseline before continuing.
 - For questions with multiple candidate solutions, provide a **comparison table** (approach, pros/cons, scope of change, risk), and explicitly state the **recommended solution** with a clear **reasoning/justification**.
-- Record the user's final decision as 結論 **both within the specific Q item's description** (detailed) and in the progress table (concise, 1-2 sentences)
+- Record the user's final decision as 結論 **both within the specific DQ item's detailed body** (in the main plan or supporting document) and in the main plan's progress table (concise, 1-2 sentences)
+- Apply the Phase 2 artifact-routing rule when detailed DQ content would overwhelm the main plan; the main plan remains the authoritative index and gate.
 
 ### 3. Design (Technical Specification)
 
@@ -140,12 +174,20 @@ Detail the **structural and behavioral definition** (the "What" and "Where"). Fo
 > **Code Snippet Rule — Contract only, no implementation:**
 > - ✅ Use snippets for: field declarations (`public int Foo { get; set; }`), method signatures (`Task<Dto> GetXxxAsync(int id);`), event schema shape.
 > - ❌ Do NOT include: method bodies, SQL queries, mapping logic, or any "how it works" code. Those belong in Task.
+
+**Design artifact routing:**
+- Keep the main plan as the authoritative summary of confirmed design decisions.
+- When one design concern needs substantial detail — such as a dependency diagram, several collaborating services/classes, responsibility reassignment, method relocation/removal, or a long file-impact list — move that detail into a dedicated document named `{ticket}_{service}_類別結構設計.md`.
+- In the main plan, retain only the affected components, one-sentence responsibilities, key boundaries, and a link to the dedicated document. The dedicated document is supporting detail, not a new lifecycle phase; its conclusion remains represented by the corresponding `D` item in the main plan.
+- Keep ownership and dependency decisions in **Internal Component Structure**. Keep behavioral rules, ordering, early returns, state transitions, concurrency, and failure handling in **Core Logic Spec**. Cross-reference instead of duplicating either side.
+
 - **Impact Scope:** List existing Services or APIs affected by the changes.
 - **DB Schema:** Table/Column changes, **Index** adjustments, and **Data Migration / Initialization Strategy** (e.g., handling existing records when adding columns or refactoring/replacing tables).
-- **Entity / Domain:** **Entity field** changes and Domain Service interfaces.
+- **Domain Model:** Entity / Value Object / Enum changes, relationships, and domain invariants. Do not put service interfaces, class responsibilities, dependency direction, or orchestration here. Omit this item when no domain-model change exists.
 - **Contract:** **API Request/Response** structures and **Event Schemas**.
 - **Caching Strategy:** **Key naming conventions**, TTL, data structures, and Interface/Method definitions.
 - **Core Logic Spec:** Description of **behavioral shifts** (e.g., priority logic between Mode A and Mode B, state transitions). **Explicitly address Concurrency (e.g., potential Race Conditions) and Error Handling (e.g., rollback or compensation for external API failures).**
+- **Internal Component Structure:** Internal service/class responsibilities, dependency direction, public or interface method signatures, DI boundaries, and existing methods or responsibilities that move or disappear. Domain Services belong here because this item answers **which component owns the behavior**, while Core Logic Spec answers **how the behavior must work**. Use the dedicated class-structure document rule above when this item would dominate the main plan.
 - **Component Flow:** **Sequence of calls** between modules and side effects (e.g., "After saving, update Cache X then publish Event Y"). **Always provide diagrams (e.g., Mermaid sequence diagrams or flowcharts)** to visualize the flow instead of relying solely on text descriptions.
 - **Test Plan:** Identify what needs to be tested and where. Rules:
   - TC details go in a **separate `{ticket}_tc.md` file** in the same directory as the plan — never inline in the plan.
@@ -175,8 +217,9 @@ Detail the **structural and behavioral definition** (the "What" and "Where"). Fo
 
 Each section ends with its **own** progress table.
 
-> - R items: Req sub-items (Objective / Current State / Proposed Changes / Constraints / Technical Impact Analysis / Acceptance Criteria). Initial status `Review`.
-> - Q items: no prefix, just the question title. Initial status `Todo`.
+> - R items: Req sub-items (Objective / Current State / Proposed Changes / Constraints / Technical Impact Analysis / Acceptance Criteria). They begin as `Todo` / `InProgress` / `Review` according to actual completeness; only user-confirmed items become `Done`.
+> - RQ items: requirement clarification questions inside Req. Initial status `Todo`.
+> - DQ items: design decisions inside Pre Design Sync. Initial status `Todo`.
 > - D items: no prefix, just the sub-section name. Initial status `Review`.
 
 ---
@@ -184,12 +227,12 @@ Each section ends with its **own** progress table.
 ## Guidelines
 - **Traditional Chinese:** Communicate and produce reports in Traditional Chinese.
 - **Response Header:** At the start of **every response**, provide a brief status indicator: `Current Phase: [Req | Pre Design Sync | Design]`.
-- **Comparison tables & Recommendations:** For Q items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body, followed by a **recommended solution** and **rationale**, before recording the final conclusion.
-- **Decision Lineage & Root Cause Tracing:** If a proposal is questioned, AI MUST explain the lineage (e.g., `Task T01` <- `Design D01` <- `Sync Conclusion Q01` <- `Req R01`). Help identify the earliest upstream point for correction.
+- **Comparison tables & Recommendations:** For internal design-decision DQ items with multiple candidate solutions, always include a comparison table in the Pre Design Sync section body, followed by a **recommended solution** and **rationale**, before recording the final conclusion.
+- **Decision Lineage & Root Cause Tracing:** If a proposal is questioned, AI MUST explain the lineage (e.g., `Task T01` <- `Design D01` <- `Sync Conclusion DQ01` <- `Req R03` <- `RQ02`). Help identify the earliest upstream point for correction.
 - **Recursive Modification Impact:** If an item in Phase N is modified, automatically re-evaluate and reset status of all dependent items in Phases > N to `Review` or `Todo`. Summarize these changes for the user.
-- **Conflict detection & self-correction:** Actively check for contradictions: (a) between AC and TC (e.g., a TC case contradicts an AC rule), or between AC/TC and other Req content (Objective, Proposed Changes, Constraints) — fix silently before presenting; if a genuine spec ambiguity cannot be resolved, surface to user; (b) between Q conclusions within Pre Design Sync OR between a Q conclusion and the Req section — surface to user immediately; (c) between Design items, or between Design and Pre Design Sync — fix silently before notifying user; (d) between Task and Design — fix silently before notifying user.
+- **Conflict detection & self-correction:** Actively check for contradictions: (a) between RQ conclusions and Req content, or between AC and other Req content — surface genuine requirement conflicts to the user and update every affected R item after resolution; (b) between AC and TC — fix silently before presenting unless a genuine specification ambiguity requires an RQ; (c) between DQ conclusions within Pre Design Sync OR between a DQ conclusion and the confirmed Req — surface to user immediately; (d) between Design items, or between Design and Pre Design Sync — fix silently before notifying user; (e) between Task and Design — fix silently before notifying user.
 - **Precision:** Use accurate technical terms (e.g., Entity, Repository, CacheRepo).
 - **Progress Table is mandatory:** Each section ends with its own progress table.
 - **Output Format by Decision Scope:**
-    - **Internal decisions** (architecture / implementation choice the AI can resolve with the user): present a comparison table + explicit recommendation + rationale, then wait for the user to pick.
-    - **External decisions** (PM / stakeholder / external-team confirmation required): default to outputting a forwardable Given/When/Then draft that captures the current behavior under each spec option, with the clarification questions called out explicitly. The user should be able to copy the draft to PM verbatim.
+    - **Requirement clarification (RQ):** if confirmation must come from a PM, stakeholder, or external team, default to a forwardable Given/When/Then draft showing the behavioral difference between options and the exact point requiring confirmation.
+    - **Internal design decisions (DQ):** present a comparison table + explicit recommendation + rationale, then wait for the user to pick.

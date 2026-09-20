@@ -181,16 +181,16 @@ AI 必須遵循以下 **「雙源合成流程 (Dual-Source Synthesis Flow)」** 
 
 **範例 1：完整形狀 — 段落、條列、結尾行**
 ```
-test(payment): code review 衍生任務與 Q05 定案 #27492
+test(payment): code review 衍生任務與 DQ05 定案 #27492
 
-補強兩處測試的防呆與可讀性，並結案 Q05；僅動測試檔，
+補強兩處測試的防呆與可讀性，並結案 DQ05；僅動測試檔，
 生產碼零 diff。
 
 - FT01 補上第三方退款 mock，讓守衛回歸時以斷言失敗，
   而非 NullReferenceException 加 18 秒重試。
 - FT02 抽離 Get_Payment_Created_With_ChargeType，消除
   5 引數呼叫靜默綁到 nonDeductionAmount 的歧義。
-- Q05 定案：訂單服務不需為 3282 調整，自動重送只認 3270。
+- DQ05 定案：訂單服務不需為 3282 調整，自動重送只認 3270。
 
 建置 0 錯誤、測試 239 通過。
 

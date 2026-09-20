@@ -25,7 +25,7 @@ You always review a **whole feature branch against its base**, with multi-agent 
 2. **Detect a plan.** Discover a plan / feature doc in the repo (e.g. a `plan.md` / feature doc under `docs/`) — don't hardcode a path.
    - **Plan found → plan-based review:** all layers apply, including the plan layers (0–2).
    - **No plan → code-only review:** skip Layers 0–2; rely on Layers 3–6 and infer Design intent from the code and commit messages.
-3. **Load Layer 0 once, in the orchestrator (plan only).** Read the plan top-down yourself *before* fanning out — especially Pre Design Sync (deliberate decisions are not bugs). Pass the relevant Task / Design excerpts down to each subagent rather than having all of them re-read and re-interpret the whole plan.
+3. **Load Layer 0 once, in the orchestrator (plan only).** Read the plan top-down yourself *before* fanning out — especially Pre Design Sync (deliberate decisions are not bugs). Follow any links from the plan to supporting Pre Design Sync documents and treat their DQ details as part of Layer 0. Pass the relevant Task / Design excerpts down to each subagent rather than having all of them re-read and re-interpret the whole plan.
 4. **Fan out — read-only subagents.** A finished branch can touch 100+ files; don't review it in one pass. Cluster the changed files by directory / layer / aggregate and spawn one read-only review subagent per cluster (cap ~5–6; batch if more). Each subagent:
    - loads any project coding-convention / architecture skill covering its slice — that skill is the single source of those conventions, so do not restate them here;
    - applies Layers 1–6 to its slice (Layers 1–2 only when a plan exists);
@@ -47,7 +47,7 @@ Execute review in this order. Each layer builds on the previous.
 Read the plan document top-down **before touching any code**:
 
 1. **Req** — Understand *why* this change exists. What problem is being solved?
-2. **Pre Design Sync** — Understand *why the design was made this way*. Every Q conclusion is a deliberate decision. Do not flag deliberate decisions as bugs.
+2. **Pre Design Sync** — Understand *why the design was made this way*. Read both the main plan's DQ index/conclusions and any linked Pre Design Sync supporting document. Every DQ conclusion is a deliberate decision. Do not flag deliberate decisions as bugs.
 3. **Design** — Understand *what the structure and contracts should look like*.
 4. **Task** — Use as the checklist of expected changes.
 

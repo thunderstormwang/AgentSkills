@@ -10,11 +10,22 @@ Default (user-level and personal-project repos): **English** — these files are
 user and the AI, so there's no audience to write for in Chinese.
 
 **Trigger rule:** the first time in a session you operate on a repo whose name starts with `PXBox`
-or `PXEC` (case-insensitive), load the `pxbox-conventions` skill before writing any code, docs,
-instruction files, or commits in it. That skill overrides the file-language default above for
-such repos, and holds further team conventions and tacit knowledge as they're added.
+or `PXEC` (case-insensitive), or the first time B2C itself (the user's department/system, as
+opposed to B2E or 3PL) comes up in conversation even outside such a repo, load the
+`b2c-conventions` skill before writing any code, docs, instruction files, or commits. That skill
+overrides the file-language default above for such repos, and holds further team conventions and
+tacit knowledge as they're added.
 
 **When it is unclear whether a repo counts as a company project, ask before writing** — switching language later means rewriting the whole file.
+
+## Personal Skills, Agents, and Instructions
+
+**Trigger rule:** before editing, creating, or discussing any of the user's own personal skill,
+agent, or instruction file (`CLAUDE.md`, `copilot-instructions.md`) — work that belongs in this
+repo (`AgentSkills`), not in some other project — load the `agentskills-conventions` skill
+first. It covers where the edit actually belongs (this repo's own clone, never the linked global
+copy), the full global-link manifest and how to check/repair it, and the required
+Traditional-Chinese `_Cht` translation and commit flow.
 
 ## Response Style
 

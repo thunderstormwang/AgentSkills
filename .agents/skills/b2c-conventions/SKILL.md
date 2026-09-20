@@ -1,11 +1,13 @@
 ---
-name: pxbox-conventions
-description: Team conventions and tacit knowledge for the user's company repos — any repo whose name starts with PXBox or PXEC, case-insensitive. Covers things not derivable from the code itself, such as file-language rules and team practices. Load this the first time in a session you operate on such a repo, before writing any code, docs, instruction files, or commits in it.
+name: b2c-conventions
+description: Team conventions and tacit knowledge for the user's B2C e-commerce system — any repo whose name starts with `PXBox` or `PXEC` (the system's two project-name lineages, case-insensitive), or whenever B2C itself — the user's department/system, as distinct from B2E or 3PL — comes up in conversation, even outside such a repo. Covers things not derivable from the code itself — file-language rules, team practices, and the PXEC-to-PXBox history. Load this the first time in a session such a repo is touched or B2C is discussed, before writing any code, docs, instruction files, or commits.
 ---
 
-# PXBox / PXEC Company Conventions
+# B2C Conventions
 
-Applies to any repo whose name starts with `PXBox` or `PXEC` (case-insensitive).
+Applies to any repo whose name starts with `PXBox` or `PXEC` (case-insensitive), and to any
+discussion of B2C — the user's department and system — even when the session isn't currently
+inside such a repo.
 
 ## File language
 
@@ -32,6 +34,23 @@ Other 全聯 units and systems work with 全電商 but are not part of it:
 - **PXPay** — Payment service provider.
 - **全支付** — Payment service provider.
 - **資訊部** — Responsible for accounting, member data, and the intermediary database.
+
+## History: PXEC → PXBox, and the B2C/B2E/3PL split
+
+The e-commerce platform originally consisted of `PXEC`-prefixed projects, also a microservice
+architecture. While `PXEC` was still under active development, a separate `PXBox`-prefixed
+project line was started in parallel — likewise microservices, but simpler and faster to ship.
+
+To speed up development, `PXEC` development was later halted, and its responsibilities were
+split three ways — B2C, B2E, 3PL — each handled differently:
+
+- **B2C** was handed entirely to the `PXBox` project line, which is why `PXBox` is the system
+  the user's department (B2C) actually runs today.
+- **B2E** and **3PL** were each built from scratch by two other, separate teams.
+
+So `PXBox` and `PXEC` are not two versions of the same thing — they're two separate project
+lineages from the same original platform, and only `PXBox` continues, carrying B2C's share of
+what `PXEC` used to own.
 
 ## Deployment environment mapping
 

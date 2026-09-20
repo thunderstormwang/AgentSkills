@@ -10,10 +10,19 @@
 撰寫的讀者。
 
 **觸發規則：** 在某個 session 中首次操作名稱以 `PXBox` 或 `PXEC` 開頭（不分大小寫）的 repo 時，
-須先載入 `pxbox-conventions` skill，才可在其中撰寫任何程式碼、文件、指令檔或 commit。該 skill
-會覆寫上述的檔案語言預設，並隨著陸續補充，收納更多團隊慣例與默會知識。
+或首次在對話中提到 B2C 本身（相對於 B2E、3PL 而言，使用者所屬的部門／系統）時，即使當下不在
+這類 repo 裡，都須先載入 `b2c-conventions` skill，才可撰寫任何程式碼、文件、指令檔或 commit。
+該 skill 會覆寫上述的檔案語言預設，並隨著陸續補充，收納更多團隊慣例與默會知識。
 
 **無法判斷某個 repo 是否屬於公司專案時，先詢問再撰寫** — 事後改變語言等同整份重寫。
+
+## 個人 Skill、Agent 與 Instruction
+
+**觸發規則：** 在編輯、建立或討論使用者自己個人的 skill、agent，或 instruction 檔案
+（`CLAUDE.md`、`copilot-instructions.md`）之前——只要這項工作屬於這個 repo
+（`AgentSkills`），而不是某個其他專案——須先載入 `agentskills-conventions` skill。它涵蓋了
+編輯目標實際該落在哪裡（這個 repo 自己的複本，絕不是連結出去的全域複本）、完整的全域連結對照
+表與檢查／修復方式，以及必要的繁體中文 `_Cht` 翻譯與 commit 流程。
 
 ## 回應風格
 

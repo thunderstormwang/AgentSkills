@@ -1,6 +1,6 @@
 ---
 name: agentskills-conventions
-description: 使用者個人 AgentSkills repo 的規範——這是唯一真實來源，會透過 symlink（macOS）或 Junction/Symlink（Windows）的方式，曝露到使用者每一台機器（公司用 Windows、家裡用 Mac）上，變成全域的 Claude Code skills/agents/instructions。當使用者要求編輯自己個人的 skill、agent 或 instruction 檔案時載入此 skill——「改我的 skill」／「個人 skill」／「改一下我的 XXX skill」、「我的 XXX agent」、「改我的 CLAUDE.md」／「個人的 copilot-instructions」（編輯目標永遠是這個 repo，不是連結出去的全域複本——這對 skill、agent、instruction 檔案一視同仁，不是只適用於 skill）。當使用者明確點名這個 repo，並提出連結相關請求時，也要載入——「建立與 AgentSkills repo 的連結」、「檢查與 AgentSkills repo 的連結」、「AgentSkills 的連結有沒有建好」、「幫我建 AgentSkills 的連結」——單純講「建立連結」／「檢查連結」而沒有提到 AgentSkills 或使用者個人 skill 的話，太過籠統，不算這個觸發條件。在這個 repo 裡編輯任何 SKILL.md／agent 的 .md／CLAUDE.md／copilot-instructions.md 之後，也要立刻載入，因為它會驅動必要的繁體中文 `_Cht` 同步與 commit。
+description: 使用者個人 AgentSkills repo 的編輯規範；該 repo 是全域 skills、agents 與 instruction 檔案的唯一真實來源。當使用者要求建立或修改個人 skill、agent、CLAUDE.md、Copilot instructions，或編輯 AgentSkills 內的這類檔案時使用。當連結請求明確涉及 AgentSkills 或個人 skills 時也使用。確保修改落在 repo 本體而非全域連結路徑，並在內容變更後同步繁中 `_Cht` 對照版及提交 commit。
 ---
 
 # AgentSkills Repo 規範

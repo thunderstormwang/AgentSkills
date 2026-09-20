@@ -20,7 +20,7 @@ Req may begin from incomplete input. Do not manufacture a complete specification
 
 1. **Build the draft from confirmed information.**
    - Preserve the user's source wording and distinguish confirmed facts from assumptions.
-   - Investigate what code and data can answer, especially Current State and the initial Technical Impact Analysis.
+   - Investigate what code and data can answer, especially Current State and requirement gaps.
    - When the investigation is substantial, keep the evidence in supporting documents such as `{ticket}_現況查核.md` or `{ticket}_落差與待確認.md`, then link them from Req.
 2. **Clarify requirement gaps inside Req.**
    - Add a `### Req 待確認事項` subsection when an unknown affects scope, target behavior, constraints, or acceptance criteria.
@@ -29,7 +29,7 @@ Req may begin from incomplete input. Do not manufacture a complete specification
    - If the answer must come from a PM, stakeholder, or external team, provide a forwardable Given/When/Then clarification draft.
 3. **Establish the Req baseline.**
    - An incomplete R item stays `Todo` or `InProgress`; set it to `Review` only when its content is complete enough for user confirmation.
-   - When all blocking RQs are resolved and all six R items are ready, ask the user to confirm the complete Req. Only confirmed R items become `Done`.
+   - When all blocking RQs are resolved and all five R items are ready, ask the user to confirm the complete Req. Only confirmed R items become `Done`.
 
 When RQs exist, include a progress table for them:
 ```markdown
@@ -48,8 +48,7 @@ End the Req section with a **Req 進度表** listing each sub-item individually.
 | R02 | Current State | InProgress |
 | R03 | Proposed Changes | InProgress |
 | R04 | Constraints | Todo |
-| R05 | Technical Impact Analysis | Todo |
-| R06 | Acceptance Criteria | Todo |
+| R05 | Acceptance Criteria | Todo |
 ```
 The statuses above are illustrative, not fixed defaults. Do not proceed to Phase 2 until all blocking RQs are resolved and all R items are `Done`.
 
@@ -57,7 +56,7 @@ The statuses above are illustrative, not fixed defaults. Do not proceed to Phase
 
 ### Phase 2 — Pre Design Sync
 > **Gate:** Phase 1 must be Done before starting Phase 2.
-> **Note:** TIA in Req is reference-level. Re-read the actual code when formulating design questions — do not assume TIA is complete or accurate at the file/method level.
+> **Note:** Re-read the actual code when formulating design questions. Req describes the business baseline, not the implementation structure.
 
 List all unresolved **design decisions** under a `## Pre Design Sync` section. These questions directly affect architecture, data model, caching strategy, API contract, internal component structure, or external integrations.
 - Do not use Pre Design Sync to complete requirement understanding. Scope boundaries, intended behavior, terminology, and acceptance expectations must already have been resolved as RQs in Phase 1.
@@ -85,7 +84,7 @@ List all unresolved **design decisions** under a `## Pre Design Sync` section. T
 
 ### Phase 3 — Design
 > **Gate:** Phase 2 must be fully resolved before starting Phase 3.
-> **Note:** Do not rely solely on TIA for scope. Re-read the actual code for each TIA area before specifying the design — TIA only identifies logical areas, not the full detail of what needs to change.
+> **Note:** Re-read the actual code for each design concern before specifying the design. Do not infer implementation structure from Req alone.
 
 Append the `## Design` section after `## Pre Design Sync`. **Do NOT modify or remove** the Pre Design Sync section.
 
@@ -116,13 +115,13 @@ Clearly define the business context:
 - **Current State:** Describe what the system **can do today**, in functional/capability language. Rules:
   - Written at a level readable by PM and non-engineers — no class names, method names, or internal field references
   - Every statement is a **confirmed fact** about the current system — no "pending", "to be decided", or future-oriented language
-  - Component-level details (which class does what) belong in Technical Impact Analysis, not here
+  - Keep component-level investigation details in a supporting existing-state document or the later Design section, not here
   - May include a reference link to a detailed existing-state analysis document (e.g., `[analysis.md](analysis.md)`)
 
 - **Proposed Changes:** Describe what **new capabilities will be added** or what **behaviors will change**. Rules:
   - Written in functional/capability language, readable by PM — focus on "what the system will do", not "which component will change"
   - Pending items (e.g., "⚠️ 待 PM 確認") are acceptable here, since this describes the target state
-  - Component-level change details belong in Technical Impact Analysis, not here
+  - Component-level change details belong in Design, not here
   - May include a reference link to a detailed new-feature design document
 
 - **Constraints:** Fixed conditions the design must respect, decided **before** the Design phase begins. Four sources:
@@ -130,20 +129,7 @@ Clearly define the business context:
   2. **Scope exclusions** — items explicitly out of this SD's scope; describe by functionality, not by class name
   3. **Pre-decided design choices** — decisions already made (e.g., reuse an existing field instead of adding a new one); when a technical detail IS the constraint itself (e.g., a specific field name or convention), keep it
   4. **Data precision / format specs** — non-functional requirements that affect field type design
-  - Do NOT include: which class implements something (belongs in TIA), factual statements about current state (belongs in Current State), or implementation details like handler names
-
-- **Technical Impact Analysis:** A logical-area map that helps reviewers understand the scope of change. Generation process:
-  1. **Identify areas:**
-     - Refactor / extension: read the relevant parts of the codebase first to identify what logical areas actually exist; do not infer without reading
-     - Greenfield: decompose Proposed Changes into the major components / layers that need to be created
-  2. **Group by logical area** — cluster related components into coherent groups (e.g., "活動建立/編輯", "折扣計算"); each group = one TIA entry
-  3. **Cross-check with Proposed Changes** — verify every proposed change maps to at least one TIA area; surface any uncovered area
-  4. **Path hint per area:**
-     - Refactor / extension: 1~2 representative existing files
-     - Greenfield: suggested target file paths or namespaces for the new component
-  - Each entry: one sentence for 現行 (or `N/A (new)` for greenfield), one sentence for 調整 (or `新建：目的 + 職責` for greenfield), and representative 路徑
-  - ⚠️ **TIA is reference-level, not definitive.** Pre Design Sync and Design phases must re-read the actual code (refactor) or finalize the detailed structure (greenfield) — do not treat TIA as a complete or authoritative spec
-  - **Language rule for 現行 / 調整 columns:** Use functional/behavioral descriptions only — no method names, class names, field names, or interface names. If a sentence names a specific class or method, it belongs in Design, not TIA. File paths in the 代表路徑 column are exempt from this rule.
+  - Do NOT include: which class implements something (belongs in Design), factual statements about current state (belongs in Current State), or implementation details like handler names
 
 - **Acceptance Criteria:** Conditions that must be met for the requirement to be considered fulfilled. **Primary reader of AC is PM / stakeholder** — write in plain business language; technical jargon, class names, and method names are forbidden. Given/When/Then belongs in TC, not AC (see Principle 11).
 
@@ -217,7 +203,7 @@ Detail the **structural and behavioral definition** (the "What" and "Where"). Fo
 
 Each section ends with its **own** progress table.
 
-> - R items: Req sub-items (Objective / Current State / Proposed Changes / Constraints / Technical Impact Analysis / Acceptance Criteria). They begin as `Todo` / `InProgress` / `Review` according to actual completeness; only user-confirmed items become `Done`.
+> - R items: Req sub-items (Objective / Current State / Proposed Changes / Constraints / Acceptance Criteria). They begin as `Todo` / `InProgress` / `Review` according to actual completeness; only user-confirmed items become `Done`.
 > - RQ items: requirement clarification questions inside Req. Initial status `Todo`.
 > - DQ items: design decisions inside Pre Design Sync. Initial status `Todo`.
 > - D items: no prefix, just the sub-section name. Initial status `Review`.

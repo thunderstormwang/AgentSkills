@@ -45,29 +45,33 @@ instruction 檔案，要改的檔案是**這個 repo 的複本裡的檔案**，�
 | `.claude/skills` | `.agents/skills` | 目錄 |
 | `.agents/skills` | `.agents/skills` | 目錄 |
 | `.claude/agents` | `.claude/agents` | 目錄 |
+| `.copilot/agents` | `.claude/agents` | 目錄 |
 | `.claude/CLAUDE.md` | `.claude/CLAUDE.md` | 檔案 |
 | `.copilot/copilot-instructions.md` | `.github/copilot-instructions.md` | 檔案 |
 
 （`.claude/skills` 和 `.agents/skills` 兩個都指向 repo 裡同一個資料夾——一個是 Claude Code 自己
 的 skill 路徑，另一個是其他 agent 工具會去看的通用路徑。兩個都要保留。）
 
-（針對 agent 另外補充：它跟 skill 一樣有 project／user 兩層 scope——同名時 project
+（針對 Claude Code agent 另外補充：它跟 skill 一樣有 project／user 兩層 scope——同名時 project
 （`<repo>/.claude/agents`）覆蓋 user（`~/.claude/agents`）——這正是為什麼一個只存在於這個 repo
 自己 `.claude/agents` 裡的 agent，只有在這個 repo 內才叫得出來，也是為什麼這個路徑同樣需要連
 結。另外，Claude Code 沒有 `/agent <name>` 或 `@<name>` 這種呼叫語法——在指令中直接指名 agent
 就是呼叫方式；`@` 在 Claude Code 是檔案路徑補全，`/` 才是 skill。）
 
-（這兩者之間有一個已知且接受的不對稱——而且不是出自一開始就想清楚的設計。`.agents/skills` 當
-初設計時，是以為**所有** AI 工具（包含 Claude Code）都會從那一個通用路徑讀 skill；結果發現
-Claude Code 其實不吃這條路徑，只好在原本就打算給其他工具用的鏡射連結（`~/.agents/skills`）之
-外，另外多建一條 Claude 專用的連結（`~/.claude/skills`）——這兩條連結現在都是必要的，沒有一條
-是多餘的。`.claude/agents` 則完全不是什麼跨工具的決定：當初設定它的時候，根本只用 Claude
-Code，壓根沒考慮過其他工具的路徑——它只是剛好就落在 Claude Code 自己原生的 project-scope 路
-徑上，這就是為什麼 agent 不需要像 skill 那樣多補一條連結，也是為什麼 session 的主要工作目錄只
-要是這個 repo 本身，不靠任何全域連結就能找到它，連全新一台機器也一樣。這是真實存在的行為差異，
-不是 bug：project 依名稱覆蓋 user，所以不管哪一種情況都不會出現重複列出或衝突的風險。目前刻意
-維持現狀、不往任何一個方向去「理順」——AI 工具這個生態變動太快，很可能不久後又要重新考慮一次，
-現在花力氣去講究並不划算。）
+（對 Copilot CLI 而言，`~/.copilot/agents` 是 user-level agent 的探索目錄；
+`.github/agents` 則是 repository-level。將整個 user-level 目錄連結到這個 repo 的
+`.claude/agents` 原檔資料夾，讓既有設定檔（包含 `implementation-agent.md`）能跨專案使用，
+不必維護第二份複本。用 `/agent` 檢查是否找到 agent，再用 `/agent implementation-agent`
+選用它。找到 agent 不代表完整提示詞會載入每一次對話；選用或呼叫時才會啟用。如果現有 session
+沒有列出剛連結的 agent，重新啟動 CLI 後再檢查。
+參見 [Copilot CLI 自訂 agents](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/overview#use-custom-agents)。）
+
+（原檔資料夾有一個已接受的歷史不對稱。`.agents/skills` 原本規劃為通用路徑，但 Claude Code
+需要另外的 `~/.claude/skills` 連結；這兩條 skill 連結仍然必要。`.claude/agents` 是只使用
+Claude Code 時選定的路徑，已符合它原生的 project-scope 路徑，因此 Claude Code 在這個 repo
+工作時，不靠全域連結也能找到 repo 自己的 agents。Copilot CLI 則需要獨立的
+`~/.copilot/agents` 連結。維持一個 agent 原檔資料夾與兩條工具專屬的全域連結，不複製設定檔，
+也不搬動既有 Claude Code 資料夾。）
 
 （針對 `CLAUDE.md` 另外補充：跟 skill、agent 不一樣，Claude Code 的 memory 檔案是跨 scope
 **疊加**的，不是靠覆蓋規則二選一——project memory 跟 user memory 是兩個各自獨立追蹤的來源，

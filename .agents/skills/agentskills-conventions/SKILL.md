@@ -50,33 +50,36 @@ side.
 | `.claude/skills` | `.agents/skills` | dir |
 | `.agents/skills` | `.agents/skills` | dir |
 | `.claude/agents` | `.claude/agents` | dir |
+| `.copilot/agents` | `.claude/agents` | dir |
 | `.claude/CLAUDE.md` | `.claude/CLAUDE.md` | file |
 | `.copilot/copilot-instructions.md` | `.github/copilot-instructions.md` | file |
 
 (`.claude/skills` and `.agents/skills` both point at the same repo folder — one is Claude
 Code's own skill path, the other is the generic path other agent tools look at. Keep both.)
 
-(On agents specifically: they have the same project-vs-user scope split as skills — project
+(On Claude Code agents specifically: they have the same project-vs-user scope split as skills — project
 (`<repo>/.claude/agents`) overrides user (`~/.claude/agents`) on a name clash — which is exactly
 why an agent that only exists in this repo's own `.claude/agents` is callable only from inside
 this repo, and why that path needs linking too. Also, Claude Code has no `/agent <name>` or
 `@<name>` call syntax — naming an agent directly in the prompt is how you invoke it; `@` does
 file-path completion in Claude Code, `/` is a skill.)
 
-(A known, accepted asymmetry between the two — and not the product of a clean original design.
-`.agents/skills` was set up on the assumption that *every* AI tool, Claude Code included, would
-read skills from that one generic path; it turned out Claude Code doesn't, so a second,
-Claude-specific link (`~/.claude/skills`) had to be added on top of the mirror link that was
-already planned for other tools (`~/.agents/skills`) — both are load-bearing today, neither is
-redundant. `.claude/agents`, by contrast, was never a multi-tool decision at all: at the time it
-was set up, only Claude Code was in use, so no other tool's path was ever considered — it simply
-happens to already sit at Claude Code's own native project-scope path, which is why agents don't
-need the same workaround skills do, and why a session whose primary directory is this repo finds
-them with no global link at all, on any machine, even a brand-new one. This is a genuine
-difference in behaviour, not a bug: project overrides user by name, so neither case risks a
-duplicate listing or a conflict. Left as-is for now rather than untangled in either
-direction — the AI tool landscape moves fast enough that this could well need revisiting again
-soon anyway, so it's not worth over-engineering today.)
+(For Copilot CLI, `~/.copilot/agents` is the user-level agent discovery directory;
+`.github/agents` is repository-level. Link the whole user-level directory to this repo's
+canonical `.claude/agents` folder so existing profiles, including `implementation-agent.md`,
+are available across projects without a second maintained copy. Use `/agent` to check
+discovery and `/agent implementation-agent` to select the agent. Discovery does not load
+the full agent prompt into every conversation; selection or invocation activates it. If an
+existing session does not list a newly linked agent, restart the CLI and check again.
+See [Copilot CLI custom agents](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/overview#use-custom-agents).)
+
+(The canonical folders have an accepted historical asymmetry. `.agents/skills` was planned as
+a generic path, but Claude Code required the additional `~/.claude/skills` link; both skill
+links remain necessary. `.claude/agents` was chosen when only Claude Code was in use and
+already matches its native project-scope path, so Claude Code finds this repo's own agents
+without a global link when working here. Copilot CLI needs its separate `~/.copilot/agents`
+link instead. Keep one canonical agent folder and the two tool-specific global links rather
+than copying profiles or relocating the existing Claude Code folder.)
 
 (On `CLAUDE.md` specifically: unlike skills and agents, Claude Code's memory files are additive
 across scopes, not selected by an override rule — project memory and user memory are two

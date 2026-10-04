@@ -102,6 +102,11 @@ single Redis instance (no cluster, no slots). Some keys use `{...}` hash tags so
 land on the same slot — on UAT/SIT this has no effect, since there's no slot routing at all;
 keys just live on that one instance as normal strings.
 
+Existing Master/Replica read distribution is intentional: it spreads read load and avoids
+concentrating all traffic on the Master. Preserve this distribution rather than routing all
+reads to the Master merely because replicas may lag. For a specific path that requires
+strong consistency, explicitly prefer the Master without changing the default for all reads.
+
 ## Kafka consumer group identity
 
 For Kafka event subscriptions, the shared package `PXGo.EventBus` determines the consumer
@@ -115,6 +120,17 @@ offset if older records have expired).
 
 Treat such a rename as a consumption-behavior change, not just a cosmetic refactor, and
 consider the effects of replaying previously handled events.
+
+## Kafka subscription progress
+
+Different EventHandlers subscribed to the same topic have different consumer groups and
+maintain independent committed offsets. Even with a single partition, ordering within that
+partition does not synchronize the groups' progress or guarantee processing order across
+handlers.
+
+When merging or removing handlers, compare the old and new group identities and consumption
+progress to identify events that may be missed or replayed. An unchanged topic and partition
+count do not mean the subscription's processing progress is preserved.
 
 ## Invoice issuance: per sub-order → per parent order
 

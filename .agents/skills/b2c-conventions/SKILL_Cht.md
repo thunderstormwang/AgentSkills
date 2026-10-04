@@ -94,6 +94,10 @@ instance（沒有 cluster，也沒有 slot）。部分 key 使用 `{...}` hash t
 slot 上——在 UAT/SIT 上這個做法沒有任何效果，因為根本沒有 slot 路由這回事；key 就只是以一般
 string 的形式存在那唯一的 instance 上。
 
+現有的 Master／Replica 讀取分流是刻意保留的設計：它能分散讀取負載，避免所有流量集中在 Master。
+應保留這項分流，而不是只因 Replica 可能延遲，就將所有讀取改走 Master。若特定路徑需要強一致，
+應在該路徑明確優先讀取 Master，而不改變所有讀取的預設行為。
+
 ## Kafka consumer group 識別
 
 訂閱 Kafka 事件時，底層共用套件 `PXGo.EventBus` 以 **EventHandler** 的完整類別名稱決定 consumer
@@ -105,6 +109,15 @@ EventHandler 上線後若更改命名空間或類別名稱，其 consumer group 
 （若較早的紀錄已過期刪除，則從仍保留的最早 offset 開始）。
 
 這類更名應視為消費行為的變更，而不只是單純的名稱整理，並須考量重播已處理事件所帶來的影響。
+
+## Kafka 訂閱進度
+
+訂閱同一 topic 的不同 EventHandler 對應不同 consumer group，各自維護已提交的 offset。
+即使 topic 只有一個 partition，該 partition 內的訊息順序也不會同步各 group 的進度，亦不保證
+不同 handler 之間的處理順序。
+
+合併或移除 handler 時，應比較新舊 group 的識別與消費進度，以辨識可能漏掉或重播的事件。
+topic 與 partition 數量不變，不代表訂閱的處理進度會被保留。
 
 ## 發票開立：依子單改為依母單
 

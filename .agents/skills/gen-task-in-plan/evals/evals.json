@@ -5,7 +5,7 @@
       "id": 0,
       "name": "compatible-append",
       "prompt": "在 fixtures/pxbox-26324_plan.md 這份 plan 加一個 task：把 OrderQuantity.cs 測試檔裡 [Trait(\"PromotionCondition\", \"OrderPrice\")] 這個 typo 改成 \"OrderQuantity\"（這個 Trait 標籤標錯案型了）。",
-      "expected_output": "skill 判定為 compatible（純 typo 修正、不改 prod 行為）。不直接修改原 plan 既有章節；建立獨立衍生檔 pxbox-26324_ft_01.md（事先詢問或預設 {XXX}=01 標籤），檔首引用原 plan；在衍生檔內寫入 FT01 task detail block，欄位順序：Current state → Goal → Dependency → Target → Implementation Details → Affected Files；衍生檔附 Follow-up Task 進度表並新增 FT01 列 Status=Todo；原 plan 末新增 ## Follow-up Task 章節引用衍生檔。回報新 task ID 與衍生檔路徑。",
+      "expected_output": "skill 判定為 compatible（純 typo 修正、不改 prod 行為）。不直接修改原 plan 既有章節；建立獨立衍生檔 pxbox-26324_ft_01.md（事先詢問或預設 {XXX}=01 標籤），檔首引用原 plan；在衍生檔內寫入 FT01 task detail block，欄位順序：Current state → Goal → Dependency → Target → Implementation Details → Validation → Test File (DoD) → Affected Files；驗證納入同一 task，不另開只為驗證此變更的 task；衍生檔附 Follow-up Task 進度表並新增 FT01 列 Status=Todo；原 plan 末新增 ## Follow-up Task 章節引用衍生檔。回報新 task ID 與衍生檔路徑。",
       "files": ["fixtures/pxbox-26324_plan.md"],
       "expectations": [
         "原始 fixture (evals/fixtures/pxbox-26324_plan.md) 內容未被修改",
@@ -13,7 +13,9 @@
         "`## Follow-up Task` 章節引用 `pxbox-26324_ft_*.md` 衍生檔",
         "outputs 目錄含 `pxbox-26324_ft_01.md`（或對應的 ft_{XXX} 衍生檔）",
         "ft 衍生檔含 `FT01` task block",
-        "FT01 task block 含全部 6 個必要欄位：Current state / Goal / Dependency / Target / Implementation Details / Affected Files",
+        "FT01 task block 含全部 7 個必要欄位：Current state / Goal / Dependency / Target / Implementation Details / Validation / Affected Files",
+        "FT01 的 Validation 記錄此變更的適用檢查或限定範圍的共用策略引用，不另開只為驗證此變更的 task",
+        "FT01 的 Test File (DoD) 與 Affected Files 列出被修改的測試檔案",
         "ft 衍生檔含 `Follow-up Task 進度表`，且有 FT01 列、Status=Todo",
         "ft 衍生檔檔首引用原 plan（pxbox-26324_plan.md）",
         "plan 副本中既有的 `## Design` 與 `## Task` 章節未被修改"

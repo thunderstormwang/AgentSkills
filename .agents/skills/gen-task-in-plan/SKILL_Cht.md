@@ -59,12 +59,13 @@ Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不�
 - 完整讀取所有 Design 子章節（D01、D02……）
 - 不可僅依賴 TIA —— 此階段 Design 段落是權威規格
 - 對 Design 有引用但未完整說明的區域，需重新讀實際程式碼
+- 讀取已確認的驗證策略，以及明確限定於這些 task 的使用者指示。生成 Task 時須承接，不以衝突的預設取代。
 
 ### Step 4 — 生成 Task 列表
 
 依下列兩份 reference：
-- **Task 區塊格式**：見 `references/task-format.md`（Mode A 範本 + 共用限制：一 commit、≤ 3 檔、實作碼歸 Task）
-- **排序與類別規則**：見 `references/task-guidelines.md`（DB → Entity → API → API Summary → Test → Impl；SQL 檔名；API Summary 純文件 task）
+- **Task 區塊格式**：見 `references/task-format.md`（Mode A 範本 + 共用限制：每個 task 一個邏輯 commit、無固定檔案數限制、每個 task 包含驗證、實作碼歸 Task）
+- **排序與類別規則**：見 `references/task-guidelines.md`（依實際依賴排序；類別優先原則、SQL 檔名、API Summary 純文件 task）
 
 **Mode A 專屬規則：**
 - 每個 Task 必須包含 **Reference** 欄位，指向它所實作的 Design ID。
@@ -74,6 +75,8 @@ Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不�
 - 每個 Task 都引用有效的 Design ID
 - Task 的內容不得與 Design 任何內容衝突
 - 依賴關係無循環且正確
+- 每個 task 都是完整的改動，而不是只為減少檔案數而拆出的片段
+- 每個 task 都包含符合已確認策略的 `Validation`；獨立驗證 task 須有獨立目的，或需要等待多個 task 完成
 自行修正任何遺漏後再呈現。通過自我檢查後才通知使用者。
 
 ### Step 5 — 附加 `## Task` 章節
@@ -170,11 +173,11 @@ Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不�
 
 Mode B 的 task 一律寫入**獨立的衍生檔案**，而不是原始 plan。這讓原始 plan 在接近 ~1000 行時仍保持可讀性。
 
-**Task 區塊格式：** 使用 `references/task-format.md` 的 **Mode B 範本**。共用限制適用（一 commit、≤ 3 檔）。
+**Task 區塊格式：** 使用 `references/task-format.md` 的 **Mode B 範本**。共用限制適用（每個 task 一個邏輯 commit、無固定檔案數限制、每個 task 包含驗證）。撰寫前須讀取已確認的驗證策略，以及明確限定於新 task 的使用者指示。
 
 **Mode B 專屬規則：**
-- 一次呼叫可生成**多個有依賴關係的 FT task**（例如 FT01 = 測試 task、FT02 = 實作 task 且 `Dependency: FT01`），透過 `Dependency` 欄位表達順序。
-- **無預設排序規則** —— 不像 Mode A 有 DB → Entity → API → Test → Impl 的固定順序，Mode B 的後續工作太多樣化無法預先排序（補測試 / 改文件 / 純改生產碼…）。AI 依實際依賴關係逐案判斷順序並向使用者說明。
+- 一次呼叫可生成**多個有依賴關係的 FT task**（例如 FT01 更新契約及呼叫端，FT02 新增依賴該契約的行為；兩者各自包含驗證），透過 `Dependency` 欄位表達順序。
+- **無預設類別順序** —— 後續工作太多樣化無法預先排序（補測試 / 改文件 / 純改生產碼…）。與 Mode A 相同，由實際依賴決定順序；AI 向使用者說明建議順序。
 
 #### 5a. 決定衍生 task 檔案路徑
 
@@ -203,7 +206,7 @@ Mode B 的 task ID 一律使用 `FT` 前綴（例如 `FT01`、`FT02`），不論
 
 #### 5d. 在衍生檔案末尾附加 task 細節區塊
 
-使用 `references/task-format.md` 的 **Mode B 範本**。欄位順序：`Current state` → `Goal` → `Dependency` → `Target` → `Implementation Details` → `Affected Files`。
+使用 `references/task-format.md` 的 **Mode B 範本**。欄位順序：`Current state` → `Goal` → `Dependency` → `Target` → `Implementation Details` → `Validation` → `Test File (DoD)`（新增或修改測試時）→ `Affected Files`。
 
 #### 5e. 在衍生檔案的 Follow-up Task 進度表中附加一列
 
@@ -253,6 +256,7 @@ Mode B 的 task ID 一律使用 `FT` 前綴（例如 `FT01`、`FT02`），不論
 - **冪等（Idempotent）**：若已存在範疇相似的 task，先詢問使用者再決定是否重複建立。
 - **不改程式碼**：本 skill 只編輯 plan 文件。程式碼實作之後交給 `implementation` skill 或 `implementation-agent`。
 - **Mode B — 允許一次新增多個 task**：一次呼叫可加入多個有依賴關係的 FT task。每個 task 都必須個別通過 Step 3 的分類檢查。
+- **兩種模式 — 粒度與驗證自查**：遵循 `references/task-format.md` 的共用規則。每個 task 都須有明確目的、完整受影響檔案清單及 `Validation` 欄位。預設將實作與對應驗證放在一起，不強制另開測試 task。呈現前先修正不一致之處。
 
 ---
 
@@ -282,7 +286,7 @@ T 項目與 FT 項目使用相同的狀態值。所有生成 task 的初始狀�
 **Skill**：
 1. 讀 plan 的 Design 進度表 —— 所有 D01–D06 皆為 `Done`
 2. 完整讀取 D01–D06 內容
-3. 依 task 順序（DB → Entity → API → Test → Implementation）生成 T01–T18
+3. 依實際依賴排序生成 T01–T18，每個實作 task 都包含對應驗證
 4. 附加 `## Task` 章節與 Task 進度表
 5. 回報：「✅ 已生成 18 個 Task (T01–T18)，進度表已附於 Design 之後」
 

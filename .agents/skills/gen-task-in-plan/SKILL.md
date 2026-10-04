@@ -57,12 +57,13 @@ The key invariant for Mode B: the new task must serve the plan's original purpos
 - Read all Design sub-sections (D01, D02, ...) in full
 - Do NOT rely solely on TIA for scope — the Design section is the authoritative spec at this stage
 - Re-read actual code for any area that Design references but doesn't fully specify
+- Read the confirmed validation strategy and any explicit user instructions scoped to these tasks. Carry them into Task generation; do not replace them with a conflicting default.
 
 ### Step 4 — Generate Task list
 
 Follow:
-- **Task block format** from `references/task-format.md` (Mode A template + shared constraints: one commit per task, ≤ 3 files, implementation code belongs here)
-- **Ordering & category rules** from `references/task-guidelines.md` (DB → Entity → API → API Summary → Test → Impl; SQL filename; documentation-only API Summary)
+- **Task block format** from `references/task-format.md` (Mode A template + shared constraints: one logical commit per task, no fixed file-count limit, validation included in each task, implementation code belongs here)
+- **Ordering & category rules** from `references/task-guidelines.md` (actual dependencies determine order; category priorities, SQL filename, documentation-only API Summary)
 
 **Mode A-specific rule:**
 - Each Task MUST include a **Reference** field pointing to the Design ID(s) it implements.
@@ -72,6 +73,8 @@ Follow:
 - Every Task references a valid Design ID
 - No Task content contradicts any Design content
 - Dependencies are acyclic and correct
+- Each task is a coherent change, not a fragment split merely to reduce file count
+- Each task includes `Validation` matching the confirmed strategy; separate verification tasks have an independent purpose or require multiple tasks to be completed
 Fix any gaps silently before presenting. Only notify the user once the self-check passes.
 
 ### Step 5 — Append `## Task` section
@@ -168,11 +171,11 @@ Wait for the user's decision before proceeding.
 
 Mode B tasks are always written to a **separate follow-up file**, not the original plan. This keeps the original plan readable as it approaches ~1000 lines.
 
-**Task block format:** Use the **Mode B template** in `references/task-format.md`. Shared constraints apply (one commit per task, ≤ 3 files per task).
+**Task block format:** Use the **Mode B template** in `references/task-format.md`. Shared constraints apply (one logical commit per task, no fixed file-count limit, validation included in each task). Read the confirmed validation strategy and any explicit user instructions scoped to the new tasks before writing them.
 
 **Mode B-specific rules:**
-- One invocation may generate **multiple FT tasks** with dependencies (e.g., FT01 = test task, FT02 = implementation with `Dependency: FT01`). Express ordering via the `Dependency` field.
-- **No preset ordering rule** — unlike Mode A's DB → Entity → API → Test → Impl flow, Mode B's follow-up work is too varied to pre-order (補測試 / 改文件 / 純改生產碼…). The AI decides order case by case based on actual dependencies and surfaces the proposed order to the user.
+- One invocation may generate **multiple FT tasks** with dependencies (e.g., FT01 updates a contract and its callers, FT02 adds dependent behavior; both include their own validation). Express ordering via the `Dependency` field.
+- **No preset category order** — follow-up work is too varied to pre-order (補測試 / 改文件 / 純改生產碼…). As in Mode A, actual dependencies determine order; the AI surfaces the proposed order to the user.
 
 #### 5a. Determine the follow-up file path
 
@@ -201,7 +204,7 @@ Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the 
 
 #### 5d. Append the task detail block to the follow-up file
 
-Use the **Mode B template** from `references/task-format.md`. Field order: `Current state` → `Goal` → `Dependency` → `Target` → `Implementation Details` → `Affected Files`.
+Use the **Mode B template** from `references/task-format.md`. Field order: `Current state` → `Goal` → `Dependency` → `Target` → `Implementation Details` → `Validation` → `Test File (DoD)` (when adding or modifying tests) → `Affected Files`.
 
 #### 5e. Append a row to the Follow-up Task 進度表 in the follow-up file
 
@@ -251,6 +254,7 @@ Report back to the user:
 - **Idempotent**: If a task with similar scope already exists, ask the user before duplicating.
 - **No code changes**: This skill only edits the plan document. Code implementation is delegated to `implementation` skill or `implementation-agent` later.
 - **Mode B — Multiple tasks allowed**: One invocation may add several FT tasks with dependencies. Each task must individually pass the Step 3 classification.
+- **Both modes — Granularity and validation self-check**: Follow the shared rules in `references/task-format.md`. Every task must have a clear purpose, a complete affected-file list, and a `Validation` field. Keep implementation and its corresponding validation together by default; do not force a separate test task. Fix inconsistencies before presenting.
 
 ---
 
@@ -280,7 +284,7 @@ T items and FT items both use the same status values. Initial status for all gen
 **Skill**:
 1. Reads the plan's Design 進度表 — all D01–D06 are `Done`
 2. Reads D01–D06 content in full
-3. Generates T01–T18 following task ordering (DB → Entity → API → Test → Implementation)
+3. Generates T01–T18 ordered by actual dependencies, with each implementation task including its corresponding validation
 4. Appends `## Task` section with all tasks and Task 進度表
 5. Reports: 「✅ 已生成 18 個 Task (T01–T18)，進度表已附於 Design 之後」
 

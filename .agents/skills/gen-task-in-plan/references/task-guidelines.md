@@ -8,14 +8,15 @@ For the **task block format** (fields, templates, shared constraints), see `task
 
 ## Task Ordering (Prioritization)
 
-When generating the Mode A Task list, always follow this order to facilitate parallel development and smooth integration:
+Order tasks by actual prerequisites. Use these category priorities where applicable, not as mandatory separate tasks or a fixed pipeline. Keep a coherent contract/implementation change and its validation together when they must take effect together:
 
-1. **DB Schema Changes**: Always prioritize SQL script generation.
+1. **DB Schema Changes**: Prioritize SQL script generation when later changes depend on the schema.
 2. **Entity / Domain Changes**: Core business logic and data structures.
 3. **API Skeletons & Fields**: Define Request/Response models and Controller endpoints first.
 4. **API Summary**: Provide the frontend summary immediately after API contracts are defined (documentation-only task).
-5. **Verification Task (Test Task)**: Create independent test tasks for entry points. Interfaces are now defined; write tests first to define expected behavior (Fail-First).
-6. **Functional Implementation**: Detailed logic and optimizations, developed until tests pass.
+5. **Functional Implementation with Validation**: Include the corresponding test additions/updates and applicable checks in each implementation task, following the confirmed strategy.
+
+Writing tests first may happen within the implementation task; it does not require an independent Verification Task. Create a separate verification task only for an independent verification purpose or checks that require multiple tasks to be completed, and record its actual dependencies. See `task-format.md` for the shared validation rules.
 
 ---
 

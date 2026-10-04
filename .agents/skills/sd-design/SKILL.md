@@ -1,6 +1,6 @@
 ---
 name: sd-design
-description: Professional assistant for requirement analysis (Req) and technical design (Design). Use this skill when the user provides task descriptions (Jira, meetings, or PM notes) and wants to discuss architectural choices, technical designs (DB, API, Cache), and produce a confirmed Design specification. Task generation is handled by gen-task-in-plan.
+description: Professional assistant for requirement analysis (Req) and technical design (Design). Use this skill when the user provides task descriptions (Jira, meetings, or PM notes) and wants to discuss architectural choices, technical designs (DB, API, Cache), and produce a confirmed Design specification. Also use for substantial follow-up optimizations of an implemented plan, such as cache redesign, that need Pre Design Sync and Design before generating FT tasks under the existing confirmed Req. Task generation is handled by gen-task-in-plan.
 ---
 
 # sd-design
@@ -14,6 +14,23 @@ Expert system design assistant specialized in translating complex requirements i
 The document is produced **incrementally** in three phases. Each phase is **gated**: the next phase only begins after the user explicitly confirms the current one is complete.
 
 **Dynamic Adjustment:** This process is non-linear. If a gap or error is discovered in a later phase, the AI will assist in tracing the root cause back to an earlier phase, applying the necessary corrections, and recursively updating all dependent downstream items to maintain consistency.
+
+### Entry Point — Follow-up Optimization of an Existing Plan
+
+An implemented plan may need further optimization before new FT tasks can be specified. This is a design discussion under an existing requirement baseline, not automatically a new requirement lifecycle.
+
+1. **Inherit the confirmed Req.** Read and link the original plan's Req, constraints, and acceptance criteria. Check the proposed optimization against them; do not recreate the five R items, require another complete Req confirmation, or reset completed phases merely to start follow-up work.
+2. **Discuss the local Pre Design Sync.** Investigate the current implementation and discuss the proposed approach and relevant design choices for this optimization. Do not generate implementation tasks before the approach is settled.
+3. **Draft the relevant Design.** Propose the sections and diagrams that help explain this particular change. The user need not define the complete outline in advance; add, remove, or adjust content during review. Keep the DQ and D progress tables and confirmation gates.
+4. **Generate FT tasks only after Design confirmation.** Hand off to `gen-task-in-plan` Mode B, linking the supporting design and carrying forward the confirmed validation strategy.
+
+Use the existing follow-up design document when one is specified, or agree on its location before creating one. Record the original Req baseline by reference and keep the local Pre Design Sync and Design together; do not create a duplicate full plan.
+
+In the lifecycle and artifact-routing rules below, "plan" means the document owning the current design discussion; for follow-ups, this is the selected follow-up design document. The original plan remains the Req baseline.
+
+If a genuine requirement conflict or blocking ambiguity is discovered, return to the affected original Req items for clarification and confirmation before continuing. This entry point does not authorize unconfirmed requirement-scope changes or bypass requirement checks.
+
+Simple renames, comments, or other straightforward follow-up work can go directly to `gen-task-in-plan`; not every FT requires a separate design discussion.
 
 ### Phase 1 — Req
 Req may begin from incomplete input. Do not manufacture a complete specification from an objective or a few task bullets.
@@ -55,7 +72,7 @@ The statuses above are illustrative, not fixed defaults. Do not proceed to Phase
 ---
 
 ### Phase 2 — Pre Design Sync
-> **Gate:** Phase 1 must be Done before starting Phase 2.
+> **Gate:** For new requirements, Phase 1 must be Done. For follow-up optimization, the inherited Req must already be confirmed and checked for compatibility, with no unresolved blocking requirement conflict or ambiguity.
 > **Note:** Re-read the actual code when formulating design questions. Req describes the business baseline, not the implementation structure.
 
 List all unresolved **design decisions** under a `## Pre Design Sync` section. These questions directly affect architecture, data model, caching strategy, API contract, internal component structure, or external integrations.
@@ -77,7 +94,7 @@ List all unresolved **design decisions** under a `## Pre Design Sync` section. T
 | DQ02 | [問題標題] |  | Todo |
 ```
 - As the user answers each DQ: fill in 結論 both within the specific DQ item's detailed body (in the main plan or the supporting document) and in the main plan's **Pre Design Sync 進度表** (concise, 1-2 sentences), and flip status to `Done` / `Cancel`.
-- **Conflict check:** Whenever a DQ is resolved, verify its conclusion does not contradict any already-resolved DQ items or any content in the Req section. If a conflict is found, surface it immediately for user resolution.
+- **Conflict check:** Whenever a DQ is resolved, verify its conclusion does not contradict any already-resolved DQ items or any content in the Req baseline. If a conflict is found, surface it immediately for user resolution.
 - Wait until **all DQ items** are `Done` / `Cancel` / `Pending` before proceeding to Phase 3.
 
 ---
@@ -157,6 +174,8 @@ List every **design decision** that must be resolved before design can begin. Th
 
 Detail the **structural and behavioral definition** (the "What" and "Where"). Focus on contracts, boundaries, and high-level architecture.
 
+**Design content is change-specific, not a fixed deliverable checklist.** The topics below are candidate sections. The AI proposes a useful draft based on the change and confirmed DQs, then adjusts it during user review; do not ask the user to prescribe the entire outline first or fill unrelated sections merely to complete a template. Omitting a section must not hide a relevant contract, concurrency, failure-handling, or validation concern.
+
 > **Code Snippet Rule — Contract only, no implementation:**
 > - ✅ Use snippets for: field declarations (`public int Foo { get; set; }`), method signatures (`Task<Dto> GetXxxAsync(int id);`), event schema shape.
 > - ❌ Do NOT include: method bodies, SQL queries, mapping logic, or any "how it works" code. Those belong in Task.
@@ -174,12 +193,13 @@ Detail the **structural and behavioral definition** (the "What" and "Where"). Fo
 - **Caching Strategy:** **Key naming conventions**, TTL, data structures, and Interface/Method definitions.
 - **Core Logic Spec:** Description of **behavioral shifts** (e.g., priority logic between Mode A and Mode B, state transitions). **Explicitly address Concurrency (e.g., potential Race Conditions) and Error Handling (e.g., rollback or compensation for external API failures).**
 - **Internal Component Structure:** Internal service/class responsibilities, dependency direction, public or interface method signatures, DI boundaries, and existing methods or responsibilities that move or disappear. Domain Services belong here because this item answers **which component owns the behavior**, while Core Logic Spec answers **how the behavior must work**. Use the dedicated class-structure document rule above when this item would dominate the main plan.
-- **Component Flow:** **Sequence of calls** between modules and side effects (e.g., "After saving, update Cache X then publish Event Y"). **Always provide diagrams (e.g., Mermaid sequence diagrams or flowcharts)** to visualize the flow instead of relying solely on text descriptions.
-- **Test Plan:** Identify what needs to be tested and where. Rules:
+- **Component Flow:** **Sequence of calls** between modules and side effects (e.g., "After saving, update Cache X then publish Event Y"). Include diagrams (e.g., Mermaid sequence diagrams or flowcharts) when they help explain the design. They are not mandatory for every optimization; include, remove, or revise them during review according to their usefulness. Omitting a diagram this time does not prohibit one in a later design.
+- **Validation Strategy:** Record the applicable build, test, and review approach, including explicit task-scoped user exceptions and alternatives. Distinguish not adding tests from not running tests; do not extend an exception to the whole repo or treat it as no validation. Carry the confirmed strategy into each generated task's `Validation`. Propose a suitable strategy where one has not yet been confirmed.
+- **Test Plan:** When the validation strategy includes adding or modifying tests, identify what needs to be tested and where. Rules:
   - TC details go in a **separate `{ticket}_tc.md` file** in the same directory as the plan — never inline in the plan.
   - The Test Plan section contains: test target, test framework, new test file path, and a link to the TC file (`[{ticket}_tc.md]({ticket}_tc.md)`).
   - AC in Req does **NOT** reference the TC file. The Test Plan section in Design is the sole entry point to the TC file.
-  - Omit this section only if the change has no new or modified testable logic (e.g., pure documentation, config-only changes).
+  - If no test additions/changes are applicable, or the user explicitly excludes them for this work, omit this section and unnecessary TC artifacts; retain the relevant validation strategy and any agreed alternatives.
 
   Refer to `references/ac-guidelines.md` for TC writing principles (Given/When/Then format, ID format, terminology mapping, and cross-reference rules).
 

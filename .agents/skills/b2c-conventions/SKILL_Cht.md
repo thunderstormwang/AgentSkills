@@ -94,6 +94,18 @@ instance（沒有 cluster，也沒有 slot）。部分 key 使用 `{...}` hash t
 slot 上——在 UAT/SIT 上這個做法沒有任何效果，因為根本沒有 slot 路由這回事；key 就只是以一般
 string 的形式存在那唯一的 instance 上。
 
+## Kafka consumer group 識別
+
+訂閱 Kafka 事件時，底層共用套件 `PXGo.EventBus` 以 **EventHandler** 的完整類別名稱決定 consumer
+group 名稱：`{namespace}.{class name}`，即 `{命名空間}.{類別名稱}`。使用的是 handler 型別，而非
+事件型別。
+
+EventHandler 上線後若更改命名空間或類別名稱，其 consumer group 也會改變。
+新 group 不會沿用舊 group 已提交的 offset；依共用套件的消費行為，會從 offset 0 開始重播事件
+（若較早的紀錄已過期刪除，則從仍保留的最早 offset 開始）。
+
+這類更名應視為消費行為的變更，而不只是單純的名稱整理，並須考量重播已處理事件所帶來的影響。
+
 ## 發票開立：依子單改為依母單
 
 系統最初是**依子單**開立發票：一張訂單拆成幾個子單，就開出幾張發票。後來遭國稅局警告——消費者

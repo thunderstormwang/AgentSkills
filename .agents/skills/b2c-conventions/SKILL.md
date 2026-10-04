@@ -102,6 +102,20 @@ single Redis instance (no cluster, no slots). Some keys use `{...}` hash tags so
 land on the same slot — on UAT/SIT this has no effect, since there's no slot routing at all;
 keys just live on that one instance as normal strings.
 
+## Kafka consumer group identity
+
+For Kafka event subscriptions, the shared package `PXGo.EventBus` determines the consumer
+group name from the **EventHandler's** fully qualified class name:
+`{namespace}.{class name}`. It uses the handler type, not the event type.
+
+Changing a handler's namespace or class name after deployment changes its consumer group.
+A new group does not inherit the old group's committed offsets; under the shared package's
+consumption behavior, it starts replaying events from offset 0 (or the earliest retained
+offset if older records have expired).
+
+Treat such a rename as a consumption-behavior change, not just a cosmetic refactor, and
+consider the effects of replaying previously handled events.
+
 ## Invoice issuance: per sub-order → per parent order
 
 Originally invoices were issued **per sub-order**: an order split into N sub-orders produced N

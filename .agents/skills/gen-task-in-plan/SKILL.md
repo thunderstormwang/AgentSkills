@@ -121,6 +121,19 @@ Restate the plan's intent in 1-2 sentences for the user. **This defines the boun
 
 ### Step 3 — Classify the new task against the boundary
 
+Before classifying, trace each relevant restriction to its source and applicability:
+
+| Prior decision | Meaning | Handling a new task |
+| :--- | :--- | :--- |
+| Original Req / plan-wide constraint | A required behavior or an explicit prohibition that still applies | Respect it; a conflicting task requires the Step 4 scope-change decision |
+| Earlier task's "not in this task" exclusion | A boundary for that task, not a permanent prohibition | Keep the earlier task unchanged; assess the newly requested work against the original Req |
+| Accepted risk | A conscious acceptance under recorded conditions | Preserve the decision and conditions; do not automatically add mitigation tasks |
+
+- Users may deliberately stage work or decide on further improvements after an earlier change. A new explicit request is not a contradiction merely because an earlier task excluded it, and the user need not justify changing their mind.
+- Reassess the new request against the original Req, not solely an earlier task's exclusions or affected-file list. This does not authorize unsolicited work or silently amend the Req.
+- If a restriction's applicability is unclear, surface that ambiguity rather than treating a local exclusion as a plan-wide constraint.
+- Revisit an accepted risk only when new evidence or the proposed change alters its consequences or acceptance conditions. Explain what changed; do not turn an unchanged accepted risk back into a blocker or an automatic compensation, replay, or offset-adjustment task.
+
 **Heuristic**: ask "does this task change *what* the plan delivers, or just *how* it's achieved?" Changing *what* (different outcome, new feature, modified spec) → violates. Changing *how* (better tests, cleaner code, same outcome) → compatible. When the answer depends on assumptions about future state (e.g. "the test might fail and force a prod change"), treat as ambiguous and surface to the user.
 
 Classify as one of three buckets:
@@ -132,12 +145,13 @@ Classify as one of three buckets:
 - Move a test between layers (Service ↔ Handler) without changing what is tested
 - Fix typo in test attribute / docstring
 - Add a Trait / Category attribute for test classification
+- Newly requested internal improvements that an earlier task deferred, provided they still satisfy the original Req
 
 **B. Violates** — introduces scope beyond the plan's intent:
 - Changes a test's expected value (changes spec)
 - Adds a new business rule or behavior
 - Modifies production code beyond what the plan permits
-- Touches files / domains not in the plan's stated scope
+- Touches files / domains explicitly excluded by the original Req or a plan-wide constraint, not merely omitted from an earlier task
 
 **C. Ambiguous** — classification depends on assumptions about future state, or sits on the boundary:
 - Test added for an edge case where prod behavior is unclear (might force prod change → would violate)
@@ -205,6 +219,8 @@ Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the 
 #### 5d. Append the task detail block to the follow-up file
 
 Use the **Mode B template** from `references/task-format.md`. Field order: `Current state` → `Goal` → `Dependency` → `Target` → `Implementation Details` → `Validation` → `Test File (DoD)` (when adding or modifying tests) → `Affected Files`.
+
+When prior exclusions or accepted risks are relevant, use `Current state` / `Goal` and the implementation details to identify what was deferred, what is newly requested, and which acceptance conditions remain applicable. Reference existing decisions rather than rewriting earlier tasks or duplicating a long discussion history.
 
 #### 5e. Append a row to the Follow-up Task 進度表 in the follow-up file
 
@@ -349,3 +365,14 @@ T items and FT items both use the same status values. Initial status for all gen
    > 你怎麼判斷？
 
 5. Waits for user decision. Does not modify any file.
+
+### Example 5 — Earlier task scope is not a permanent prohibition
+
+**User**: 「前次只改快取、不改事件處理。現在我想合併事件接收；原始 Req 的業務規則與 API 契約維持不變。部署可能漏掉舊 Scopes 的風險已接受，不做補償。」
+
+**Skill**:
+1. Re-reads the original Req and checks the proposed event change against it.
+2. Identifies "do not change event handling" as the earlier task's local scope, not an original Req prohibition.
+3. If the change satisfies the original Req, classifies it as compatible and adds a newly requested follow-up task without rewriting the earlier task or requiring a new Req merely because priorities changed.
+4. References the accepted deployment risk and its conditions; does not automatically add replay or offset-adjustment work. Raises the issue again only if new evidence changes those conditions or consequences.
+5. If the original Req instead explicitly requires two independent subscriptions, follows Step 4 to obtain a scope-change decision before writing the task.

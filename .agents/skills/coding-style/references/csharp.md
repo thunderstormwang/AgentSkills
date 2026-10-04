@@ -78,6 +78,113 @@ var rows = (await conn.QueryAsync<MemberReceiverQueryModel>(sql, p)).ToList();
 var vo = rows.Select(x => new MemberReceiverItemVo(x)).ToList();
 ```
 
+### Caller-Focused Interfaces
+- Expose only the capabilities callers need, not every method on the implementation class. Keep internal steps private.
+- This prevents callers from bypassing the complete workflow and keeps implementation details out of the public contract.
+
+Avoid exposing the steps used to load and refill a cache:
+```csharp
+public interface ISettingCache
+{
+    Task<SettingDto> GetAsync();
+    Task<SettingDto> LoadFromDatabaseAsync();
+    Task WriteCacheAsync(SettingDto setting);
+}
+```
+Prefer a contract for the caller's actual operation; keep loading and writing private in the implementation:
+```csharp
+public interface ISettingCache
+{
+    Task<SettingDto> GetAsync();
+}
+```
+
+### Empty Interfaces
+- Do not introduce or retain empty interfaces without an actual role in marker-based behavior, generic constraints, registration, or discovery.
+- An unused inheritance layer adds investigation and maintenance work without providing capabilities or constraints.
+
+If `ICacheRepository<T>` has no such role, remove the empty parent rather than inheriting it just for classification:
+```csharp
+// Avoid an unused parent.
+public interface ICacheRepository<T> { }
+public interface IProductCache : ICacheRepository<ProductDto>
+{
+    Task<ProductDto> GetAsync(int productId);
+}
+```
+```csharp
+// Prefer the actual contract.
+public interface IProductCache
+{
+    Task<ProductDto> GetAsync(int productId);
+}
+```
+
+### Logging-Only Context
+- Prefer the existing logger and local variables over a mutable context passed through methods solely to track the current logging stage.
+- Such a context requires updates at every step. Cleanup can overwrite the stage and make a log describe cleanup rather than the original failure.
+- Retain contexts that genuinely manage shared state or lifetimes. Preserve necessary locking, cleanup, and exception handling.
+
+Avoid extra state maintained only for diagnostics:
+```csharp
+context.Stage = "ReadCache";
+context.Key = key;
+var value = await ReadAsync(key);
+
+context.Stage = "WriteCache";
+await WriteAsync(key, value);
+```
+Prefer logging the full exception with a useful identifier:
+```csharp
+catch (Exception exception)
+{
+    _logger.LogWarning(exception, "Failed to get product cache. ProductId: {ProductId}", productId);
+    throw;
+}
+```
+The rethrow illustrates a propagating exception contract; preserve the method's established fallback or propagation behavior. Add targeted diagnostic detail when needed, not a tracking framework by default.
+
+### Parameter Models Across Call Chains
+- When many parameters belong to a cohesive group of business data, look for an existing model/interface pattern before adding a new one.
+- Update constructors, update methods, and upstream callers consistently. Packaging arguments only at the bottom leaves long argument lists and positional mistakes upstream.
+- Do not bundle unrelated parameters merely to shorten a signature.
+
+Instead of repeatedly passing individual category IDs:
+```csharp
+entity.UpdateCategories(command.D1CategoryId, command.D2CategoryId, command.D3CategoryId);
+```
+Reuse the existing category contract:
+```csharp
+public void UpdateCategories(IProductCategoriesModel categories)
+{
+    D1CategoryId = categories.D1CategoryId;
+    D2CategoryId = categories.D2CategoryId;
+    D3CategoryId = categories.D3CategoryId;
+}
+```
+When the upstream command already represents this data and implements `IProductCategoriesModel`, pass it directly:
+```csharp
+entity.UpdateCategories(command);
+```
+
+### DTO Mapping Constructors
+- For pure mapping from a source object, prefer a DTO constructor over a one-off `ConvertXxx` helper on the caller.
+- This keeps creation direct and field mapping with the destination type.
+- Do not move I/O or business decisions into constructors, or replace an established shared mapper/factory merely to follow this pattern. Preserve constructors and setters required by serialization/frameworks.
+
+Instead of a caller-local `ConvertProductBorder(entity)` helper, put the pure mapping in `ProductBorderCacheDto`:
+```csharp
+public ProductBorderCacheDto(BorderPicEntity entity)
+{
+    Id = entity.Id;
+    Priority = entity.Priority;
+}
+```
+The caller then constructs the DTO directly:
+```csharp
+var dto = new ProductBorderCacheDto(entity);
+```
+
 ### Member Ordering
 1. Constants & Fields
 2. Constructors
@@ -107,10 +214,6 @@ public bool IsBlocked { get; set; }
 /// </summary>
 public int AddressType { get; set; }
 ```
-
-## API Design Standards
-- Use **ONLY GET and POST**.
-- **GET**: For queries. **POST**: For Create, Update, Delete.
 
 ## Testing
 - Use **FluentAssertions** for assertions, not raw `Assert.*`.

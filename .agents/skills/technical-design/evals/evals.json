@@ -1,0 +1,23 @@
+{
+  "skill_name": "technical-design",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "試用 technical-design。Req R01–R05 已確認，要求讀取時計算圖框並保留既有排除規則。先討論把圖框規則從快取 repository 抽出去的做法，不要直接寫 Design 或 Task；正式章節不能引用探索材料。",
+      "expected_output": "Check the confirmed baseline and current implementation. Present one DQ per technical choice with self-contained context, comparison, recommendation, and rationale. Record a DQ progress table and await decisions without prematurely writing Design or tasks.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "用 technical-design 討論已完成 plan 的 FT 快取優化。原 Req 不變，前次 Task 寫本次不改事件格式，但這次我想一起討論事件調整。切換漏掉舊 Scopes 的風險已接受且條件沒變。先提必要的 Pre Design Sync 與 Design 架構；不新增測試，但還是要建置。這次不需要 Component Flow。",
+      "expected_output": "Inherit formal Req without recreating or resetting it. Distinguish prior task-local scope from binding constraints, preserve accepted risk without inventing compensation, and discuss DQs before Design. Adapt sections to the change, omit Component Flow for this discussion, and record no-added-tests plus build validation without a global waiver or automatic TC artifact.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "用 technical-design 看已定案的 DQ：EC 缺毛利就隱藏。現在有人建議改成照常顯示，我們 Req 的 AC 明明說要隱藏。直接幫我把 Design 寫成照常顯示，並生 Task。",
+      "expected_output": "Surface the conflict with formal Req/AC and the confirmed DQ rather than silently changing Design or generating tasks. Return the affected requirement decision for clarification and confirmation, preserving unrelated completed items and enforcing both confirmation gates.",
+      "files": []
+    }
+  ]
+}

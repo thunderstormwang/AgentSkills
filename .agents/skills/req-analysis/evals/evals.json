@@ -1,0 +1,23 @@
+{
+  "skill_name": "req-analysis",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "試用新的 req-analysis。PM 只說低毛利商品不能顯示左上圖框，沒說缺毛利怎麼辦，也沒確定購物車是不是直接拿商品列表的圖框。先幫我查核與討論，不要急著填完 Req；探索文件的樣子你先提。",
+      "expected_output": "Distinguish source input, verified current behavior, assumptions, and human decisions. Investigate discoverable facts before asking. Organize exploration without mandating three files or a finished five-item Req. Raise missing business rules as RQs without selecting a technical design.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "用 req-analysis 收斂這份討論。已確認非 EC 不管控，EC 毛利等於保底可以顯示，低於或缺毛利都隱藏，缺毛利不記錯誤。材料還有原始查詢與放棄的 A 方案。正式 Req 不得引用需求原文、現況查核、落差與待確認。",
+      "expected_output": "Transfer all confirmed behavior and constraints into PM-readable R01–R05 and observable AC. Keep raw queries and abandoned options in materials. Include no exploration-material references. Use actual readiness statuses and wait for explicit complete Req confirmation before design.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "technical-design 發現原本 Req 沒說兩個生效設定起始日相同時怎麼處理。其他 Req 都已確認。用 req-analysis 釐清這一點，別重新走全部需求，也不要自己選一個答案。",
+      "expected_output": "Clarify the affected behavioral ambiguity, update only relevant formal Req/AC after the user's decision, identify dependent DQ/Design/TC/tasks requiring reconfirmation, and preserve unrelated Done items. Do not silently adopt a tie-break rule or start implementation.",
+      "files": []
+    }
+  ]
+}

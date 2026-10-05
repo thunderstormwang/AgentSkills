@@ -33,6 +33,14 @@ in chat or existing materials; create files when requested or needed for the
 agreed documentation workflow. Agree on the destination before creating a
 plan when none has been specified.
 
+Choose where exploration content belongs without asking the user to route
+each discussion item: preserve original statements in source-text materials,
+verified behavior and evidence in current-state investigation, and differences,
+questions, options, and decisions in gaps/questions materials. Use other
+documents when they better fit the topic; update existing materials rather than
+creating a new file for every turn. This is content organization, not a fixed
+set of required files. Small discussions may still remain in chat.
+
 **Formal specifications must not reference exploration materials.** Req,
 Pre Design Sync, and Design must contain the facts, conditions, conclusions,
 and reasoning each needs. Do not use a link, file name, section pointer, or
@@ -70,6 +78,25 @@ does not make the formal specification depend on them.
 Stay in exploration while major ambiguity prevents a coherent Req. Do not
 require the user to prescribe the entire document outline in advance. Propose
 a useful organization and revise it during review.
+
+### Investigation Evidence
+
+Flexible document format does not waive evidence requirements. Record the
+following with investigated findings, whether they remain in chat or are saved
+in materials, so later readers can locate the evidence and assess its age:
+
+- **Code:** repository, file path, and actual line numbers or line ranges for
+  the relevant behavior. A class/method name alone is not enough. Obtain the
+  locations from the inspected source; do not invent line numbers.
+- **Database queries or statistics:** database environment, query date, SQL
+  or another reproducible retrieval method, and the actual parameters, filters,
+  or time window used. Include the result or a sufficient statistical summary
+  and what it supports; a conclusion without the retrieval method is not
+  reproducible.
+
+Keep only necessary, non-sensitive result details; do not record credentials.
+If evidence or a retrieval detail is unavailable, state the limitation instead
+of presenting an unsupported claim as verified.
 
 ### Requirement Questions
 
@@ -173,6 +200,10 @@ only for an explicitly non-blocking item whose exclusion or agreed condition
 is stated in Req; `Cancel` records an explicitly cancelled question.
 
 Ask the user to confirm the complete Req when all five R items are ready.
+Present the draft and wait; producing it does not establish confirmation.
+If review reveals missing needs or changes, return to the relevant exploration
+and clarification, rewrite affected formal Req content, and await confirmation
+again.
 After confirmation, hand off the formal Req location and its confirmed scope,
 constraints, and AC to `technical-design`. Exploration materials are not a
 required handoff input. Do not start design merely because the last RQ was

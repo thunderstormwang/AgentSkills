@@ -4,7 +4,7 @@
     {
       "id": 0,
       "prompt": "試用新的 req-analysis。PM 只說低毛利商品不能顯示左上圖框，沒說缺毛利怎麼辦，也沒確定購物車是不是直接拿商品列表的圖框。先幫我查核與討論，不要急著填完 Req；探索文件的樣子你先提。",
-      "expected_output": "Distinguish source input, verified current behavior, assumptions, and human decisions. Investigate discoverable facts before asking. Organize exploration without mandating three files or a finished five-item Req. Raise missing business rules as RQs without selecting a technical design.",
+      "expected_output": "Distinguish source input, verified current behavior, assumptions, and human decisions. Investigate discoverable facts before asking. Choose suitable exploration content locations without asking the user to route each item or mandating three files or a finished five-item Req. Record inspected code paths with repository and actual line numbers. Raise missing business rules as RQs without selecting a technical design.",
       "files": []
     },
     {
@@ -17,6 +17,12 @@
       "id": 2,
       "prompt": "technical-design 發現原本 Req 沒說兩個生效設定起始日相同時怎麼處理。其他 Req 都已確認。用 req-analysis 釐清這一點，別重新走全部需求，也不要自己選一個答案。",
       "expected_output": "Clarify the affected behavioral ambiguity, update only relevant formal Req/AC after the user's decision, identify dependent DQ/Design/TC/tasks requiring reconfirmation, and preserve unrelated Done items. Do not silently adopt a tie-break rule or start implementation.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "用 req-analysis 做一小段現況查核就好，不用為這輪建立文件。請查目前 EC 商品有幾筆毛利率是空的，也查程式用哪個欄位判定 EC。把查核結果留在對話中；有結果也先別往設計走。",
+      "expected_output": "Keep this small investigation in chat without creating mandatory materials. For code, record repository, file path, and actual inspected line ranges. For DB counts, record environment, query date, reproducible SQL/retrieval method with filters, and the count or statistical summary; if access is unavailable, state the limitation instead of inventing evidence. Do not move to design without confirmed formal Req.",
       "files": []
     }
   ]

@@ -2,7 +2,8 @@
 
 Read this document before creating, reading, splitting, or updating a plan in
 `req-analysis`, `technical-design`, `gen-task-in-plan`, or `implementation`.
-It defines document organization, not another lifecycle or confirmation gate.
+It defines document organization and communication about formal plan items,
+not another lifecycle or confirmation gate.
 The owning skill defines how its phase is discussed and confirmed.
 
 ## One Formal Entry Point
@@ -110,6 +111,33 @@ owner. Reuse agreed destinations; confirm a new file location when necessary.
 - Hand off the entry plan path, relevant IDs, and body locations. Update status
   only in the entry plan, keeping affected body/summary edits together. An
   implementation commit includes its code/document changes and plan status.
+
+## Decision Explanations and Change Reporting
+
+When the user questions a proposal, explain its decision lineage rather than
+merely saying "the design requires it." Follow the relevant formal sources,
+for example `T01 ← D02 ← DQ03 ← R04/AC`, and state which requirement or confirmed
+decision led to the proposal and why. Distinguish fixed requirements, confirmed
+technical choices, and new AI recommendations. Use only actual items; do not
+invent a full chain or rationale that was never recorded. If the source is
+missing or ambiguous, say so and identify what needs clarification.
+Keep the explanation self-contained; do not require exploration materials to
+understand the decision.
+
+When proposing or applying an upstream correction, report the original and
+revised conclusion, the reason for the change, and the affected formal IDs.
+Identify which DQs, Design items, TC, or tasks need revision or reconfirmation
+and why, including any status changes and the gate to resume from. Preserve
+unrelated completed work; do not silently reset a whole phase or alter several
+downstream items without explaining the impact. This report does not replace
+the owning skill's required user confirmation.
+
+Briefly identify the current phase when switching phases, presenting a phase
+for review, or returning upstream for correction. Distinguish requirement
+exploration, convergence, and Req review where useful, as well as Pre Design
+Sync, Design, Task generation, or implementation. A short natural-language
+statement is sufficient; ordinary same-phase questions do not need a repeated
+`Current Phase` header or any fixed prefix.
 
 `_shared` is a resource directory, not a skill: it has no `SKILL.md` and does
 not load automatically. Each consuming skill must explicitly require this read.

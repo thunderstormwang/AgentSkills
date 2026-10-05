@@ -24,6 +24,12 @@
       "prompt": "原 plan 是唯一入口，正式 Req 正文已拆到另外一檔且已確認。這次要做 FT 快取優化，Pre Design Sync 與 Design 也放局部設計文件。請保持所有進度表在原 plan，不要複製 Req 或狀態。",
       "expected_output": "先讀共用 plan 規範，沿原 plan 連結讀完整正式 Req，再查現況並討論 DQ。局部文件承載正式 PDS/Design 正文與原 plan 回連，原 plan 對應章節保留摘要、群組、正文連結與權威 DQ/D 表格。保持各階段確認 gate，既有 Req 狀態不重設。",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "已確認 Design 的測試策略要補 TC。新促銷規則沿用未改動的共用攤提方法，會輸出活動彙總與逐商品折扣明細。請整理 TC，包含取整、逐商品最低值與餘額分配；其中一條 AC 剛改過，舊 TC 也要一起檢查。",
+      "expected_output": "將 PM-facing AC 與具體 Given/When/Then TC 分開，TC 包含術語與彙總/逐商品輸出欄位對照、可作測試方法名的標題及繁中引言。依適用策略列獨立共用契約回歸章節，即使共用方法未變；檢查新舊 TC 與最新 AC/Design 的一致性，真正規格歧義返回 Req，不把測試策略擴為全域義務。",
+      "files": []
     }
   ]
 }

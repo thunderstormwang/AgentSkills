@@ -158,19 +158,35 @@ When adding or modifying tests, place detailed TC in a separate formal
 contains the target, framework, test file paths, and TC link. Req AC does not
 need a reverse TC link.
 
+Keep PM-facing AC separate from RD/QA-facing TC for complex algorithms,
+allocation, or multiple calculation cases when TC is in scope. AC states rules
+and formulas; TC supplies concrete examples, calculation traces, per-item
+attribution, and assertions. Split TC by layer when useful without duplicating
+the formal rules or plan status.
+
 TC guidance:
 
 - Reference the corresponding formal AC IDs and use concrete Given/When/Then
   values. Avoid `$X`, "depends on configuration", or unspecified expected
   outputs; split into concrete cases.
 - Use headings such as `{MethodUnderTest}_{Scenario}_{ExpectedBehavior}` and
-  a one-line Traditional-Chinese description beneath each.
-- Include terminology and observable-output field mappings so test authors
-  can identify the correct assertions.
+  a one-line Traditional-Chinese blockquote beneath each, so headings can serve
+  as test method names.
+- At the start of each TC file, map domain terms to system fields and explain
+  the observable output structures and fields asserted by Then clauses.
+  Distinguish an aggregate result from per-item details, so authors do not
+  assert against the wrong object or a field it does not expose.
 - Cover relevant boundaries, failure paths, ordering, and existing shared
   behavior affected by the change, not just the new happy path.
+  When extending behavior built on shared calculation logic, include a separate
+  shared-contract regression chapter even if the shared method itself is
+  unchanged. Cover relevant observable guarantees such as residual allocation,
+  per-item minimums, and proportional attribution. Identify missing coverage
+  as a gap rather than assuming the new-feature cases cover existing behavior.
 - Check TC against confirmed AC and Design. Fix transcription inconsistencies;
   return genuine specification ambiguity to Req instead of inventing a rule.
+  Repeat the check whenever an upstream acceptance rule changes, including
+  previously written TC; do not wait for the user to discover stale cases.
 
 When no test additions/changes are applicable or they are explicitly excluded,
 omit unnecessary Test Plan/TC artifacts but retain Validation Strategy.

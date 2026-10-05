@@ -143,20 +143,48 @@ change must preserve or correct it when that affects scope.
 
 ### Acceptance Criteria
 
+- Ground each AC in verified behavior and the agreed target. For refactors or
+  extensions, trace the relevant existing code path before drafting; for new
+  features, check the supplied requirement/specification. Surface gaps and
+  contradictions instead of silently reconciling them. Known defects are not
+  automatically requirements to preserve.
 - Use plain business-language rule statements, not implementation steps or
   Given/When/Then test scripts. Preserve exact business terminology.
+  Describe observable triggers and outcomes, not intermediate pipeline state;
+  an AC should survive renaming or refactoring internal helpers.
+- Match rule names in AC titles and bodies to the confirmed requirement.
+  Do not collapse distinct rules into a generic label: a first-purchase product
+  exclusion is not interchangeable with a per-product promotion rule.
 - Give each AC one concern and an ID such as `AC-{group}-01`; avoid global
   renumbering when an unrelated group changes.
 - Cover observable boundaries, equality, ordering/tie-breaks, time transitions,
   exclusions, and failure outcomes where they affect the requirement.
+  For calculations, include dedicated concerns for rounding to zero, per-item
+  minimums, residual allocation, and early completion when relevant. Express
+  the business effect rather than the implementation branch.
 - State shared prerequisites and rules once in the relevant section.
   Include their substance; do not point back to exploration materials.
+  Identify invalid or excluded combinations and who enforces their exclusion,
+  so readers do not assume every forbidden combination needs a new test.
 - Keep unresolved rules in RQs, not placeholders inside final AC.
 - Separate business acceptance rules from detailed test cases, concrete test
   data, calculation traces, and assertions. Detailed TC belongs to the design
   workflow when tests are part of the validation strategy.
 - For complex rules, a dedicated formal AC document is allowed. It is part of
   Req, not exploration material; retain R05 as its authoritative entry point.
+
+For a multi-case formal AC document, organize chapters by business case and
+include AC IDs in headings. Put common term definitions at the top. If system
+field mappings are useful, isolate them in a dictionary subsection rather than
+using English field names in business-rule prose. Keep core rules readable
+without implementation jargon; explain ordering/tie-breaks in natural language.
+Use plain-text formulas without emoji, and add a table of contents when the
+document has more than five chapters. Concrete calculation traces and per-item
+attribution belong to TC, not the PM-facing rules.
+
+When an acceptance rule changes, identify affected existing TC and hand off
+their consistency check to `technical-design`. Updating Req alone must not
+leave contradictory tests unnoticed; this does not authorize new test scope.
 
 ### Convergence Check
 

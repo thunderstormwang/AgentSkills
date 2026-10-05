@@ -24,6 +24,12 @@
       "prompt": "用 req-analysis 做一小段現況查核就好，不用為這輪建立文件。請查目前 EC 商品有幾筆毛利率是空的，也查程式用哪個欄位判定 EC。把查核結果留在對話中；有結果也先別往設計走。",
       "expected_output": "Keep this small investigation in chat without creating mandatory materials. For code, record repository, file path, and actual inspected line ranges. For DB counts, record environment, query date, reproducible SQL/retrieval method with filters, and the count or statistical summary; if access is unavailable, state the limitation instead of inventing evidence. Do not move to design without confirmed formal Req.",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "這次正式 Req 很長，我要 plan 當入口，Req 詳細正文放另外一份正式文件。探索材料照留，但正式章節不要引用材料。請先用 req-analysis 整理，不進設計。",
+      "expected_output": "先讀共用 plan 規範，確認入口與拆分正文位置。plan 的 Req 保留有用摘要、R/RQ ID、正式正文連結與權威進度表；詳細規則只有一份正式正文，該文件回連入口但不複製狀態表。正式內容自足且無探索材料引用，等待使用者確認。",
+      "files": []
     }
   ]
 }

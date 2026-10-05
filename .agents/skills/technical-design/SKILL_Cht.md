@@ -1,6 +1,6 @@
 ---
 name: technical-design
-description: 在已確認 Req 下處理 Pre Design Sync 與 Design 的拆分流程草稿 skill。當使用者明確選擇 technical-design，或要求在生成任務前針對架構、DB、API、快取、事件契約或較大的後續優化試用新的拆分流程時使用。比較期間，不要自動取代 sd-design。未確認的需求由 req-analysis 處理；Task 生成由 gen-task-in-plan 處理。
+description: 在已確認 Req 下討論 Pre Design Sync 並產出 Design。用於生成任務前的架構、DB、API、快取、事件契約、元件職責或較大的後續優化。承接已確認需求，不重新開始 Req；未解業務需求屬於 req-analysis，Task 生成屬於 gen-task-in-plan。
 ---
 
 # 已確認 Req 下的技術設計
@@ -9,11 +9,13 @@ description: 在已確認 Req 下處理 Pre Design Sync 與 Design 的拆分流�
 先定案技術選擇，再規定設計；使用者確認後才交給
 `gen-task-in-plan`。此 skill 不生成實作任務或原始碼變更。
 
-## 草稿並存與入口 Gate
+## Plan 入口與入口 Gate
 
-這是供比較的第一版草稿。保持 `sd-design`、`gen-task-in-plan`
-及其既有路由不變。僅在使用者選擇拆分流程時使用此 skill；
-不要在同一場討論執行兩套生命週期。
+讀取、建立或更新 plan 前，先閱讀
+[Plan 文件規範](../_shared/plan-document.md)，
+路徑相對於此 skill 目錄解析。
+從入口 plan 開始並沿正式正文連結讀取；
+不要從索引摘要推論完整需求。
 
 1. 閱讀正式 Req，包含限制、AC、未結 RQ 與實際確認狀態。
    不要從檔案存在或最後一題已回答推論已確認。
@@ -21,8 +23,11 @@ description: 在已確認 Req 下處理 Pre Design Sync 與 Design 的拆分流�
    否則將受影響問題交給 `req-analysis`，不要自行製造缺少的業務規則。
 3. 其他流程產出的已確認 Req 也是有效輸入。
    不要要求以 `req-analysis` 重新建立。
-4. 未指定位置時，先確認設計文件儲存位置再建立。
-   新工作附加於選定的 plan；後續工作使用選定的局部設計文件。
+4. Pre Design Sync 與 Design 的索引保留在入口 plan。
+   正文可內嵌或使用已約定的拆分文件。
+   後續工作從原始 plan 連到局部設計；
+   DQ／D 進度表保留在該 plan。
+   未指定新的正文位置時，先確認位置。
 
 ### 後續優化
 
@@ -61,7 +66,7 @@ Req 描述業務行為，不是現行實作結構。
 
 ## 1. Pre Design Sync
 
-以 `## Pre Design Sync` 記錄影響架構、歸屬、資料模型、快取、
+在入口 plan 的 `## Pre Design Sync` 填入影響架構、歸屬、資料模型、快取、
 契約或整合的未解技術選擇。
 每個決策使用一個 `DQ01`、`DQ02`、……。尚不要產出 Design 章節。
 
@@ -71,7 +76,7 @@ Req 描述業務行為，不是現行實作結構。
    納入足夠背景，使讀者不讀探索材料也能理解。
 2. 有多個候選方案時，提供比較表，涵蓋做法、優缺點、變更範圍與風險。
    明確寫出建議方案與理由；不要只留下未排序清單給使用者。
-3. 請使用者決定。在詳細正文與進度表記錄最終結論；
+3. 請使用者決定。在詳細正文與入口 plan 的進度表記錄最終結論；
    精簡表格不能代替決策必要的條件或理由。
 4. 檢查結論是否符合 Req 與已解決的 DQ。
    真正衝突應提出由使用者解決，而不是默默選擇其中一方。
@@ -99,7 +104,7 @@ Req 描述業務行為，不是現行實作結構。
 
 ## 2. Design
 
-在 Pre Design Sync 後附加 `## Design`，不要移除或覆寫其決策。
+在入口 plan 的 Pre Design Sync 後填入 `## Design`，不要移除或覆寫其決策。
 定義結構與行為契約：改什麼、責任放哪裡，
 以及必須成立的順序／不變量。
 
@@ -165,7 +170,8 @@ TC 指引：
 
 ### Design 確認
 
-實際設計章節使用 `D01`、`D02`、……，並以此表結尾：
+實際設計章節使用 `D01`、`D02`、……，
+入口 plan 的 Design 章節以此表結尾，即使正文拆分也一樣：
 
 ```markdown
 ### Design 進度表
@@ -188,7 +194,7 @@ TC 指引：
 
 每個 D 項目都已確認或明確非阻塞／取消後，交給
 `gen-task-in-plan`：初始任務用 Mode A，後續任務用 Mode B。
-提供正式 Req／設計位置、適用 DQ／D ID、依賴、
+提供入口 plan 與正式 Req／設計正文位置、適用 DQ／D ID、依賴、
 限制、已接受風險條件與驗證策略。
 不要在此 gate 前生成任務，也不要要求探索材料才能實作。
 

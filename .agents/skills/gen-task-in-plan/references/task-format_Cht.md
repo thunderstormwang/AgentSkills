@@ -29,7 +29,7 @@
 | 欄位 | 適用模式 | 說明 |
 | :--- | :--- | :--- |
 | **Reference** | 僅 Mode A | 此 task 實作的 Design ID（例如 `[D01]`） |
-| **Current state** | 僅 Mode B | 現況 / 缺什麼（1-2 行）—— 取代 Reference 的「為什麼有此 task」角色，因為 FT 無 Design 來源 |
+| **Current state** | 僅 Mode B | 現況 / 缺什麼（1-2 行）—— 說明為什麼需要此 FT；有適用且已確認的後續 Design 時引用它 |
 | **Goal** | 僅 Mode B | 此 task 達成什麼（1-2 行） |
 | **Dependency** | 兩者 | 前置 task ID 或 `None` |
 | **Target** | 兩者 | `[專案名稱]` -> `[類別名稱]` -> `[方法名稱]` |

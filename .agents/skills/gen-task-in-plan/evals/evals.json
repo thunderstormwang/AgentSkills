@@ -4,21 +4,21 @@
     {
       "id": 0,
       "name": "compatible-append",
-      "prompt": "在 fixtures/pxbox-26324_plan.md 這份 plan 加一個 task：把 OrderQuantity.cs 測試檔裡 [Trait(\"PromotionCondition\", \"OrderPrice\")] 這個 typo 改成 \"OrderQuantity\"（這個 Trait 標籤標錯案型了）。",
-      "expected_output": "skill 判定為 compatible（純 typo 修正、不改 prod 行為）。不直接修改原 plan 既有章節；建立獨立衍生檔 pxbox-26324_ft_01.md（事先詢問或預設 {XXX}=01 標籤），檔首引用原 plan；在衍生檔內寫入 FT01 task detail block，欄位順序：Current state → Goal → Dependency → Target → Implementation Details → Validation → Test File (DoD) → Affected Files；驗證納入同一 task，不另開只為驗證此變更的 task；衍生檔附 Follow-up Task 進度表並新增 FT01 列 Status=Todo；原 plan 末新增 ## Follow-up Task 章節引用衍生檔。回報新 task ID 與衍生檔路徑。",
+      "prompt": "在 fixtures/pxbox-26324_plan.md 這份 plan 加一個 task：把 OrderQuantity.cs 測試檔裡 [Trait(\"PromotionCondition\", \"OrderPrice\")] 這個 typo 改成 \"OrderQuantity\"（這個 Trait 標籤標錯案型了）。這次正文指定放 pxbox-26324_ft_01.md，入口與狀態留在原 plan。",
+      "expected_output": "讀取共用 plan 規範後判定 compatible（純 typo 修正、不改 prod 行為）。建立指定衍生正文 pxbox-26324_ft_01.md，檔首回連原 plan；寫入 FT01 task detail block，欄位順序：Current state → Goal → Dependency → Target → Implementation Details → Validation → Test File (DoD) → Affected Files；驗證納入同一 task，不另開只為驗證此變更的 task。入口 plan 的 Task 索引保留目的、依賴、正文連結與權威 FT01 進度列 Status=Todo；外部正文不複製進度表。回報入口與正文路徑。",
       "files": ["fixtures/pxbox-26324_plan.md"],
       "expectations": [
         "原始 fixture (evals/fixtures/pxbox-26324_plan.md) 內容未被修改",
-        "outputs 目錄含 plan 副本，且 plan 副本新增了 `## Follow-up Task` 章節",
-        "`## Follow-up Task` 章節引用 `pxbox-26324_ft_*.md` 衍生檔",
+        "outputs 目錄含 plan 副本，且 Task 索引新增 FT01 的目的、依賴與正文連結",
+        "plan 的 Task 或既有 Follow-up Task 索引引用 `pxbox-26324_ft_01.md` 正文",
         "outputs 目錄含 `pxbox-26324_ft_01.md`（或對應的 ft_{XXX} 衍生檔）",
         "ft 衍生檔含 `FT01` task block",
         "FT01 task block 含全部 7 個必要欄位：Current state / Goal / Dependency / Target / Implementation Details / Validation / Affected Files",
         "FT01 的 Validation 記錄此變更的適用檢查或限定範圍的共用策略引用，不另開只為驗證此變更的 task",
         "FT01 的 Test File (DoD) 與 Affected Files 列出被修改的測試檔案",
-        "ft 衍生檔含 `Follow-up Task 進度表`，且有 FT01 列、Status=Todo",
+        "plan 副本含權威 FT01 進度列、Status=Todo，ft 正文沒有重複進度表",
         "ft 衍生檔檔首引用原 plan（pxbox-26324_plan.md）",
-        "plan 副本中既有的 `## Design` 與 `## Task` 章節未被修改"
+        "plan 副本中既有 Design 決策與任務正文未被改寫"
       ]
     },
     {
@@ -89,6 +89,20 @@
         "說明風險條件或後果改變時仍須重新評估",
         "沒有寫入或修改檔案"
       ]
+    },
+    {
+      "id": 6,
+      "name": "split-design-read-full-body",
+      "prompt": "從已確認 plan 生成 Task。plan 的 Design 索引摘要只說調整商品快取，但 D01 的正式正文另外寫了切換期間兩種 key 共存、不得變更 EventHandler 名稱、要建置且不執行測試。請沿正文連結讀完再生成；Task 正文也拆出去，狀態只留在入口 plan。",
+      "expected_output": "先讀共用 plan 規範與完整正式 Design，不以摘要代替規格。Task 承接共存、禁止更名與限範圍驗證條件，引用有效 D01；入口 plan 保留目的、依賴、正文連結及唯一進度表，拆分 Task 文件附回連且不複製狀態。",
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "ft-ids-across-bodies",
+      "prompt": "同一入口 plan 已索引兩個 FT 正文檔，已有 FT01 到 FT07。現在加一個小型命名整理，直接寫在 plan 的 Task 章節，不要再建立新檔。",
+      "expected_output": "讀入口與必要既有正文後對照原 Req 分類，不強制另開 FT 檔。新 ID 使用 FT08，不因內嵌或換檔重啟 FT01；正文、索引與權威進度列一起更新，無重複狀態表。",
+      "files": []
     }
   ]
 }

@@ -29,7 +29,7 @@ For **Mode A category rules and dependency-based ordering** (category priorities
 | Field | Modes | Description |
 | :--- | :--- | :--- |
 | **Reference** | Mode A only | The Design ID(s) this task implements (e.g., `[D01]`) |
-| **Current state** | Mode B only | What exists now / what's missing (1-2 lines) — replaces Reference's "why" role since FT has no Design source |
+| **Current state** | Mode B only | What exists now / what's missing (1-2 lines) — explains why the FT is needed; cite an applicable confirmed follow-up Design when one exists |
 | **Goal** | Mode B only | What this task achieves (1-2 lines) |
 | **Dependency** | Both | Prerequisite task ID(s), or `None` |
 | **Target** | Both | `[Project Name]` -> `[Class Name]` -> `[Method Name]` |

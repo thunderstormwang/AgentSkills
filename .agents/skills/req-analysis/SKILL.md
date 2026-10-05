@@ -1,6 +1,6 @@
 ---
 name: req-analysis
-description: Draft split-workflow skill for requirement exploration and convergence into a confirmed Req. Use when the user explicitly selects req-analysis or asks to try the new split workflow for Jira descriptions, meeting notes, current-state investigation, hidden requirements, or requirement clarification. During comparison, do not automatically replace sd-design or use this skill for technical solution selection, Design, or Task generation.
+description: Explore requirements and converge into a confirmed Req. Use when the user brings Jira descriptions, meeting or PM notes, incomplete requirements, current-state questions, hidden needs, or requirement changes and wants to clarify what the system should do. Owns exploration, RQs, and formal Req confirmation; technical solution selection belongs to technical-design, and Task generation belongs to gen-task-in-plan.
 ---
 
 # Requirement Exploration and Convergence
@@ -10,13 +10,15 @@ Turn incomplete input into a trustworthy requirement baseline through
 discussion into a formal template. This skill owns what is needed and why;
 `technical-design` owns how the confirmed requirement will be satisfied.
 
-## Draft Coexistence
+## Plan Entry and Workflow Boundary
 
-This is a first draft for comparison with `sd-design`, not its replacement.
-Keep the existing skill and its callers unchanged. Use this workflow only when
-the user selects it; do not apply both lifecycles to the same discussion.
-Do not create Pre Design Sync, Design, implementation tasks, or source changes
-under this skill.
+Before reading, creating, or updating a plan, read
+[Plan Document Conventions](../_shared/plan-document.md), resolving the path
+relative to this skill directory. Keep Req's index and authoritative R/RQ
+progress tables in the entry plan; its full formal body may be inline or split.
+Do not draft Pre Design Sync or Design content, generate implementation tasks,
+or change source code under this skill. Empty future-phase headings in the plan
+outline are not permission to advance those phases.
 
 ## Working Documents and Formal Specifications
 
@@ -116,7 +118,8 @@ the affected R items; a question log is not a substitute for rewriting them.
 
 ## 2. Converge into Formal Req
 
-Draft `## Req` from confirmed understanding:
+Draft `## Req` in the entry plan from confirmed understanding. If the body is
+split, preserve its summary, formal-body links, and progress tables in the plan:
 
 | ID | Item | Content |
 | :--- | :--- | :--- |
@@ -169,7 +172,8 @@ items.
 
 ## 3. Confirm and Hand Off
 
-End Req with its own progress table:
+End the entry plan's Req section with its own progress table, even when the
+detailed formal body is in a separate document:
 
 ```markdown
 ### Req 進度表

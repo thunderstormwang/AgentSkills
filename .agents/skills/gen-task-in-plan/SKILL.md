@@ -1,6 +1,6 @@
 ---
 name: gen-task-in-plan
-description: "Task generation for plan documents. Mode A — generates the initial Task list after all Design items are confirmed (continuation from sd-design). Mode B — appends a derivative task after verifying it doesn't violate the plan's original Req. Trigger Mode A when Design is Done and user wants to proceed to Task generation; trigger Mode B when user asks to add follow-up work (補測試 / refactor / typo fix / 改風格 / 樣式調整 / 補欄位 / 補例外處理) to an established plan. When in doubt about triggering Mode B, prefer this skill; its core value is the Req-violation check, which silently degrades if skipped."
+description: "Task generation for plan documents. Mode A — generates initial tasks after technical-design is confirmed. Mode B — appends derivative tasks after verifying they respect the original Req. Use when Design is confirmed and the user wants tasks, or requests follow-up work such as tests, refactoring, typo fixes, style adjustments, fields, or error handling under an existing plan. New or changed requirements belong to req-analysis; substantial unsettled technical choices belong to technical-design."
 ---
 
 # gen-task-in-plan
@@ -12,6 +12,11 @@ This skill manages **Task generation** within a plan document. It operates in tw
 
 The key invariant for Mode B: the new task must serve the plan's original purpose, not introduce new scope.
 
+Before reading or updating a plan, read
+[Plan Document Conventions](../_shared/plan-document.md), resolving the path
+relative to this skill directory. Start from the entry plan, follow formal-body
+links, and keep authoritative T/FT progress tables there even when bodies split.
+
 ---
 
 ## When to Use
@@ -19,7 +24,7 @@ The key invariant for Mode B: the new task must serve the plan's original purpos
 **Mode A** — triggered when:
 
 - 「Design 完成，生 Task」/ 「Phase 4」/ 「幫我從 Design 生成 Task」
-- Continuing from sd-design after all D items are Done
+- Continuing from technical-design after the applicable D items are confirmed
 
 **Mode B** — triggered when:
 
@@ -31,8 +36,9 @@ The key invariant for Mode B: the new task must serve the plan's original purpos
 
 ## When NOT to Use
 
-- **New plan from scratch** → use `sd-design` or write manually
-- **Cross-plan / new-feature scope** → use `sd-design`
+- **New plan from scratch** → use `req-analysis`, then `technical-design`
+- **Cross-plan / new-feature scope** → use `req-analysis` to confirm scope, then `technical-design`
+- **Substantial optimization with unsettled technical choices** → use `technical-design` before generating FT tasks
 - **Modifying existing tasks** (not adding) → direct `Edit` on the plan file
 - **Standalone task without a parent plan** → write manually
 
@@ -45,16 +51,17 @@ The key invariant for Mode B: the new task must serve the plan's original purpos
 - If the user specifies the plan path, use it directly
 - If only a plan name is given, search likely locations (`docs/`, repo root, etc.)
 - If ambiguous or no match, ask the user before proceeding
+- If given a split document, follow its backlink to the entry plan before reading gates or updating status
 
 ### Step 2 — Verify Design is complete
 
 - Locate the **Design 進度表** in the plan
-- All D items must be `Done` / `Cancel` / `Pending` before proceeding
-- If any items are still `Review` / `Todo`, notify the user and wait for confirmation
+- Applicable D items must be `Done`, explicitly `Cancel`, or explicitly non-blocking `Pending` with recorded conditions
+- If any required items are `Review` / `Todo` / `InProgress`, or `Pending` without a non-blocking agreement, notify the user and wait for confirmation
 
 ### Step 3 — Read and internalize Design
 
-- Read all Design sub-sections (D01, D02, ...) in full
+- Read all applicable Design sub-sections (D01, D02, ...) in full, following the plan's external formal-body links
 - Do NOT rely solely on TIA for scope — the Design section is the authoritative spec at this stage
 - Re-read actual code for any area that Design references but doesn't fully specify
 - Read the confirmed validation strategy and any explicit user instructions scoped to these tasks. Carry them into Task generation; do not replace them with a conflicting default.
@@ -69,7 +76,7 @@ Follow:
 - Each Task MUST include a **Reference** field pointing to the Design ID(s) it implements.
 
 **Self-check before notifying the user:**
-- Every non-Cancelled Design item is covered by ≥ 1 Task
+- Every confirmed Design item included in this work is covered by ≥ 1 Task; do not create tasks for explicitly cancelled or deferred scope
 - Every Task references a valid Design ID
 - No Task content contradicts any Design content
 - Dependencies are acyclic and correct
@@ -77,9 +84,13 @@ Follow:
 - Each task includes `Validation` matching the confirmed strategy; separate verification tasks have an independent purpose or require multiple tasks to be completed
 Fix any gaps silently before presenting. Only notify the user once the self-check passes.
 
-### Step 5 — Append `## Task` section
+### Step 5 — Populate `## Task` section
 
-Append after `## Design`. **Do NOT modify prior sections.**
+Populate the existing `## Task` after `## Design` in the entry plan, creating
+it only if absent. **Do NOT modify prior decisions.**
+Keep bodies inline when readable, or use an agreed split Task document with
+summaries and formal-body links retained here. The following table always stays
+in the entry plan, not in the external body.
 
 End with **Task 進度表**:
 
@@ -118,6 +129,8 @@ Locate and summarize the plan's intent section. Common section names:
 - The opening `>` blockquote at the file top
 
 Restate the plan's intent in 1-2 sentences for the user. **This defines the boundary the new task must respect.**
+If formal Req/AC bodies are split, read them before classification; the entry
+summary or opening blockquote is not a substitute for their full constraints.
 
 ### Step 3 — Classify the new task against the boundary
 
@@ -161,7 +174,9 @@ Classify as one of three buckets:
 
 ### Step 4 — Branch on classification
 
-**If compatible (A)** → proceed to Step 5.
+**If compatible (A)** → proceed to Step 5 for straightforward work. If the
+requested optimization has substantial unsettled design choices, first use
+`technical-design` under the confirmed Req and return after Design confirmation.
 
 **If violates (B)** → Don't write to any file yet. Surface the conflict:
 
@@ -172,6 +187,9 @@ Classify as one of three buckets:
   - **(b)** Explicitly amend the original plan's Req to include this scope (user approves scope expansion in-plan)
 
 Wait for the user's decision before proceeding.
+If the decision changes requirements, hand off to `req-analysis` for formal
+Req confirmation, then `technical-design` for applicable design decisions;
+scope-change permission alone is not a confirmed implementation specification.
 
 **If ambiguous (C)** → Don't write to any file yet. Surface the ambiguity:
 
@@ -181,9 +199,11 @@ Wait for the user's decision before proceeding.
 
 Wait for the user's decision before proceeding.
 
-### Step 5 — Write to the follow-up task file
+### Step 5 — Write the follow-up tasks and plan index
 
-Mode B tasks are always written to a **separate follow-up file**, not the original plan. This keeps the original plan readable as it approaches ~1000 lines.
+Keep small FT bodies inline under the entry plan's Task section. Use a separate
+follow-up file when the detail is large or the user selects one. In either case,
+keep the authoritative FT progress table in the entry plan.
 
 **Task block format:** Use the **Mode B template** in `references/task-format.md`. Shared constraints apply (one logical commit per task, no fixed file-count limit, validation included in each task). Read the confirmed validation strategy and any explicit user instructions scoped to the new tasks before writing them.
 
@@ -191,18 +211,19 @@ Mode B tasks are always written to a **separate follow-up file**, not the origin
 - One invocation may generate **multiple FT tasks** with dependencies (e.g., FT01 updates a contract and its callers, FT02 adds dependent behavior; both include their own validation). Express ordering via the `Dependency` field.
 - **No preset category order** — follow-up work is too varied to pre-order (補測試 / 改文件 / 純改生產碼…). As in Mode A, actual dependencies determine order; the AI surfaces the proposed order to the user.
 
-#### 5a. Determine the follow-up file path
+#### 5a. Determine the body location
 
-1. **Extract the jira ticket prefix** by stripping `_plan.md` from the original plan filename:
+1. Reuse the agreed inline or external destination. If splitting, **extract the jira ticket prefix** by stripping `_plan.md` from the original plan filename:
    - `docs/pxbox-26324_plan.md` → ticket prefix: `pxbox-26324`
-2. **Search** the same directory for existing `{ticket-prefix}_ft_*.md` files.
-3. **If existing FT files are found** — list them and ask the user: append to an existing file, or create a new one?
-4. **If no FT files exist (or user chooses to create a new file)** — ask the user for the `{XXX}` label:
+2. When splitting, **search** the same directory for existing `{ticket-prefix}_ft_*.md` files.
+3. **If existing FT files are found and no destination is agreed** — ask whether to append inline, use an existing file, or create a new one.
+4. **If a new external body is selected** — ask for the `{XXX}` label unless already specified:
    - Suggest `01` as the default
    - User may provide a descriptive label instead (e.g., `refactor`)
    - Final path: `{same-directory}/{ticket-prefix}_ft_{XXX}.md`
+   - If the original name does not follow the example pattern, agree on a suitable prefix rather than inventing a ticket.
 
-#### 5b. If the follow-up file does not exist — create it
+#### 5b. If using a new external body — create it
 
 Write the file with this header (use a relative path back to the original plan):
 
@@ -214,17 +235,18 @@ Write the file with this header (use a relative path back to the original plan):
 
 #### 5c. Assign the next FT ID
 
-Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the original plan's ID pattern. Check the existing Follow-up Task 進度表 in the follow-up file for the highest `FT` number; if none exists, start at `FT01`.
+Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the original plan's ID pattern. Check all FT tables and indexed bodies under the entry plan for the highest number; if none exists, start at `FT01`. Do not restart numbering for each split file.
 
-#### 5d. Append the task detail block to the follow-up file
+#### 5d. Append the task detail block to the chosen body location
 
 Use the **Mode B template** from `references/task-format.md`. Field order: `Current state` → `Goal` → `Dependency` → `Target` → `Implementation Details` → `Validation` → `Test File (DoD)` (when adding or modifying tests) → `Affected Files`.
 
 When prior exclusions or accepted risks are relevant, use `Current state` / `Goal` and the implementation details to identify what was deferred, what is newly requested, and which acceptance conditions remain applicable. Reference existing decisions rather than rewriting earlier tasks or duplicating a long discussion history.
 
-#### 5e. Append a row to the Follow-up Task 進度表 in the follow-up file
+#### 5e. Append a row to the Follow-up Task 進度表 in the entry plan
 
-If the table does not exist yet, add it after the last task block:
+If the table does not exist yet, add it under Task's follow-up subsection in the
+entry plan, or in an existing indexed Follow-up Task extension:
 
 ```markdown
 ### Follow-up Task 進度表
@@ -233,22 +255,22 @@ If the table does not exist yet, add it after the last task block:
 | FT01 | [Task 名稱] | — | — | Todo |
 ```
 
-If it already exists, append a new row.
+If it already exists, append a new row. Do not duplicate the table in the
+external body; migrate an affected legacy table according to the shared rules.
 
-#### 5f. Keep the original plan's `## Follow-up Task` section up to date
+#### 5f. Keep the original plan's Task index up to date
 
-- If the section does not exist: append it after `## Task`
-- If it exists but the current FT file is not yet listed: add a reference line for it
-- If it exists and the current FT file is already listed (appending to existing): no change
+- Keep FT summaries, dependencies, progress rows, and external-body links under `## Task`
+- Retain an existing `## Follow-up Task` as an indexed Task extension
+- For an external body, link the relevant task headings and keep its backlink to the entry plan
 
 Section format:
 
 ```markdown
-## Follow-up Task
+### Follow-up Tasks
 
 > 衍生任務清單：
-> - [{ticket-prefix}_ft_01.md](./{ticket-prefix}_ft_01.md)
-> - [{ticket-prefix}_ft_refactor.md](./{ticket-prefix}_ft_refactor.md)
+> - FT01 [Task purpose](./{ticket-prefix}_ft_01.md#ft01-task-purpose) — Dependency: None
 ```
 
 ### Step 6 — Confirm
@@ -257,8 +279,8 @@ Report back to the user:
 
 - New Task IDs (e.g., `FT01`, or a range like `FT01`–`FT03` when multiple)
 - 1-line summary per task
-- Follow-up file path that was written to
-- Whether the original plan's `## Follow-up Task` section was created or already existed
+- Entry plan path and the inline or external body location that was written to
+- Task index and authoritative FT progress table updated in the entry plan
 - Status set to `Todo` for all new tasks pending implementation
 
 ---
@@ -268,7 +290,7 @@ Report back to the user:
 - **Traditional Chinese**: Plan content stays in Traditional Chinese, matching the existing plan's language. User-facing messages also in Traditional Chinese.
 - **Match existing style**: If the plan has consistent formatting / wording across existing tasks, follow them.
 - **Idempotent**: If a task with similar scope already exists, ask the user before duplicating.
-- **No code changes**: This skill only edits the plan document. Code implementation is delegated to `implementation` skill or `implementation-agent` later.
+- **No code changes**: This skill only edits plan documents. Code implementation is handled by `implementation`, or `implementation-agent` when explicitly requested.
 - **Mode B — Multiple tasks allowed**: One invocation may add several FT tasks with dependencies. Each task must individually pass the Step 3 classification.
 - **Both modes — Granularity and validation self-check**: Follow the shared rules in `references/task-format.md`. Every task must have a clear purpose, a complete affected-file list, and a `Validation` field. Keep implementation and its corresponding validation together by default; do not force a separate test task. Fix inconsistencies before presenting.
 
@@ -314,10 +336,10 @@ T items and FT items both use the same status values. Initial status for all gen
 1. Reads `docs/pxbox-26324_task_refactor.md` Background section
 2. Identifies intent: 「測試重組，零行為變更，零生產碼動到」
 3. Classifies as **Compatible** (typo fix, only test file attribute, no behavior change)
-4. No existing `pxbox-26324_ft_*.md` found — asks user for `{XXX}` label; user confirms `01` → creates `docs/pxbox-26324_ft_01.md` with header referencing original plan
+4. User chooses a separate FT body and confirms label `01` → creates `docs/pxbox-26324_ft_01.md` with a backlink to the original plan
 5. Appends `FT01` task detail block to `docs/pxbox-26324_ft_01.md`
-6. Appends `FT01` row to Follow-up Task 進度表 in follow-up file
-7. Appends `## Follow-up Task` section to original plan, referencing `pxbox-26324_ft_01.md`
+6. Appends `FT01` row to Follow-up Task 進度表 in the original plan, not the external body
+7. Updates the original plan's Task index with FT01's purpose and body link
 8. Reports: 「✅ 已加入 FT01 — 修正 `OrderQuantity.cs` 的 Trait typo（寫入 docs/pxbox-26324_ft_01.md）」
 
 ### Example 3 — Mode B: Violating task

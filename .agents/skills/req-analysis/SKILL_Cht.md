@@ -1,6 +1,6 @@
 ---
 name: req-analysis
-description: 將需求探索與收斂為已確認 Req 的拆分流程草稿 skill。當使用者明確選擇 req-analysis，或要求針對 Jira 描述、會議筆記、現況查核、隱含需求或需求釐清試用新的拆分流程時使用。比較期間，不要自動取代 sd-design，也不要將此 skill 用於技術方案選擇、Design 或 Task 生成。
+description: 探索需求並收斂為已確認 Req。當使用者帶來 Jira 描述、會議或 PM 筆記、不完整需求、現況問題、隱含需求或需求變更，並想釐清系統應如何行為時使用。負責探索、RQ 與正式 Req 確認；技術方案選擇屬於 technical-design，Task 生成屬於 gen-task-in-plan。
 ---
 
 # 需求探索與收斂
@@ -9,12 +9,16 @@ description: 將需求探索與收斂為已確認 Req 的拆分流程草稿 skil
 先查核，再將討論整理成正式範本。此 skill 負責需要什麼與為什麼；
 `technical-design` 負責如何滿足已確認的需求。
 
-## 草稿並存
+## Plan 入口與流程邊界
 
-這是供與 `sd-design` 比較的第一版草稿，不是其替代品。
-保持既有 skill 與其呼叫端不變。僅在使用者選擇時使用此流程；
-不要在同一場討論套用兩套生命週期。
-不要在此 skill 下建立 Pre Design Sync、Design、實作任務或原始碼變更。
+讀取、建立或更新 plan 前，先閱讀
+[Plan 文件規範](../_shared/plan-document.md)，
+路徑相對於此 skill 目錄解析。
+Req 索引與權威 R／RQ 進度表保留在入口 plan；
+完整正式正文可內嵌或拆分。
+不要在此 skill 下撰寫 Pre Design Sync 或 Design 內容、
+生成實作任務，或修改原始碼。
+plan 目錄中的空白後續階段標題，不代表允許推進這些階段。
 
 ## 工作文件與正式規格
 
@@ -101,7 +105,8 @@ description: 將需求探索與收斂為已確認 Req 的拆分流程草稿 skil
 
 ## 2. 收斂為正式 Req
 
-依已確認理解撰寫 `## Req`：
+依已確認理解，在入口 plan 撰寫 `## Req`。
+正文拆分時，在 plan 保留摘要、正式正文連結與進度表：
 
 | ID | 項目 | 內容 |
 | :--- | :--- | :--- |
@@ -150,7 +155,8 @@ Current State 包含已查證的現行行為，不是未來意圖或未解猜測
 
 ## 3. 確認與交接
 
-Req 結尾放置自己的進度表：
+入口 plan 的 Req 章節結尾放置自己的進度表，
+即使詳細正式正文在獨立文件中也一樣：
 
 ```markdown
 ### Req 進度表

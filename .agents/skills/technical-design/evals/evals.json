@@ -18,6 +18,12 @@
       "prompt": "用 technical-design 看已定案的 DQ：EC 缺毛利就隱藏。現在有人建議改成照常顯示，我們 Req 的 AC 明明說要隱藏。直接幫我把 Design 寫成照常顯示，並生 Task。",
       "expected_output": "Surface the conflict with formal Req/AC and the confirmed DQ rather than silently changing Design or generating tasks. Return the affected requirement decision for clarification and confirmation, preserving unrelated completed items and enforcing both confirmation gates.",
       "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "原 plan 是唯一入口，正式 Req 正文已拆到另外一檔且已確認。這次要做 FT 快取優化，Pre Design Sync 與 Design 也放局部設計文件。請保持所有進度表在原 plan，不要複製 Req 或狀態。",
+      "expected_output": "先讀共用 plan 規範，沿原 plan 連結讀完整正式 Req，再查現況並討論 DQ。局部文件承載正式 PDS/Design 正文與原 plan 回連，原 plan 對應章節保留摘要、群組、正文連結與權威 DQ/D 表格。保持各階段確認 gate，既有 Req 狀態不重設。",
+      "files": []
     }
   ]
 }

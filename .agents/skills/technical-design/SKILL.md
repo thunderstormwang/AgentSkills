@@ -1,6 +1,6 @@
 ---
 name: technical-design
-description: Draft split-workflow skill for Pre Design Sync and Design under a confirmed Req. Use when the user explicitly selects technical-design or asks to try the new split workflow for architecture, DB, API, cache, event contracts, or substantial follow-up optimization before generating tasks. During comparison, do not automatically replace sd-design. Unconfirmed requirements belong to req-analysis; Task generation belongs to gen-task-in-plan.
+description: Discuss Pre Design Sync and produce Design under a confirmed Req. Use for architecture, DB, API, cache, event contracts, component responsibilities, or substantial follow-up optimization before generating tasks. Inherit confirmed requirements without restarting Req; unresolved business requirements belong to req-analysis, and Task generation belongs to gen-task-in-plan.
 ---
 
 # Technical Design Under a Confirmed Req
@@ -10,11 +10,12 @@ Settle technical choices before specifying the design; hand off to
 `gen-task-in-plan` only after user confirmation. This skill does not generate
 implementation tasks or source changes.
 
-## Draft Coexistence and Entry Gate
+## Plan Entry and Entry Gate
 
-This is a first draft for comparison. Leave `sd-design`, `gen-task-in-plan`,
-and their existing routing unchanged. Use this skill only when the user
-selects the split workflow; do not run two lifecycles for the same discussion.
+Before reading, creating, or updating a plan, read
+[Plan Document Conventions](../_shared/plan-document.md), resolving the path
+relative to this skill directory. Start from the entry plan and follow its
+formal-body links; do not infer the full requirement from an index summary.
 
 1. Read the formal Req, including constraints, AC, outstanding RQs, and actual
    confirmation status. Do not infer confirmation from the existence of a file
@@ -24,9 +25,10 @@ selects the split workflow; do not run two lifecycles for the same discussion.
    `req-analysis`, without manufacturing the missing business rule.
 3. A confirmed Req produced by another workflow is valid input. Do not require
    recreating it with `req-analysis`.
-4. Agree on the design document location before creating one when no destination
-   has been specified. For new work, append to the selected plan; for follow-up
-   work, use the selected local design document.
+4. Keep Pre Design Sync and Design indexed in the entry plan. Their bodies may
+   remain inline or use agreed split documents. For follow-ups, link the local
+   design from the original plan; keep its DQ/D progress tables in that plan.
+   Agree on a new body location when none has been specified.
 
 ### Follow-up Optimization
 
@@ -66,7 +68,7 @@ Do not split merely to meet a line count.
 
 ## 1. Pre Design Sync
 
-Create `## Pre Design Sync` for unresolved technical choices affecting
+Populate `## Pre Design Sync` in the entry plan for unresolved technical choices affecting
 architecture, ownership, data models, caching, contracts, or integrations.
 Use one `DQ01`, `DQ02`, ... per decision. Do not produce the Design section yet.
 
@@ -78,7 +80,7 @@ For each DQ:
    covering approach, pros/cons, change scope, and risk. State the recommended
    solution and why; do not leave the user with an unranked list.
 3. Ask for the user's decision. Record the final conclusion in the detailed
-   body and in the progress table; the concise table does not replace the
+   body and in the entry plan's progress table; the concise table does not replace the
    decision's necessary conditions or rationale.
 4. Check the conclusion against Req and already-resolved DQs. Surface genuine
    conflicts for user resolution rather than silently choosing a winner.
@@ -106,7 +108,7 @@ no DQs; do not invent questions to fill a template.
 
 ## 2. Design
 
-Append `## Design` after Pre Design Sync without removing or overwriting its
+Populate `## Design` in the entry plan after Pre Design Sync without removing or overwriting its
 decisions. Define structural and behavioral contracts: what changes, where
 responsibilities belong, and which ordering/invariants must hold.
 
@@ -175,7 +177,8 @@ omit unnecessary Test Plan/TC artifacts but retain Validation Strategy.
 
 ### Design Confirmation
 
-Use `D01`, `D02`, ... for the actual design sections and end with:
+Use `D01`, `D02`, ... for the actual design sections and end the entry plan's
+Design section with this table, even when the bodies are split:
 
 ```markdown
 ### Design 進度表
@@ -197,7 +200,7 @@ a confirmed decision.
 
 After every D item is confirmed or explicitly non-blocking/cancelled, hand off
 to `gen-task-in-plan`: Mode A for initial tasks, Mode B for follow-ups.
-Provide the formal Req/design locations, applicable DQ/D IDs, dependencies,
+Provide the entry plan and formal Req/design body locations, applicable DQ/D IDs, dependencies,
 constraints, accepted risk conditions, and validation strategy. Do not generate
 tasks before this gate or require exploration materials to implement them.
 

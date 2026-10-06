@@ -163,8 +163,10 @@ TC 指引：
 - 引用對應正式 AC ID，使用具體 Given/When/Then 值。
   避免 `$X`、「視設定而定」或未指定的預期輸出；
   拆成具體案例。
-- 標題使用如 `{MethodUnderTest}_{Scenario}_{ExpectedBehavior}`，
-  每個標題下放一行繁體中文引言，讓標題可作為測試方法名稱。
+- 使用如 `{MethodUnderTest}_{Scenario}_{ExpectedBehavior}` 的英文標題；
+  每個標題原樣作為單元測試的方法名稱，因此測試方法名稱絕不使用中文。
+  每個標題下放一行繁體中文引言，為讀者說明該案例；
+  它也可作為測試的顯示名稱（display name）。
 - 每份 TC 文件開頭，將領域術語對照系統欄位，
   並說明 Then 子句斷言的可觀察輸出結構與欄位。
   區分彙總結果與逐商品明細，

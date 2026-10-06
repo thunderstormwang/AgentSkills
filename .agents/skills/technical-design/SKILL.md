@@ -169,9 +169,12 @@ TC guidance:
 - Reference the corresponding formal AC IDs and use concrete Given/When/Then
   values. Avoid `$X`, "depends on configuration", or unspecified expected
   outputs; split into concrete cases.
-- Use headings such as `{MethodUnderTest}_{Scenario}_{ExpectedBehavior}` and
-  a one-line Traditional-Chinese blockquote beneath each, so headings can serve
-  as test method names.
+- Use English headings such as
+  `{MethodUnderTest}_{Scenario}_{ExpectedBehavior}`; each heading is used
+  verbatim as the unit test method name, so never write test method names in
+  Chinese. Beneath each heading, add a one-line Traditional-Chinese blockquote
+  that explains the case for the reader; it may also serve as the test's
+  display name.
 - At the start of each TC file, map domain terms to system fields and explain
   the observable output structures and fields asserted by Then clauses.
   Distinguish an aggregate result from per-item details, so authors do not

@@ -1,6 +1,6 @@
 ---
 name: gen-task-in-plan
-description: "plan 文件的 Task 生成工具。Mode A —— 在 technical-design 確認後生成初始任務。Mode B —— 在驗證符合原始 Req 後附加衍生任務。Design 已確認且使用者想生成任務，或在既有 plan 要求測試、重構、修 typo、風格調整、欄位或例外處理等後續工作時使用。新增或變更需求屬於 req-analysis；尚未定案的較大技術選擇屬於 technical-design。"
+description: "plan 文件的 Task 生成工具。Mode A —— 在 technical-design 確認後生成初始任務，或在向前回溯修正重新確認變更後的 Design 後附加增量 T 任務。Mode B —— 在驗證符合原始 Req 後附加衍生任務。Design 已確認且使用者想生成任務，或在既有 plan 要求測試、重構、修 typo、風格調整、欄位或例外處理等後續工作時使用。新增或變更需求屬於 req-analysis；尚未定案的較大技術選擇屬於 technical-design。"
 ---
 
 > **注意**：本檔為 `SKILL.md` 的繁體中文對照參考，**非執行用檔案**。skill router 實際載入的是英文版 `SKILL.md`；本檔僅供閱讀理解。兩者內容需保持同步。
@@ -9,10 +9,12 @@ description: "plan 文件的 Task 生成工具。Mode A —— 在 technical-des
 
 本 skill 管理 plan 文件內的 **Task 生成**，分為兩種模式：
 
-- **Mode A — 初始 Task 生成**：在所有 Design 項目確認後觸發。讀取 Design 段落，拆解為有引用來源的原子級可實作任務。
+- **Mode A — 初始 Task 生成**：在所有 Design 項目確認後觸發，或在向前回溯修正重新確認變更後的 Design 項目後觸發（增量）。讀取 Design 段落，拆解為有引用來源的原子級可實作任務。
 - **Mode B — 衍生 Task 附加**：當使用者想在既有 plan 加入精修、清理或後續工作時觸發。附加前先做 Req 違反檢查。
 
 Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不可引入新的範疇。
+
+需求變更永遠不會成為 `FT` 任務——`FT` 保留給 Req 不變下的工作。實作後（code review、UAT／QA）才發現的不一致，先走 `req-analysis` 的向前回溯修正與 `technical-design`，再以增量 Mode A 回到這裡。
 
 讀取或更新 plan 前，先閱讀
 [Plan 文件規範](../_shared/plan-document.md)，
@@ -28,6 +30,7 @@ Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不�
 
 - 「Design 完成，生 Task」/ 「Phase 4」/ 「幫我從 Design 生成 Task」
 - 在 technical-design 走完後，適用的 D 項目皆已確認
+- 在 technical-design 經向前回溯修正、重新確認變更後的 D 項目後——增量附加（見 Step 5）
 
 **Mode B** —— 當：
 
@@ -43,6 +46,7 @@ Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不�
 - **跨 plan / 新功能範疇** → 用 `req-analysis` 確認範圍，再用 `technical-design`
 - **尚有未定案技術選擇的較大優化** → 生成 FT 任務前先用 `technical-design`
 - **修改既有 task**（非新增） → 直接 `Edit` plan 檔
+- **實作後才發現的需求變更** → 先走 `req-analysis` 的向前回溯修正；再以增量 Mode A 回來，不走 Mode B
 - **沒有母 plan 的獨立 task** → 手寫
 
 ---
@@ -104,6 +108,8 @@ Mode B 的關鍵不變量：新 task 必須服務於 plan 的原始目的，不�
 | T01 | [Task 名稱] | D01 | None | Todo |
 | T02 | [Task 名稱] | D01, D02 | T01 | Todo |
 ```
+
+**增量（向前回溯修正後）**：Step 2–4 只套用於變更的 D 項目。接續既有 `T` 編號附加新任務。不要重開或改寫已實作的任務——它們記錄的是當時的規格。每個新任務引用修正後的 D ID，並在 Implementation Details 中寫明觸發它的 RQ。可選擇在被取代的任務正文加一行指向新任務的註記。
 
 ### Step 6 — 確認回報
 

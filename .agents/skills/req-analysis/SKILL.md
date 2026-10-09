@@ -198,6 +198,16 @@ conditions? Rewrite missing content into Req. Remove material references,
 resolved tentative wording, and contradictions between RQ conclusions and R
 items.
 
+For every rule that orders, filters, deduplicates, or caps results, attach
+3–5 concrete scenarios to Req or AC showing the before/after output. Include
+rules stated as unchanged: "the rest stays the same" hides consequences that
+an example exposes at a glance. Re-check each unchanged rule against any
+dimension this change introduces; a rule that fit before may no longer fit.
+
+If the user did not clearly answer an RQ, do not record a default as its
+conclusion. Mark it as an assumption, list it first when presenting Req for
+confirmation, and state its concrete consequence.
+
 ## 3. Confirm and Hand Off
 
 End the entry plan's Req section with its own progress table, even when the
@@ -243,14 +253,21 @@ answered.
 
 ## Backward Correction
 
-If design later exposes a genuine scope, behavior, constraint, or acceptance
-ambiguity, clarify the affected Req items here. Do not restart the entire
-requirement lifecycle for a local issue.
+Use this whenever a genuine scope, behavior, constraint, or acceptance
+mismatch surfaces after Req confirmation — during design, implementation,
+code review, or UAT/QA. Prevention will miss some mismatches; this path
+corrects them through the formal baseline instead of patching code. Do not
+restart the entire requirement lifecycle for a local issue.
 
-Record the new conclusion in formal Req and re-evaluate affected formal DQs,
-Design items, TC, and tasks. Reset only dependent items requiring reconfirmation
-to `Review` or `Todo`, explain the impact, and resume from the corrected gate.
-Materials may retain the history, but changing them alone never updates the
-formal baseline.
+Record the new conclusion as a new RQ stating its date, source, and which
+earlier conclusion it overturns. Then correct formal Req and re-evaluate
+affected formal DQs, Design items, TC, and tasks. Reset only dependent items
+requiring reconfirmation to `Review` or `Todo`, explain the impact, and resume
+from the corrected gate. Materials may retain the history, but changing them
+alone never updates the formal baseline.
+
+Do not reopen or rewrite tasks that are already implemented; they record the
+specification at that time. Corrected work becomes new tasks through
+`technical-design` handoff.
 
 Communicate and produce project documents in Traditional Chinese.

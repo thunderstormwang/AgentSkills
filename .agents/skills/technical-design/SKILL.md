@@ -219,6 +219,8 @@ a confirmed decision.
 
 After every D item is confirmed or explicitly non-blocking/cancelled, hand off
 to `gen-task-in-plan`: Mode A for initial tasks, Mode B for follow-ups.
+Work produced by a Backward Correction that changes Req/AC goes to Mode A's
+incremental path (new `T` IDs), never to Mode B's `FT`.
 Provide the entry plan and formal Req/design body locations, applicable DQ/D IDs, dependencies,
 constraints, accepted risk conditions, and validation strategy. Do not generate
 tasks before this gate or require exploration materials to implement them.
@@ -228,5 +230,10 @@ If an upstream conclusion changes, trace the earliest formal source:
 Reset only affected items requiring reconfirmation to `Review` or `Todo`;
 do not reset unrelated completed work. Updating exploration materials alone
 never updates a formal decision.
+
+Do not rewrite already-implemented tasks. Append corrected work as new tasks
+that reference the corrected D items and the RQ that triggered them. When the
+correction changes acceptance rules, update the affected TC in the same pass
+and mark which cases were rewritten or added.
 
 Communicate and produce project documents in Traditional Chinese.

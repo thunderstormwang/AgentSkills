@@ -1,16 +1,18 @@
 ---
 name: gen-task-in-plan
-description: "Task generation for plan documents. Mode A — generates initial tasks after technical-design is confirmed. Mode B — appends derivative tasks after verifying they respect the original Req. Use when Design is confirmed and the user wants tasks, or requests follow-up work such as tests, refactoring, typo fixes, style adjustments, fields, or error handling under an existing plan. New or changed requirements belong to req-analysis; substantial unsettled technical choices belong to technical-design."
+description: "Task generation for plan documents. Mode A — generates initial tasks after technical-design is confirmed, or appends incremental T tasks after a Backward Correction re-confirms changed Design. Mode B — appends derivative tasks after verifying they respect the original Req. Use when Design is confirmed and the user wants tasks, or requests follow-up work such as tests, refactoring, typo fixes, style adjustments, fields, or error handling under an existing plan. New or changed requirements belong to req-analysis; substantial unsettled technical choices belong to technical-design."
 ---
 
 # gen-task-in-plan
 
 This skill manages **Task generation** within a plan document. It operates in two modes:
 
-- **Mode A — Initial Task Generation**: Triggered after all Design items are confirmed. Reads the Design section and breaks it down into atomic, implementable tasks referenced to their Design source.
+- **Mode A — Initial Task Generation**: Triggered after all Design items are confirmed, or after a Backward Correction re-confirms changed Design items (incremental). Reads the Design section and breaks it down into atomic, implementable tasks referenced to their Design source.
 - **Mode B — Derivative Task Addition**: Triggered when the user wants to add refinement, cleanup, or follow-up work to an existing plan. Performs a Req-violation check before appending.
 
 The key invariant for Mode B: the new task must serve the plan's original purpose, not introduce new scope.
+
+Requirement changes never become `FT` tasks — `FT` is reserved for work under an unchanged Req. A mismatch discovered after implementation (code review, UAT/QA) goes through `req-analysis` Backward Correction and `technical-design`, then returns here as incremental Mode A.
 
 Before reading or updating a plan, read
 [Plan Document Conventions](../_shared/plan-document.md), resolving the path
@@ -25,6 +27,7 @@ links, and keep authoritative T/FT progress tables there even when bodies split.
 
 - 「Design 完成，生 Task」/ 「Phase 4」/ 「幫我從 Design 生成 Task」
 - Continuing from technical-design after the applicable D items are confirmed
+- Continuing from technical-design after a Backward Correction re-confirmed changed D items — append incrementally (see Step 5)
 
 **Mode B** — triggered when:
 
@@ -40,6 +43,7 @@ links, and keep authoritative T/FT progress tables there even when bodies split.
 - **Cross-plan / new-feature scope** → use `req-analysis` to confirm scope, then `technical-design`
 - **Substantial optimization with unsettled technical choices** → use `technical-design` before generating FT tasks
 - **Modifying existing tasks** (not adding) → direct `Edit` on the plan file
+- **Requirement change found after implementation** → `req-analysis` Backward Correction first; return for incremental Mode A, not Mode B
 - **Standalone task without a parent plan** → write manually
 
 ---
@@ -101,6 +105,8 @@ End with **Task 進度表**:
 | T01 | [Task 名稱] | D01 | None | Todo |
 | T02 | [Task 名稱] | D01, D02 | T01 | Todo |
 ```
+
+**Incremental (after Backward Correction)**: Steps 2–4 apply to the changed D items only. Append new tasks continuing the existing `T` numbering. Do not reopen or rewrite implemented tasks — they record the specification at that time. Each new task references the corrected D IDs and names the triggering RQ in its Implementation Details. Optionally add a one-line pointer in the superseded task body to the new task.
 
 ### Step 6 — Confirm
 

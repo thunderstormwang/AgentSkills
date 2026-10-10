@@ -194,6 +194,7 @@ var dto = new ProductBorderCacheDto(entity);
 
 ### XML Documentation
 - **ALL public properties** in Entities MUST have `/// <summary>`.
+- Always write `<summary>` as **three lines** — opening tag, text, closing tag — even when the description is a single word. Never use the one-line form `/// <summary>x</summary>`.
 - Chinese characters use **Full-width (全形)**; punctuation marks (`,`, `.`, `(`, `)`, `:`, `!`, `?`, etc.) MUST use **Half-width (半形)** — including when embedded in Chinese text.
 ```csharp
 /// <summary>

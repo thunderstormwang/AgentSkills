@@ -23,6 +23,7 @@ Keep these top-level sections in order:
 ## Pre Design Sync
 ## Design
 ## Task
+## Release
 ```
 
 Build the content incrementally. Future sections may be marked not started;
@@ -53,12 +54,12 @@ When splitting:
    per item; when it changes, update any affected summary in the same edit.
 
 Example destinations include `{ticket}_req.md`, `{ticket}_pre_design_sync.md`,
-`{ticket}_design.md`, and `{ticket}_task.md`. Names and document count are
-change-specific, not a required set.
+`{ticket}_design.md`, `{ticket}_task.md`, and `{ticket}_release.md`. Names and
+document count are change-specific, not a required set.
 
 ## Authority, IDs, and Status
 
-The entry plan owns the progress tables for R/RQ, DQ, D, and T/FT items.
+The entry plan owns the progress tables for R/RQ, DQ, D, T/FT, and RL items.
 Detailed formal bodies live either inline or at the indexed location.
 Read the body for the full specification and the plan table for status; an
 index summary never overrides a detailed rule.
@@ -93,6 +94,49 @@ follow-up subsection when useful. A separate FT file is allowed for readability,
 not required for every small task. If an existing plan uses `## Follow-up Task`,
 retain it as an indexed extension of Task rather than creating a second status
 owner. Reuse agreed destinations; confirm a new file location when necessary.
+
+## Release (Trial)
+
+Release holds the **execution side** of shipping: what to do, in what order,
+and how to confirm each step is done in each environment. Constraints that
+must hold — deployment ordering, coexistence of old and new versions, data
+preparation, transition mechanisms — stay in Req and Design (Deployment /
+Transition); Release cites them by ID instead of repeating their rationale.
+Operational procedures such as switch commands or manual rebuild triggers
+belong here, not in a D item.
+
+This section is on trial. The structure below is a starting point; adjust it
+as practice shows what Release actually needs, and record those lessons here.
+
+Build it incrementally rather than at the end. Add an item whenever a phase
+creates a deployment obligation: a Req constraint, a Design ordering rule, or
+a Task/FT that changes a cache key, a schema, or requires a rebuild. Review it
+for completeness before merging for release.
+
+Candidate subsections; omit what does not apply:
+
+| Subsection | Relevant content |
+| :--- | :--- |
+| Preconditions | Release dependencies on other repos or tickets, DDL and data-migration scripts and their order, configuration values per environment, external resources |
+| Operations | Commands and manual triggers used during release (switches, rebuilds, cache invalidation), each with how to confirm it actually completed — not merely that the call returned |
+| Steps | Ordered steps per environment, each with its formal source and a completion condition; environment-specific checks |
+| Rollback | What to do when data or code turns out wrong. If rollback has not been reasoned through, say so explicitly rather than implying it is safe |
+| Post-release follow-up | Monitoring, re-evaluating deferred tasks, removal of transition measures, and work that belongs to another ticket |
+
+Use `RL01`, `RL02`, ... for items that need tracking. Each item is completed
+per environment, so the progress table has one status column per environment;
+use the repository's actual environments. Use `—` where an item does not apply:
+
+```markdown
+### Release 進度表
+| ID | 項目 | SIT | UAT | PROD |
+| :--- | :--- | :--- | :--- | :--- |
+| RL01 | [Release item] | Todo | Todo | Todo |
+```
+
+Release is a checklist that supports judgment, not a script to follow
+blindly. Verification steps may stay coarse (for example, a spot check) when
+the team does not prescribe specific test data.
 
 ## Reading, Updating, and Handoff
 

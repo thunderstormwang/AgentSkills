@@ -1,9 +1,9 @@
 ---
-name: my-code-review
-description: Performs structured, multi-agent code review of a whole feature branch against its base (main). If the branch has a plan document (Req / Pre Design Sync / Design / Task) it reviews against the plan too; if not, it reviews from the code alone. Use this skill whenever the user wants a branch / feature reviewed — before merge, "check what I changed", correctness / intent / maintainability — even if they don't mention a plan or explicitly say "review". Sources the change via git diff (not gh), so it works on any host (GitHub, Gitea, self-hosted).
+name: branch-review
+description: Performs structured, multi-agent code review of a whole feature branch against its base (main). If the branch has a plan document (Req / Pre Design Sync / Design / Task / Review) it reviews against the plan too; if not, it reviews from the code alone. Use this skill whenever the user wants a branch / feature reviewed — before merge, "check what I changed", correctness / intent / maintainability — even if they don't mention a plan or explicitly say "review". Sources the change via git diff (not gh), so it works on any host (GitHub, Gitea, self-hosted).
 ---
 
-# my-code-review
+# branch-review
 
 A structured code review engine that validates implementation against a plan document. It works top-down from intent to detail, ensuring the implementation not only matches the plan but is also correct, safe, and maintainable.
 
@@ -25,13 +25,13 @@ You always review a **whole feature branch against its base**, with multi-agent 
 2. **Detect a plan.** Discover a plan / feature doc in the repo (e.g. a `plan.md` / feature doc under `docs/`) — don't hardcode a path.
    - **Plan found → plan-based review:** all layers apply, including the plan layers (0–2).
    - **No plan → code-only review:** skip Layers 0–2; rely on Layers 3–6 and infer Design intent from the code and commit messages.
-3. **Load Layer 0 once, in the orchestrator (plan only).** Read the plan top-down yourself *before* fanning out — especially Pre Design Sync (deliberate decisions are not bugs). Follow any links from the plan to supporting Pre Design Sync documents and treat their DQ details as part of Layer 0. Pass the relevant Task / Design excerpts down to each subagent rather than having all of them re-read and re-interpret the whole plan.
+3. **Load Layer 0 once, in the orchestrator (plan only).** Read the plan top-down yourself *before* fanning out — especially Pre Design Sync (deliberate decisions are not bugs). Follow any links from the plan to supporting Pre Design Sync documents and treat their DQ details as part of Layer 0. Pass the relevant Task / Design excerpts, and the prior Review findings for each subagent's files, down to each subagent rather than having all of them re-read and re-interpret the whole plan.
 4. **Fan out — read-only subagents.** A finished branch can touch 100+ files; don't review it in one pass. Cluster the changed files by directory / layer / aggregate and spawn one read-only review subagent per cluster (cap ~5–6; batch if more). Each subagent:
    - loads any project coding-convention / architecture skill covering its slice — that skill is the single source of those conventions, so do not restate them here;
    - applies Layers 1–6 to its slice (Layers 1–2 only when a plan exists);
    - reads enough surrounding context to reason — **not diff-only**, which is what misses the deep concurrency / data-flow bugs;
    - adversarially self-checks each finding, and returns `file:line` + concrete failure scenario + confidence (HIGH/MED/LOW).
-5. **Synthesize.** Dedupe into one report and verify every MED+/🔴 finding against the code yourself before presenting.
+5. **Synthesize.** Dedupe into one report and verify every MED+/🔴 finding against the code yourself before presenting. Drop any finding that repeats a prior Review finding judged Deliberate, Accepted risk, or Pre-existing, unless the code or its premise changed since that judgment; when one did change, say what changed. A finding that matches a prior finding still open is reported against that CR ID, not as new.
 6. **Cost guard.** If the diff is very large, report its size first (files / rough token estimate) and confirm before fanning out.
 
 ---
@@ -50,6 +50,7 @@ Read the plan document top-down **before touching any code**:
 2. **Pre Design Sync** — Understand *why the design was made this way*. Read both the main plan's DQ index/conclusions and any linked Pre Design Sync supporting document. Every DQ conclusion is a deliberate decision. Do not flag deliberate decisions as bugs.
 3. **Design** — Understand *what the structure and contracts should look like*.
 4. **Task** — Use as the checklist of expected changes.
+5. **Review** — Read the prior findings (`CR` items) and their dispositions. A finding judged Deliberate, Accepted risk, or Pre-existing is already decided; do not raise it again unless the code or its premise has changed. A plan without a Review section simply has no prior findings.
 
 > ⚠️ Skipping Pre Design Sync is the most common cause of false positives in code review. A design choice that looks "wrong" often has a documented reason in Pre Design Sync.
 

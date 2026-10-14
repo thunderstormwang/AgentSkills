@@ -1,9 +1,9 @@
 ---
-name: my-code-review
-description: 對整條 feature 分支、對照其基底 (main) 進行結構化的多 agent 程式碼審查。分支若有計畫文件 (Req / Pre Design Sync / Design / Task) 就一併對照計畫審；沒有就純看 code 審。當使用者想審一條分支／feature——合併前檢查、「看我改了什麼」、正確性／意圖／可維護性——即使未提到計畫、未明說「review」，都請使用此技能。變更來源以 git diff 取得（非 gh），適用任何 host（GitHub、Gitea、自建）。
+name: branch-review
+description: 對整條 feature 分支、對照其基底 (main) 進行結構化的多 agent 程式碼審查。分支若有計畫文件 (Req / Pre Design Sync / Design / Task / Review) 就一併對照計畫審；沒有就純看 code 審。當使用者想審一條分支／feature——合併前檢查、「看我改了什麼」、正確性／意圖／可維護性——即使未提到計畫、未明說「review」，都請使用此技能。變更來源以 git diff 取得（非 gh），適用任何 host（GitHub、Gitea、自建）。
 ---
 
-# my-code-review
+# branch-review
 
 一個結構化的程式碼審查引擎，用於根據計畫文件驗證實作內容。它採取由上而下（從意圖到細節）的方式，確保實作不僅符合計畫，而且正確、安全且具備可維護性。
 
@@ -25,13 +25,13 @@ description: 對整條 feature 分支、對照其基底 (main) 進行結構化�
 2. **偵測計畫：** 自動探測 repo 內的計畫／feature 文件（例如 `docs/` 下的 `plan.md`）——別寫死路徑。
    - **有計畫 → 對照計畫審：** 全部層次適用，含計畫層 0–2。
    - **無計畫 → 純 code 審：** 略過層次 0–2；靠層次 3–6，並從 code＋commit message 推 Design 意圖。
-3. **層次 0 由 orchestrator 集中做一次（僅有計畫時）：** 你自己在 fan-out **之前**由上而下讀完計畫——尤其 Pre Design Sync（刻意決策不是 bug）。跟隨 plan 內指向 Pre Design Sync 支援文件的連結，並將其中的 DQ 詳細內容視為層次 0 的一部分。把相關 Task／Design 片段分給各 subagent，而非讓每個 subagent 各自重讀、各自解讀整份計畫。
+3. **層次 0 由 orchestrator 集中做一次（僅有計畫時）：** 你自己在 fan-out **之前**由上而下讀完計畫——尤其 Pre Design Sync（刻意決策不是 bug）。跟隨 plan 內指向 Pre Design Sync 支援文件的連結，並將其中的 DQ 詳細內容視為層次 0 的一部分。把相關 Task／Design 片段，以及各 subagent 負責檔案的既有 Review 發現，分給各 subagent，而非讓每個 subagent 各自重讀、各自解讀整份計畫。
 4. **Fan-out——唯讀 subagent：** 做完的分支可能動 100+ 檔，別一次審完。把變更檔依 目錄／層／aggregate 分群，每群開一個唯讀 review subagent（上限約 5–6；更多就分批）。每個 subagent：
    - 載入涵蓋其範圍的專案 coding-convention／架構 skill——該 skill 是那些慣例的單一來源，故此處不重述；
    - 對自己那塊套用層次 1–6（層次 1–2 僅在有計畫時）；
    - **讀足夠的周邊脈絡再推理**——別只看 diff，只看 diff 會漏掉深層並發／資料流 bug；
    - 對抗式自我覆核每條 finding，回報 `file:line`＋具體失敗情境＋信心（HIGH/MED/LOW）。
-5. **彙整：** 去重成單一報告，並在呈現前對每條 MED 以上／🔴 親自對照 code 覆核。
+5. **彙整：** 去重成單一報告，並在呈現前對每條 MED 以上／🔴 親自對照 code 覆核。若某條 finding 重複了已判定為刻意設計、接受風險或既有問題的既有 Review 發現，除非程式碼或其前提在判定後已改變，否則捨棄；若確有改變，說明改變了什麼。與仍未結案的既有發現相符的 finding，以該 CR ID 回報，而非當成新發現。
 6. **成本護欄：** diff 非常大時，先回報規模（檔數／粗略 token 量）並確認後再 fan-out。
 
 ---
@@ -50,6 +50,7 @@ description: 對整條 feature 分支、對照其基底 (main) 進行結構化�
 2. **Pre Design Sync** — 了解「設計為何如此」。同時閱讀主 plan 的 DQ 索引／結論，以及任何連結的 Pre Design Sync 支援文件。每個 DQ 的結論都是深思熟慮的決定。請勿將已記錄的設計決策誤判為 Bug。
 3. **Design** — 了解結構與合約應有的樣貌。
 4. **Task** — 作為預期變更的檢查清單。
+5. **Review** — 閱讀既有發現（`CR` 項目）及其處置。已判定為刻意設計、接受風險或既有問題的發現已有定論；除非程式碼或其前提已改變，否則不再提出。計畫沒有 Review 節，就只是沒有既有發現。
 
 > ⚠️ 跳過 Pre Design Sync 是程式碼審查中最常見的誤判原因。一個看似「錯誤」的設計選擇，往往在 Pre Design Sync 中有記載原因。
 

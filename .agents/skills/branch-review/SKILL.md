@@ -164,6 +164,7 @@ For each Task ID, output one block:
 **Location:** `path/to/file.cs` line N
 **Description:** [What is wrong and why it matters]
 **Suggestion:** [Concrete fix or recommendation]
+**Suggested disposition:** [Fix / Correct specification / Deliberate / Accepted risk / Pre-existing] → [destination, e.g. new FT, new RQ against R03, DQ05] — [one-line reason]
 ```
 
 ### Changes with no owning Task / no plan
@@ -178,18 +179,36 @@ A finished branch usually contains changes with no owning Task — review-driven
 | 🟡 Risk | Correct today, but fragile or will silently fail under edge cases |
 | 🟢 Minor | Code quality, observability, or consistency issue with no immediate functional impact |
 
+### Suggested Disposition
+
+Suggest one disposition per finding, matching the plan's Review section. It is a suggestion; the user decides.
+
+| Disposition | Suggest when | Destination |
+| :--- | :--- | :--- |
+| Fix | The code diverges from its Task, Design, or Req | A new FT |
+| Correct specification | The code faithfully follows the Task and Design, yet the outcome is wrong or incomplete — the Req, DQ, or Design itself is at fault | A new RQ through Backward Correction; name the formal item to correct |
+| Deliberate | A DQ or D item arguably covers it. A finding a DQ/D clearly covers should not be raised at all (Layer 0) | Cite the DQ/D ID |
+| Accepted risk | The risk is real but fixing it costs more than it saves now; state the condition under which it would matter | State the condition; propose a Release post-release item if it needs monitoring |
+| Pre-existing | The same behavior exists on the base branch — verify it there (e.g. `git show <base>:<path>`), do not assume | Name the owner or a follow-up ticket |
+
+Distinguishing Fix from Correct specification is the main judgment: check whether the Task/Design text prescribes the faulty behavior. If it does, the specification is wrong, and fixing only the code would leave the plan contradicting the implementation.
+
+Without a plan, suggest only Fix, Accepted risk, or Pre-existing; there is no formal specification to correct or decision to cite.
+
+After the user confirms the dispositions, offer to record them as `CR` items in the plan's Review section. Do not write to the plan before that confirmation.
+
 ### Final Summary Table
 
 End with a table across all Tasks:
 
 ```markdown
-| Task | 狀態 | 備註 |
-| :--- | :--- | :--- |
-| T1 | ✅ | 正確 |
-| T2 | ✅ | 正確 |
-| T3 | ⚠️ | null guard 缺失（🟡） |
-| T4 | ✅ | 正確 |
-| T5 | ⚠️ | 無 logger，cache miss 靜默 fallback（🟡） |
+| Task | 狀態 | 備註 | 建議處置 |
+| :--- | :--- | :--- | :--- |
+| T1 | ✅ | 正確 | — |
+| T2 | ✅ | 正確 | — |
+| T3 | ⚠️ | null guard 缺失（🟡） | Fix → FT |
+| T4 | ✅ | 正確 | — |
+| T5 | ⚠️ | 無 logger，cache miss 靜默 fallback（🟡） | Accepted risk |
 ```
 
 ---

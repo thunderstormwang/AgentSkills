@@ -64,6 +64,21 @@ For each Task item, verify:
 - Dependencies added/removed match the plan
 - Callers updated where the plan requires (e.g., method signature changes)
 
+Check each Task against the **final state** of the branch, not against its own commit. Later Tasks and FTs often rewrite an earlier Task's code; an intermediate state that no longer exists is not a finding. Do not review commits one by one.
+
+#### Supersession check
+
+When a Task's expected result is not in the final state as written, decide which case applies:
+
+| Final state | Verdict |
+| :--- | :--- |
+| The expected result is present | ✅ |
+| Absent, and a later Task/FT explicitly replaces it (its Current state or Goal names the earlier Task or its behavior) | Superseded — report it as superseded by that item; not a finding |
+| Absent, and no later Task/FT replaces it | 🔴 Regression — a later change silently dropped a requirement |
+| Present but reshaped (signature, location, or structure changed by a later item) | Judge whether the Design/Req intent still holds; do not require the original Task's literal form |
+
+The regression case is the one the final diff hides: rewritten code can look complete while missing a step an earlier Task required. For each Task whose code a later item rewrote, confirm that the Task's required behaviors (rules, ordering, exclusions, early exits) still exist after the rewrite.
+
 > This is the checklist layer. It is necessary but not sufficient.
 
 ---
@@ -158,6 +173,9 @@ For each Task ID, output one block:
 
 ### ⚠️ T3 — [Task Name]
 [One sentence summary.]
+
+### ↪️ T9 — [Task Name]
+Superseded by FT01; its requirement is verified under FT01.
 
 #### Issue 1 — [Short title]
 **Severity:** 🔴 Bug / 🟡 Risk / 🟢 Minor

@@ -32,6 +32,21 @@ if (res.IsPass)
 }
 ```
 
+### No Magic Numbers
+- Do not compare, assign, or pass a bare literal for a domain-coded value (`!= 0`, `== 1`, `Type = 3`). Use the named member: `<Enumeration>.<Member>.Id` for an `Enumeration` class, or `(int)<Enum>.<Member>` for a C# `enum` when the field is stored as `int`.
+- If no named type exists for the codes yet, add one with a member for every known value, including the "none" value, rather than keeping the literal with a comment.
+- A check meaning "any non-default value" compares against the named default member; it does not enumerate every other member.
+```csharp
+// Prefer
+if (coupon.MarginPassType != (int)MarginPassType.None) return false;
+.Where(x => x.MemberUseType == PromotionMemberUseType.AllMember.Id)
+
+// Avoid
+if (coupon.MarginPassType != 0) return false;
+.Where(x => x.MemberUseType == 0)
+```
+- The same rule applies to SQL strings; see below.
+
 ### SQL Strings
 - SQL must start from the **leftmost column** (ignore C# indentation).
 - **Keywords UPPERCASE**: `SELECT`, `FROM`, `WHERE`, `AND`, `OR`, `JOIN`, `LEFT JOIN`, `ON`, `IS NULL`, `LIKE`, `AS`, `UNION ALL`, etc.

@@ -32,6 +32,21 @@ if (res.IsPass)
 }
 ```
 
+### 不用魔術數字
+- 領域代碼值不以裸字面值比較、指派或傳遞 (`!= 0`、`== 1`、`Type = 3`). 改用具名成員: `Enumeration` 類別用 `<Enumeration>.<Member>.Id`,欄位以 `int` 儲存的 C# `enum` 用 `(int)<Enum>.<Member>`.
+- 若這組代碼還沒有具名型別,就新增一個,為每個已知值 (含代表「無」的值) 建立成員,而不是保留字面值再加註解.
+- 意思是「任何非預設值」的判斷,與具名的預設成員比較;不逐一列舉其他成員.
+```csharp
+// 優先
+if (coupon.MarginPassType != (int)MarginPassType.None) return false;
+.Where(x => x.MemberUseType == PromotionMemberUseType.AllMember.Id)
+
+// 避免
+if (coupon.MarginPassType != 0) return false;
+.Where(x => x.MemberUseType == 0)
+```
+- SQL 字串適用同一規則;見下方.
+
 ### SQL 字串
 - SQL 必須從**最左欄**開始 (忽略 C# 縮排).
 - **關鍵字大寫**: `SELECT`、`FROM`、`WHERE`、`AND`、`OR`、`JOIN`、`LEFT JOIN`、`ON`、`IS NULL`、`LIKE`、`AS`、`UNION ALL` 等.

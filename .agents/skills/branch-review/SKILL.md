@@ -73,7 +73,7 @@ When a Task's expected result is not in the final state as written, decide which
 | Final state | Verdict |
 | :--- | :--- |
 | The expected result is present | ✅ |
-| Absent, and a later Task/FT explicitly replaces it (its Current state or Goal names the earlier Task or its behavior) | Superseded — report it as superseded by that item; not a finding |
+| Absent, and a later Task/FT explicitly replaces it (an FT's Current state, or a T's Reference, names the earlier Task as superseded) | Superseded — report it as superseded by that item; not a finding |
 | Absent, and no later Task/FT replaces it | 🔴 Regression — a later change silently dropped a requirement |
 | Present but reshaped (signature, location, or structure changed by a later item) | Judge whether the Design/Req intent still holds; do not require the original Task's literal form |
 

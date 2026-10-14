@@ -28,8 +28,8 @@
 
 | 欄位 | 適用模式 | 說明 |
 | :--- | :--- | :--- |
-| **Reference** | 僅 Mode A | 此 task 實作的 Design ID（例如 `[D01]`） |
-| **Current state** | 僅 Mode B | 現況 / 缺什麼（1-2 行）—— 說明為什麼需要此 FT；有適用且已確認的後續 Design 時引用它 |
+| **Reference** | 僅 Mode A | 此 task 實作的 Design ID（例如 `[D01]`）；改寫較早 task 的程式碼時，加上被取代的 task ID（見下方） |
+| **Current state** | 僅 Mode B | 現況 / 缺什麼（1-2 行）—— 說明為什麼需要此 FT；有適用且已確認的後續 Design 時引用它；改寫較早 task 的程式碼時，指名被取代的 task ID（見下方） |
 | **Goal** | 僅 Mode B | 此 task 達成什麼（1-2 行） |
 | **Dependency** | 兩者 | 前置 task ID 或 `None` |
 | **Target** | 兩者 | `[專案名稱]` -> `[類別名稱]` -> `[方法名稱]` |
@@ -37,6 +37,16 @@
 | **Validation** | 兩者 | 適用的檢查、目標/指令與通過條件，或限定適用範圍的共用驗證策略引用 |
 | **Test File (DoD)** | 新增或修改測試的 task | 實體測試檔案路徑（例如 `src/Project.Test/xxxTest.cs`） |
 | **Affected Files** | 兩者 | 完整受影響檔案清單，包含對應測試檔 |
+
+### 取代較早的 Task
+
+當 task 改寫、替換或移除較早 T 或 FT 實作的程式碼時，指名該 task ID，並說明其要求的行為（規則、順序、排除條件、提早離開）中哪些必須在改寫後保留，或哪些是刻意拿掉及其原因。Mode B 寫在 `Current state`；Mode A（Backward Correction 之後新增的 T）寫在 `Reference` 旁。
+
+Reviewer 會以分支的最終狀態檢查較早的 task。沒有這筆記錄，改寫時刻意拿掉的行為與意外弄丟的行為無法區分。
+
+```markdown
+- **Current state:** `ProductMarginCache` 的 key 使用舊格式（T09）。取代 T09 的 key 格式；T09 的逐商品鎖與 miss 回填行為不變。
+```
 
 ### 欄位順序
 

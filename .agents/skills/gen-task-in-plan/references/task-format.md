@@ -28,8 +28,8 @@ For **Mode A category rules and dependency-based ordering** (category priorities
 
 | Field | Modes | Description |
 | :--- | :--- | :--- |
-| **Reference** | Mode A only | The Design ID(s) this task implements (e.g., `[D01]`) |
-| **Current state** | Mode B only | What exists now / what's missing (1-2 lines) — explains why the FT is needed; cite an applicable confirmed follow-up Design when one exists |
+| **Reference** | Mode A only | The Design ID(s) this task implements (e.g., `[D01]`); add the superseded task IDs when it rewrites an earlier task's code (see below) |
+| **Current state** | Mode B only | What exists now / what's missing (1-2 lines) — explains why the FT is needed; cite an applicable confirmed follow-up Design when one exists; name the superseded task IDs when it rewrites an earlier task's code (see below) |
 | **Goal** | Mode B only | What this task achieves (1-2 lines) |
 | **Dependency** | Both | Prerequisite task ID(s), or `None` |
 | **Target** | Both | `[Project Name]` -> `[Class Name]` -> `[Method Name]` |
@@ -37,6 +37,16 @@ For **Mode A category rules and dependency-based ordering** (category priorities
 | **Validation** | Both | Applicable checks, targets/commands, and pass criteria, or a scoped reference to a shared validation strategy |
 | **Test File (DoD)** | Tasks adding or modifying tests | Physical test file path(s) (e.g., `src/Project.Test/xxxTest.cs`) |
 | **Affected Files** | Both | Complete list of affected file paths, including corresponding test files |
+
+### Superseding an Earlier Task
+
+When a task rewrites, replaces, or removes code that an earlier T or FT implemented, name that task ID and state which of its required behaviors (rules, ordering, exclusions, early exits) must survive the rewrite, or that they are intentionally dropped and why. Mode B writes this in `Current state`; Mode A (incremental T after a Backward Correction) writes it beside `Reference`.
+
+Reviewers check the earlier task against the branch's final state. Without this record, a behavior the rewrite drops on purpose is indistinguishable from one it loses by accident.
+
+```markdown
+- **Current state:** `ProductMarginCache` keys use the old format (T09). Supersedes T09's key format; T09's lock-per-product and miss-refill behavior stay unchanged.
+```
 
 ### Field Ordering
 

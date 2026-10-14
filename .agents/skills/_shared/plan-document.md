@@ -23,6 +23,7 @@ Keep these top-level sections in order:
 ## Pre Design Sync
 ## Design
 ## Task
+## Review
 ## Release
 ```
 
@@ -54,12 +55,14 @@ When splitting:
    per item; when it changes, update any affected summary in the same edit.
 
 Example destinations include `{ticket}_req.md`, `{ticket}_pre_design_sync.md`,
-`{ticket}_design.md`, `{ticket}_task.md`, and `{ticket}_release.md`. Names and
+`{ticket}_design.md`, `{ticket}_task.md`, `{ticket}_review.md`, and
+`{ticket}_release.md`. Names and
 document count are change-specific, not a required set.
 
 ## Authority, IDs, and Status
 
-The entry plan owns the progress tables for R/RQ, DQ, D, T/FT, and RL items.
+The entry plan owns the progress tables for R/RQ, DQ, D, T/FT, CR, and RL
+items.
 Detailed formal bodies live either inline or at the indexed location.
 Read the body for the full specification and the plan table for status; an
 index summary never overrides a detailed rule.
@@ -94,6 +97,56 @@ follow-up subsection when useful. A separate FT file is allowed for readability,
 not required for every small task. If an existing plan uses `## Follow-up Task`,
 retain it as an indexed extension of Task rather than creating a second status
 owner. Reuse agreed destinations; confirm a new file location when necessary.
+
+## Review (Trial)
+
+Review is the **traceability ledger** for findings raised against the
+implementation: what was found, how it was judged, and where it went. It does
+not specify fixes; the fix lives in the FT, RQ, or D item the finding was routed
+to. Its main value is recording the findings that end in *no* change, so a
+later review round does not raise them again.
+
+This section is on trial. The structure below is a starting point; adjust it
+as practice shows what Review actually needs, and record those lessons here.
+
+Record findings from every source: code review before merge (AI or human) and
+issues reported during QA or UAT. Do not paste full review reports.
+
+Candidate subsections; omit what does not apply:
+
+| Subsection | Relevant content |
+| :--- | :--- |
+| Review rounds | One line per round: date, scope (commit range or Task IDs), and source (AI review, a teammate, QA, UAT) |
+| Findings | One `CR01`, `CR02`, ... per finding: severity, location, a one-sentence description, disposition, and destination |
+| Feedback to conventions | Optional. When a finding exists because a skill or project convention was missing or wrong, note which one should change |
+
+Every finding takes exactly one disposition:
+
+| Disposition | When | Destination |
+| :--- | :--- | :--- |
+| Fix | The implementation diverges from its Task, Design, or Req | A new FT |
+| Correct specification | The Req, DQ, or Design itself is wrong or incomplete | A new RQ through Backward Correction, then new T items |
+| Deliberate | A Pre Design Sync or Design decision already covers it | Cite the DQ/D ID; status `Cancel` |
+| Accepted risk | Known and deliberately not addressed | State the condition; add a Release post-release item when it needs monitoring |
+| Pre-existing | Already present on the base branch and outside this change's scope | Note the owner or follow-up ticket; status `Pending` |
+
+A finding routed to Correct specification follows the owning skill's Backward
+Correction; recording it here does not update the formal baseline.
+
+Before a new review round, read the existing findings. Do not raise again a
+finding already judged Deliberate, Accepted risk, or Pre-existing unless the
+code or its premise has changed since.
+
+Severity uses 🔴 Bug (incorrect behavior or data), 🟡 Risk (correct today but
+fragile), and 🟢 Minor (quality with no functional impact). A finding is `Done`
+when its destination item is `Done`, or when the user confirms its judgment.
+
+```markdown
+### Review 進度表
+| ID | 發現 | 來源 | 嚴重度 | 處置 | 去處 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| CR01 | [Finding] | AI review | 🔴 | Correct specification | RQ18, T23 | Done |
+```
 
 ## Release (Trial)
 

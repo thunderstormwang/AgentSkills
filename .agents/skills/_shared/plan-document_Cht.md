@@ -24,6 +24,7 @@
 ## Pre Design Sync
 ## Design
 ## Task
+## Review
 ## Release
 ```
 
@@ -58,12 +59,13 @@
    變更時，在同次編輯更新受影響摘要。
 
 目的檔案範例包含 `{ticket}_req.md`、`{ticket}_pre_design_sync.md`、
-`{ticket}_design.md`、`{ticket}_task.md` 與 `{ticket}_release.md`。
+`{ticket}_design.md`、`{ticket}_task.md`、`{ticket}_review.md` 與
+`{ticket}_release.md`。
 名稱與文件數依變更而定，不是必要集合。
 
 ## 權威位置、ID 與狀態
 
-入口 plan 擁有 R／RQ、DQ、D、T／FT 與 RL 項目的進度表。
+入口 plan 擁有 R／RQ、DQ、D、T／FT、CR 與 RL 項目的進度表。
 詳細正式正文在檔案內或索引指定的位置。
 完整規格讀正文，狀態讀 plan 表格；
 索引摘要永遠不能覆蓋詳細規則。
@@ -104,6 +106,53 @@ FT 正文索引與進度列放在原始 `## Task` 下，
 既有 plan 使用 `## Follow-up Task` 時，
 將它保留為 Task 的索引延伸，而不是建立第二個狀態權威。
 重用已約定的位置；需要新檔案時確認位置。
+
+## Review（試行）
+
+Review 是針對實作所提出之發現的**追溯清單**：發現了什麼、如何判定、
+去了哪裡。它不規範修正方式；修正寫在該發現被分派到的 FT、RQ 或 D 項目中。
+它的主要價值在於記錄**沒有**產生變更的發現，讓之後的 review 輪次不再重複提出。
+
+本節為試行。下方結構是起點；依實務上 Review 真正需要的內容調整，
+並將這些經驗記錄於此。
+
+記錄所有來源的發現：merge 前的 code review（AI 或人工），
+以及 QA 或 UAT 期間回報的問題。不要貼上完整的 review 報告。
+
+候選子節；不適用的省略：
+
+| 子節 | 相關內容 |
+| :--- | :--- |
+| Review 輪次 | 每輪一行：日期、範圍（commit 區間或 Task ID）與來源（AI review、同事、QA、UAT） |
+| 發現 | 每個發現一個 `CR01`、`CR02`……：嚴重度、位置、一句話描述、處置與去處 |
+| 回饋至慣例 | 選填。當發現的成因是某個 skill 或專案慣例缺漏或錯誤時，註明哪一個應修改 |
+
+每個發現恰有一種處置：
+
+| 處置 | 適用時機 | 去處 |
+| :--- | :--- | :--- |
+| 修正（Fix） | 實作偏離其 Task、Design 或 Req | 新的 FT |
+| 修正規格（Correct specification） | Req、DQ 或 Design 本身錯誤或不完整 | 經 Backward Correction 新增 RQ，再產生新的 T 項目 |
+| 刻意設計（Deliberate） | 已有 Pre Design Sync 或 Design 決策涵蓋 | 引用 DQ／D ID；狀態 `Cancel` |
+| 接受風險（Accepted risk） | 已知且刻意不處理 | 寫明條件；需要監控時，新增 Release 上線後追蹤項目 |
+| 既有問題（Pre-existing） | 基底分支上已存在，且不在本變更範圍內 | 註明負責方或後續單號；狀態 `Pending` |
+
+分派為「修正規格」的發現，依所屬 skill 的 Backward Correction 處理；
+在此記錄並不會更新正式基準。
+
+新一輪 review 前，先讀既有發現。已判定為刻意設計、接受風險或既有問題的發現，
+除非程式碼或其前提已改變，否則不再提出。
+
+嚴重度使用 🔴 Bug（行為或資料錯誤）、🟡 Risk（目前正確但脆弱）、
+🟢 Minor（品質問題，無功能影響）。發現在其去處項目為 `Done`、
+或用戶確認其判定時，即為 `Done`。
+
+```markdown
+### Review 進度表
+| ID | 發現 | 來源 | 嚴重度 | 處置 | 去處 | 狀態 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| CR01 | [發現] | AI review | 🔴 | Correct specification | RQ18, T23 | Done |
+```
 
 ## Release（試行）
 

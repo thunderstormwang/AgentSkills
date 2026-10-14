@@ -201,11 +201,38 @@ var dto = new ProductBorderCacheDto(entity);
 ```
 
 ### Member Ordering
-1. Constants & Fields
-2. Constructors
-3. Properties
-4. Public Methods
-5. Private Methods (at the bottom)
+Follow the [Google C# Style Guide](https://google.github.io/styleguide/csharpguide.html) groups, in this order:
+1. Nested classes, enums, delegates, and events
+2. Static, const, and readonly fields
+3. Other fields and properties (including expression-bodied properties such as `public IUnitOfWork UnitOfWork => _context;`)
+4. Constructors and finalizers
+5. Methods
+
+Within each group:
+- Order by access level: `public` → `internal` → `protected internal` → `protected` → `private`. Private methods therefore end up at the bottom.
+- Within the same access level, place `static` members before instance members (StyleCop SA1204). Do not adopt StyleCop's other ordering rules; SA1201 puts constructors before properties, which contradicts group 3 → 4 above.
+- Keep interface implementations together where possible.
+
+Apply this to new files and newly added members. Do not reorder existing members of a file you are only modifying; the reordering diff obscures the real change in review.
+```csharp
+public class CouponGrossMarginRepository : ICouponGrossMarginRepository
+{
+    private readonly SpuContext _context;                  // 2. readonly field
+
+    public IUnitOfWork UnitOfWork => _context;            // 3. property
+
+    public CouponGrossMarginRepository(SpuContext context) // 4. constructor
+    {
+        _context = context;
+    }
+
+    public static bool IsValid(ICouponGrossMarginModel model) => model != null; // 5. public static
+
+    public async Task UpsertAsync(IEnumerable<ICouponGrossMarginModel> models) { } // 5. public
+
+    private void Apply(CouponGrossMarginEntity entity) { } // 5. private
+}
+```
 
 ### XML Documentation
 - **ALL public properties** in Entities MUST have `/// <summary>`.

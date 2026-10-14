@@ -201,11 +201,38 @@ var dto = new ProductBorderCacheDto(entity);
 ```
 
 ### 成員排序
-1. 常數與欄位
-2. 建構子
-3. 屬性
-4. 公開方法
-5. 私有方法 (置於底部)
+依循 [Google C# Style Guide](https://google.github.io/styleguide/csharpguide.html) 的分組,順序如下:
+1. 巢狀類別、enum、delegate 與 event
+2. static、const 與 readonly 欄位
+3. 其他欄位與屬性 (含 expression-bodied 屬性,例如 `public IUnitOfWork UnitOfWork => _context;`)
+4. 建構子與解構子 (finalizer)
+5. 方法
+
+每組之內:
+- 依存取層級排序: `public` → `internal` → `protected internal` → `protected` → `private`. 因此 private 方法會落在最底部.
+- 同一存取層級內,`static` 成員排在實例成員之前 (StyleCop SA1204). 不採用 StyleCop 其他的排序規則;SA1201 將建構子排在屬性之前,與上方第 3 → 4 組相牴觸.
+- 介面實作盡可能放在一起.
+
+套用於新檔案與新增的成員. 只是修改某個檔案時,不重排其既有成員;重排產生的 diff 會在 review 時掩蓋真正的變更.
+```csharp
+public class CouponGrossMarginRepository : ICouponGrossMarginRepository
+{
+    private readonly SpuContext _context;                  // 2. readonly 欄位
+
+    public IUnitOfWork UnitOfWork => _context;            // 3. 屬性
+
+    public CouponGrossMarginRepository(SpuContext context) // 4. 建構子
+    {
+        _context = context;
+    }
+
+    public static bool IsValid(ICouponGrossMarginModel model) => model != null; // 5. public static
+
+    public async Task UpsertAsync(IEnumerable<ICouponGrossMarginModel> models) { } // 5. public
+
+    private void Apply(CouponGrossMarginEntity entity) { } // 5. private
+}
+```
 
 ### XML 文件
 - 實體中**所有公開屬性**必須包含 `/// <summary>`.

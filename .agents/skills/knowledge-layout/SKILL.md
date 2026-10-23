@@ -53,9 +53,27 @@ documents: this tier should grow with the number of domains (slow), not the numb
 > Weak: "主題知識庫，處理相關領域前值得先查" — gives no trigger signal
 
 **A skill's `description` — trigger signals, not duties.**
-Fill it with the concrete nouns that will actually appear in a prompt or in the code being
-touched: class names, field names, endpoint names, symptom phrases ("某銀行看不到", "退點算
-錯"). State what it does *not* cover, to keep it from stealing neighbouring skills' triggers.
+Fill it with the words that will actually appear in a prompt, and stop at the level of a class
+or interface. It is matched when the request arrives, before the model has read any code, so
+list the names people say and the boundaries they point at:
+
+| Layer | List it? | Examples |
+| :--- | :--- | :--- |
+| Business terms and symptom phrases | **Yes — the most important** | "試算", "券擇一", "折上折", "某銀行看不到", "退點算錯" |
+| Public contracts: routes, serialized response fields, enum types | Yes — they rarely get renamed | `evaluate_order_discount`, `discount_trace`, `CouponType` |
+| Folders, classes, interfaces | Yes — people type them | `Service/Applicability`, `CalculateDiscountService` |
+| Members: methods, properties, fields, constants | **No** | `IsFirstBuyExcludable`, `UsableByAmount` |
+
+Members stay out for three reasons: a rename or move leaves a dead word that nothing flags;
+people rarely type them in a request; and the business term for the same concept is already
+in the list. They belong in the skill body and `docs/`, where a grep-verify keeps them current.
+For a service with an interface and an implementation, list the class name without the `I`
+prefix — it is a substring of the interface name, so one entry covers both.
+
+Keep it short: the `description` is in context every session, and a long list dilutes the
+match. State what it does *not* cover, to keep it from stealing neighbouring skills' triggers.
+A `description` only raises the odds of loading, it never guarantees it — for "must read
+before touching X", the guarantee is the `CLAUDE.md` index line (see the mechanics above).
 
 **`docs/` filenames — the filename is the description.**
 It is all that is visible from an `ls`. `TapPay請款退款時間序知識庫.md` is findable;
@@ -91,13 +109,14 @@ It is all that is visible from an `ls`. `TapPay請款退款時間序知識庫.md
 | A pure "index skill" | An index must fire *before* the topic is known; a skill fires only *after* a description matches, so it arrives too late or never |
 | Content (not an index line) in `CLAUDE.md` | Index lines are cheap; prose is what makes it bloat. When it gets long, move the prose out and keep the index |
 | Imperatives stuffed into a `description` | Does not raise hit rate; the obligation belongs in `CLAUDE.md` |
+| Member names (methods, properties, constants) in a `description` | A rename leaves a dead word with no failing check; the business term already triggers the same load |
 | A doc with a vague filename | Unreachable in practice |
 
 ## Reshaping an existing skill into this form
 
 1. Split the body into *why* (keep) and *what the code does* (delete — it is in the code).
 2. Move long reference material into `docs/`, leave a sub-index table at the top of the skill.
-3. Rewrite the `description` as trigger signals; add a "not applicable to …" clause.
+3. Rewrite the `description` as trigger signals — business terms, routes, folders, classes, never members; add a "not applicable to …" clause.
 4. Replace any line numbers with class/method names; grep-verify each name.
 5. Ensure `CLAUDE.md` has exactly one line for the domain, phrased as *when to read*.
 6. Record anything with no code boundary in the decisions/dead-code log instead.

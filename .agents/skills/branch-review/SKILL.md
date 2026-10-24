@@ -22,13 +22,15 @@ Matching the Task checklist only tells you *what was done*. The real review vali
 You always review a **whole feature branch against its base**, with multi-agent fan-out. The only variable is whether the branch has a plan: with a plan you review against it too (Layers 0–2); without one you review from code alone (Layers 3–6).
 
 1. **Source the change (git, not a PR host).** `git diff <base>...HEAD` (three-dot; base defaults to `origin/main`, fall back to `main`). Works on any host (GitHub, Gitea, self-hosted). Review committed work, not uncommitted local tinkering.
+   - **Scoping to one author (optional).** When the user wants only their own changes reviewed on a branch that also carries other people's commits, do not use the raw range diff. Compute final-state line ownership: for each changed file run `git blame -w -M <merge-base>..HEAD -- <file>` and keep the lines whose commit lies inside the range and is authored by that person (boundary lines belong to the base; commits merged in from other branches keep their own authors, so they drop out naturally). Cluster the files that contain such lines and give every subagent its file list with the line ranges. Subagents read the whole file for context but report only on those lines; a problem that arises from the interaction between those lines and someone else's code is flagged `interaction`, naming both sides. State in the report how many files and lines were in scope and what was left out (other authors' code, documents).
 2. **Detect a plan.** Discover a plan / feature doc in the repo (e.g. a `plan.md` / feature doc under `docs/`) — don't hardcode a path.
    - **Plan found → plan-based review:** all layers apply, including the plan layers (0–2).
    - **No plan → code-only review:** skip Layers 0–2; rely on Layers 3–6 and infer Design intent from the code and commit messages.
 3. **Load Layer 0 once, in the orchestrator (plan only).** Read the plan top-down yourself *before* fanning out — especially Pre Design Sync (deliberate decisions are not bugs). Follow any links from the plan to supporting Pre Design Sync documents and treat their DQ details as part of Layer 0. Pass the relevant Task / Design excerpts, and the prior Review findings for each subagent's files, down to each subagent rather than having all of them re-read and re-interpret the whole plan.
+   - **Run Layer 1 yourself** against the final state (or hand it to one dedicated subagent given the whole Task table). Cluster subagents see only their slice of the Task table and in practice check it partially, so a "no Task was silently dropped" conclusion cannot rest on them. If Layer 1 was not done in full, say so in the report.
 4. **Fan out — read-only subagents.** A finished branch can touch 100+ files; don't review it in one pass. Cluster the changed files by directory / layer / aggregate and spawn one read-only review subagent per cluster (cap ~5–6; batch if more). Each subagent:
    - loads any project coding-convention / architecture skill covering its slice — that skill is the single source of those conventions, so do not restate them here;
-   - applies Layers 1–6 to its slice (Layers 1–2 only when a plan exists);
+   - applies Layers 3–6 to its slice, plus Layer 2 when a plan exists (Layer 1 stays with the orchestrator, see step 3);
    - reads enough surrounding context to reason — **not diff-only**, which is what misses the deep concurrency / data-flow bugs;
    - adversarially self-checks each finding, and returns `file:line` + concrete failure scenario + confidence (HIGH/MED/LOW).
 5. **Synthesize.** Dedupe into one report and verify every MED+/🔴 finding against the code yourself before presenting. Drop any finding that repeats a prior Review finding judged Deliberate, Accepted risk, or Pre-existing, unless the code or its premise changed since that judgment; when one did change, say what changed. A finding that matches a prior finding still open is reported against that CR ID, not as new.
@@ -154,8 +156,14 @@ Check for quality issues beyond correctness:
 | Wrong abstraction level | Handler assembling SQL; Cache knowing Job schedules |
 | Too many constructor dependencies | > 5–6 is a signal |
 | Inconsistency with existing patterns | New code diverges from how the rest of the codebase handles the same concern |
+| Test name wider or narrower than its body | The title claims "any source" but one source is exercised; the title says something is not logged but nothing asserts it |
+| Assertion that cannot fail | A string every branch prints; `BeNullOrEmpty` on a result a mock always returns empty; `It.IsAny` on every argument of the call under test |
+| Assertion bound to presentation | A behavior test reads a formatted trace or log string instead of the structured data behind it, so a layout change breaks it |
+| Duplicate test cases | Two tests with the same arrange and assert |
 
 > Distinguish between **newly introduced smells** (must flag) and **pre-existing smells** (note but do not block).
+>
+> For test code, also apply the **Testing** rules in the `coding-style` skill's language reference (what to assert, weak assertions, mutation check).
 
 ---
 

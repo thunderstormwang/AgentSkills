@@ -265,3 +265,16 @@ result.TotalCount.Should().Be(2);
 failed.Success.Should().BeFalse();
 result.Results.Should().ContainSingle(r => r.MemberId == 2);
 ```
+
+### What to assert
+- Assert **structured output** (return values, events, enums, constants), not text formatted for people (trace strings, log lines). A change of layout must break only the formatter's own tests. When a service reports its reasons through a collaborator (a recorder, a logger), substitute a fake that just collects what it receives and assert those events.
+- A correct return value does not prove *why*. When several conditions can produce the same outcome (an item missing from a result list, a rejection code), pair every exclusion case with a baseline that passes and differs in only that one condition. Where the order of checks matters, make two conditions true at once and assert which one wins.
+
+### Names and weak assertions
+- A test name (`DisplayName`) must say exactly what the body checks — no wider (claims "any source" but exercises one) and no narrower.
+- No assertion that cannot fail: a string every branch prints, `BeNullOrEmpty` on a result a mock always returns empty, `It.IsAny` for every argument of the call under test (`Verify` the ones that matter: id, context, time).
+- Mocks of two methods that return the same value hide which one was called; give them different values.
+- Merge duplicate cases; keep one per behavior.
+
+### Prove the test can fail
+- After adding or rewriting a test, temporarily break the production code it guards (swap a constant, drop a condition, reorder two checks) and confirm the test goes red, then revert. A test that stays green under the mutation does not guard that behavior.

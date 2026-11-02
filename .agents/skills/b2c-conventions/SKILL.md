@@ -132,6 +132,53 @@ When merging or removing handlers, compare the old and new group identities and 
 progress to identify events that may be missed or replayed. An unchanged topic and partition
 count do not mean the subscription's processing progress is preserved.
 
+## Querying service logs
+
+Every B2C service writes its logs through NLog to one shared log cluster, `prod-log-es` — the
+`prod` in the name is historical; SIT, UAT, and Prod all write to it, separated only by index:
+`log-backend-{sit|uat|prod}-yyyy.MM.dd`.
+
+- **The cluster is OpenSearch 2.15, not Elasticsearch.** `GET /` reports `version.number`
+  `7.10.2` because a compatibility setting is on for Elastic clients (NLog uses
+  `Elastic.NLog.Targets`); the tagline (`The OpenSearch Project`) and `lucene_version` (`9.10.0`)
+  give it away. The team calls it "ES" anyway.
+- **Port 9200 is unreachable from the user's machine** (firewalled; DNS resolves fine). So an
+  OpenSearch MCP server cannot connect, and the `backend_log` credentials in the repos' nlog
+  configs are no use either.
+- **Query through OpenSearch Dashboards' Dev Tools proxy instead** — exactly what the browser
+  does behind Dev Tools:
+  ```
+  POST https://prod-log-es-kibana.pxec.com.tw/api/console/proxy?path=<URL-encoded cluster path>&method=<GET|POST>
+  Authorization: Basic <user:pass>
+  osd-xsrf: true
+  ```
+  `path` is the path you would type in Dev Tools, with `/` encoded as `%2F` (e.g.
+  `log-backend-sit-*%2F_search`); the request body passes through unchanged.
+- **Credentials are the user's own Dashboards login**, kept in the user environment variables
+  `OSD_USER` / `OSD_PASS`. Reference them as `$env:OSD_USER` / `$env:OSD_PASS` inside commands;
+  never print them or ask the user to paste them. Permissions are the user's own: `_search`
+  and `_field_caps` work; `_cat/indices` and `_mapping` are denied.
+- **Discover fields with `_field_caps`, not `_mapping`**: `GET <index>/_field_caps?fields=*`
+  returns every field name and type (encode `?` and `=` in `path` as `%3F` and `%3D`). Check it
+  before querying a field you have not used yet — fields come from many services and differ by
+  day. The response has keys differing only in case (e.g. `labels.Date` vs `labels.date`), so in
+  PowerShell parse it with `ConvertFrom-Json -AsHashtable`.
+- **Filter by service with `service.name.keyword`**, whose value is the project name, e.g.
+  `PXBox.Coupon.API`. Text fields cannot be sorted or aggregated — use their `.keyword` sub-field.
+  Other useful fields: `@timestamp`, `log.level.keyword`, `log.logger.keyword`, `message`,
+  `trace.id.keyword` (same request across services), and `error.type` / `error.message` /
+  `error.stack_trace`.
+- **Structured log parameters become fields.** A message-template call such as
+  `LogInformation("... {ProductId}", id)` stores each parameter as `labels.<Name>` (e.g.
+  `labels.ProductIds`, `labels.BatchId`), filterable exactly, and keeps the unformatted template
+  in `MessageTemplate.keyword` for counting occurrences of one log statement. String-interpolated
+  calls (`$"..."`) produce only `message`, so search those with `match_phrase` on `message`.
+- Always add a `@timestamp` range — indices are daily, so an unbounded query scans every day.
+- On error, the response repeats the same failure once per shard; read only
+  `error.root_cause[0]`.
+- **Query SIT and UAT only.** Query Prod indices only when the user explicitly asks — they can
+  contain member data.
+
 ## Invoice issuance: per sub-order → per parent order
 
 Originally invoices were issued **per sub-order**: an order split into N sub-orders produced N

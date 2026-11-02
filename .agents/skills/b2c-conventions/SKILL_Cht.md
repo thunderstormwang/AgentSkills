@@ -119,6 +119,44 @@ EventHandler 上線後若更改命名空間或類別名稱，其 consumer group 
 合併或移除 handler 時，應比較新舊 group 的識別與消費進度，以辨識可能漏掉或重播的事件。
 topic 與 partition 數量不變，不代表訂閱的處理進度會被保留。
 
+## 查詢服務 log
+
+每個 B2C 服務都透過 NLog 把 log 寫進同一個共用的 log 叢集 `prod-log-es`——名稱中的 `prod` 是沿用
+下來的歷史名稱；SIT、UAT 與 Prod 都寫進這個叢集，只以 index 區分：
+`log-backend-{sit|uat|prod}-yyyy.MM.dd`。
+
+- **這個叢集是 OpenSearch 2.15，不是 Elasticsearch。** `GET /` 回報的 `version.number` 是
+  `7.10.2`，因為為了 Elastic 用戶端開啟了相容設定（NLog 使用 `Elastic.NLog.Targets`）；從
+  tagline（`The OpenSearch Project`）與 `lucene_version`（`9.10.0`）可以看出真身。團隊仍然習慣稱它為「ES」。
+- **從使用者的電腦連不到 9200 port**（被防火牆擋住；DNS 解析正常）。因此 OpenSearch MCP server
+  連不上，各 repo nlog 設定裡的 `backend_log` 帳密也派不上用場。
+- **改透過 OpenSearch Dashboards 的 Dev Tools 代轉端點查詢**——這正是瀏覽器在 Dev Tools 背後做的事：
+  ```
+  POST https://prod-log-es-kibana.pxec.com.tw/api/console/proxy?path=<URL 編碼後的叢集路徑>&method=<GET|POST>
+  Authorization: Basic <user:pass>
+  osd-xsrf: true
+  ```
+  `path` 是在 Dev Tools 中會輸入的路徑，其中 `/` 要編碼為 `%2F`（例如
+  `log-backend-sit-*%2F_search`）；request body 原樣傳遞。
+- **帳密是使用者本人的 Dashboards 登入帳號**，存放在使用者環境變數 `OSD_USER`／`OSD_PASS`。在指令中
+  以 `$env:OSD_USER`／`$env:OSD_PASS` 引用；絕不印出，也不要請使用者貼上。權限與使用者本人相同：
+  `_search` 與 `_field_caps` 可用；`_cat/indices` 與 `_mapping` 會被拒絕。
+- **以 `_field_caps` 而非 `_mapping` 查詢有哪些欄位**：`GET <index>/_field_caps?fields=*`
+  會回傳每個欄位的名稱與型別（在 `path` 中，`?` 與 `=` 要編碼為 `%3F` 與 `%3D`）。查詢尚未用過的
+  欄位前先查一次——欄位來自許多服務，且每天不同。回應中有只差在大小寫的 key（例如 `labels.Date`
+  與 `labels.date`），因此在 PowerShell 中要以 `ConvertFrom-Json -AsHashtable` 解析。
+- **以 `service.name.keyword` 篩選服務**，其值為專案名稱，例如 `PXBox.Coupon.API`。text 欄位無法
+  排序或聚合——請改用其 `.keyword` 子欄位。其他實用欄位：`@timestamp`、`log.level.keyword`、
+  `log.logger.keyword`、`message`、`trace.id.keyword`（跨服務的同一個請求），以及 `error.type`／
+  `error.message`／`error.stack_trace`。
+- **結構化 log 的參數會成為欄位。** 像 `LogInformation("... {ProductId}", id)` 這種訊息範本寫法，
+  每個參數都會存成 `labels.<Name>`（例如 `labels.ProductIds`、`labels.BatchId`），可精確篩選；
+  未代入參數的範本則保留在 `MessageTemplate.keyword`，可用來統計同一句 log 出現的次數。字串插值
+  寫法（`$"..."`）只會產生 `message`，因此要以 `match_phrase` 搜尋 `message`。
+- 一律加上 `@timestamp` 範圍——index 是每天一個，不設範圍的查詢會掃過每一天。
+- 發生錯誤時，回應會對每個 shard 重複同一個錯誤；只讀 `error.root_cause[0]`。
+- **只查詢 SIT 與 UAT。** 只有在使用者明確要求時才查詢 Prod 的 index——其中可能含有會員資料。
+
 ## 發票開立：依子單改為依母單
 
 系統最初是**依子單**開立發票：一張訂單拆成幾個子單，就開出幾張發票。後來遭國稅局警告——消費者

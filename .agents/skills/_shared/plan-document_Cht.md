@@ -83,6 +83,8 @@ FT ID 跨母 plan 的任務群組指派，
 所屬 skill 控制階段 gate；
 `Pending` 不暗示允許跳過阻塞決策。
 實作完成停在 `Review`，不能自主驗收為 `Done`。
+僅限 T/FT 項目，`Done` 也可由 `task-acceptance` 技能依使用者委託設定；
+實作者絕不驗收自己的工作。
 
 沿用既有 plan，而表格位於拆分文件時，
 將受影響表格移到入口 plan，原位置改為回連。

@@ -20,7 +20,7 @@ For each identified `Todo` task, perform the following actions in sequence:
 #### A. Implementation & Coding Style
 - Call the `coding-style` skill to load project standards.
 - Apply code modifications based on the task's `Implementation Details`.
-- Adhere to the "Max 3 affected files" constraint and physical path specifications.
+- Follow the Task's `Affected Files` and physical path specifications; there is no fixed file-count limit.
 
 #### B. Validation & Stability
 - Execute project build commands (e.g., `dotnet build`, `npm run build`) to ensure **no compilation errors**.
@@ -36,16 +36,17 @@ For each identified `Todo` task, perform the following actions in sequence:
 - Modify only the Status column.
 
 ### 3. Iterative Workflow & Acceptance
-- **No Autonomous Acceptance**: The agent MUST NOT mark tasks as `Done` autonomously.
-- **User Confirmation**: Upon receiving user instruction (e.g., "T1-T5 are good, proceed with T6-T10"):
-    1.  Update the status of the reviewed tasks to `Done`.
-    2.  Automatically scan for the next batch of `Todo` tasks and repeat the **Main Execution Loop**.
+- **No Autonomous Acceptance**: The agent MUST NOT mark its own tasks as `Done`. Acceptance belongs to the user, or to the `task-acceptance` skill run by the dispatching session on the user's behalf.
+- **Next Batch**: Upon receiving an instruction to continue (e.g., "proceed with T6-T10"), scan for the next batch of `Todo` tasks and repeat the **Main Execution Loop**.
 
 ### 4. Final Report
-Once all `Todo` tasks in a batch are processed (or an unrecoverable error is encountered):
-- Compile a summary list of the execution results.
-- List the Commit SHA and affected files for each task.
-- Request the user to perform a final review and mark tasks as `Done`.
+Once all `Todo` tasks in a batch are processed (or an unrecoverable error is encountered), report the following. Acceptance is checked against this report, so give every item even when the answer is "none":
+- **Per task**: commit SHA, affected files, and what was implemented, mapped to the Task's Implementation Details items.
+- **Deviations**: every place the implementation differs from the Task body, and why.
+- **Changed existing assertions**: each pre-existing test assertion changed or removed, and the Task requirement that justifies it.
+- **Test counts**: passed / failed / skipped before the batch and after it.
+- **Uncertainties**: anything that needs a human judgment.
+- Leave the tasks at `Review`; they are marked `Done` only after acceptance.
 
 ## Usage
 

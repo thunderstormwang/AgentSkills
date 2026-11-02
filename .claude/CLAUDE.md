@@ -62,6 +62,14 @@ Ask the user where to save the plan file if no path is specified.
 3. Implement the plan step by step.
 4. After all steps are complete, **commit the changes**.
 
+### Accepting Subagent Work
+
+**Trigger rule:** when a subagent hands back code changes for plan Tasks (T or FT) — e.g.
+`implementation-agent` finishing a batch — load the `task-acceptance` skill **before reporting
+to the user**, even if the user did not ask for a check. Its summary replaces relaying the
+subagent's own report. This is per-batch acceptance only; the review after the whole plan is
+done stays user-led.
+
 ## Git Commit
 
 **Trigger rule:** if an operation will create or change a commit message, the `git-commit` skill

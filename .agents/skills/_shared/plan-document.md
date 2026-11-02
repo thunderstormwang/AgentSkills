@@ -76,7 +76,9 @@ Status meanings are shared: `Todo` unstarted, `InProgress` active/incomplete,
 `Review` ready for user review, `Done` user-confirmed, `Cancel` explicitly
 cancelled, and `Pending` explicitly deferred. The owning skill controls the
 phase gate; `Pending` is not implicit permission to bypass a blocking decision.
-Implementation finishes at `Review`, not autonomous acceptance as `Done`.
+Implementation finishes at `Review`, not autonomous acceptance as `Done`. For
+T/FT items only, `Done` may also be set by the `task-acceptance` skill acting
+on the user's delegation; the implementer never accepts its own work.
 
 When adopting an existing plan with tables in split documents, move the
 affected tables to the entry plan and replace their old location with a

@@ -52,5 +52,6 @@ For each assigned Task ID, the skill MUST follow this sequence:
 ## Guidelines
 - **Traditional Chinese**: Communicate with the user in Traditional Chinese.
 - **Atomicity**: One Task ID = One Commit. The commit MUST contain the task status update to `Review`.
-- **Acceptance**: Only the user marks reviewed tasks `Done`; implementation completion is not acceptance.
+- **Acceptance**: The implementer never marks its own tasks `Done`; implementation completion is not acceptance. Tasks become `Done` when the user confirms them, or when the `task-acceptance` skill accepts them on the user's delegation.
+- **Report**: When the assigned tasks finish or a Halt Condition stops them, report per task the commit SHA, affected files and what was implemented; deviations from the Task body; changed existing test assertions with their justification; test counts before and after; and uncertainties. Give every item even when the answer is "none" — acceptance is checked against this report.
 - **Minimal Intervention**: Aim for full autonomy; only request user intervention when the Fail-Safe conditions are met.

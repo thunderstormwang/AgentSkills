@@ -183,7 +183,7 @@ Every B2C service writes its logs through NLog to one shared log cluster, `prod-
 
 Originally invoices were issued **per sub-order**: an order split into N sub-orders produced N
 invoices. The tax authority warned that this misrepresented the transaction — the customer paid
-once but received several invoices. In mid-January 2014 the system switched to issuing **per
+once but received several invoices. In mid-January 2024 the system switched to issuing **per
 parent order**: one payment, one invoice.
 
 - `PXBox.Invoice.Service` is deprecated; `PXBox.InvoiceUnifier.Service` replaces it.

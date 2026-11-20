@@ -142,7 +142,20 @@ Every B2C service writes its logs through NLog to one shared log cluster, `prod-
   `7.10.2` because a compatibility setting is on for Elastic clients (NLog uses
   `Elastic.NLog.Targets`); the tagline (`The OpenSearch Project`) and `lucene_version` (`9.10.0`)
   give it away. The team calls it "ES" anyway.
-- **Query the cluster API directly** at `http://prod-log-es-01.pxec.com.tw:9200` (`02` and `03`
+- **Prefer the `opensearch-log` MCP server.** It is the official `opensearch-mcp-server-py`
+  (pinned `==0.12.0`, run via `uvx`), registered at user scope, pointed at the cluster below,
+  with credentials taken from `${OSD_USER}` / `${OSD_PASS}`. Only three read-only tools are
+  enabled — `SearchIndexTool` (max 100 hits per call), `CountTool`, and `MsearchTool`; all
+  three are in the user's `permissions.allow`, so they run without a prompt **even against
+  Prod indices** — the Prod rule below is the only guard. Its search tool's description says to
+  read mappings first; ignore that and use `_field_caps` over HTTP instead (see below).
+  - It takes 16–23 s to start (Python importing large packages, not the network), so the
+    user's settings set `MCP_TIMEOUT=60000`. If the session reports `opensearch-log` failed to
+    connect with `CONNECT_TIMEOUT`, fall back to HTTP for this session and tell the user;
+    restarting the session usually fixes it. Running `uv cache clean` deletes its cached
+    environment, so the next start re-downloads it and may time out once.
+- **Fall back to the cluster API over HTTP** when the MCP server is unavailable, or for calls it
+  doesn't expose (`_field_caps`): `http://prod-log-es-01.pxec.com.tw:9200` (`02` and `03`
   are nodes of the same cluster), with HTTP Basic auth — over the company network or VPN.
   Do not go through OpenSearch Dashboards: browser querying through Dashboards once overloaded
   its traffic, which is why the team moved to the direct API (PXBOX-28776). Keep queries small

@@ -128,7 +128,18 @@ topic 與 partition 數量不變，不代表訂閱的處理進度會被保留。
 - **這個叢集是 OpenSearch 2.15，不是 Elasticsearch。** `GET /` 回報的 `version.number` 是
   `7.10.2`，因為為了 Elastic 用戶端開啟了相容設定（NLog 使用 `Elastic.NLog.Targets`）；從
   tagline（`The OpenSearch Project`）與 `lucene_version`（`9.10.0`）可以看出真身。團隊仍然習慣稱它為「ES」。
-- **直接查詢叢集 API**：`http://prod-log-es-01.pxec.com.tw:9200`（`02` 與 `03` 是同一個叢集的節點），
+- **優先使用 `opensearch-log` MCP server。** 它是官方的 `opensearch-mcp-server-py`
+  （固定 `==0.12.0`，透過 `uvx` 執行），註冊在 user scope，指向下方的叢集，
+  帳密取自 `${OSD_USER}`／`${OSD_PASS}`。只啟用三個唯讀工具——`SearchIndexTool`（每次呼叫最多
+  100 筆）、`CountTool` 與 `MsearchTool`；三者都在使用者的 `permissions.allow` 中，因此**即使查詢
+  Prod 的 index** 也不會跳出確認——下方的 Prod 規則是唯一的防線。其搜尋工具的說明要求先讀
+  mapping；忽略這點，改以 HTTP 呼叫 `_field_caps`（見下方）。
+  - 它啟動需要 16–23 秒（Python 載入大型套件，而非網路），因此使用者的設定中設了
+    `MCP_TIMEOUT=60000`。若 session 回報 `opensearch-log` 以 `CONNECT_TIMEOUT` 連線失敗，
+    此 session 改用 HTTP 並告知使用者；重開 session 通常即可解決。執行 `uv cache clean` 會刪除
+    它的快取環境，下次啟動會重新下載，可能逾時一次。
+- **在 MCP server 無法使用時，或要呼叫它沒有提供的 API（`_field_caps`）時，改以 HTTP 呼叫叢集
+  API**：`http://prod-log-es-01.pxec.com.tw:9200`（`02` 與 `03` 是同一個叢集的節點），
   使用 HTTP Basic 認證——需在公司網路或 VPN 上。不要透過 OpenSearch Dashboards：過去透過
   Dashboards 以瀏覽器查詢曾把它的流量打爆，這正是團隊改為直接打 API 的原因（PXBOX-28776）。
   基於同樣的理由，查詢要壓小：先 `_count` 再 `_search`、`size` 要有上限，`_source` 只取需要的欄位。

@@ -128,21 +128,31 @@ topic 與 partition 數量不變，不代表訂閱的處理進度會被保留。
 - **這個叢集是 OpenSearch 2.15，不是 Elasticsearch。** `GET /` 回報的 `version.number` 是
   `7.10.2`，因為為了 Elastic 用戶端開啟了相容設定（NLog 使用 `Elastic.NLog.Targets`）；從
   tagline（`The OpenSearch Project`）與 `lucene_version`（`9.10.0`）可以看出真身。團隊仍然習慣稱它為「ES」。
-- **從使用者的電腦連不到 9200 port**（被防火牆擋住；DNS 解析正常）。因此 OpenSearch MCP server
-  連不上，各 repo nlog 設定裡的 `backend_log` 帳密也派不上用場。
-- **改透過 OpenSearch Dashboards 的 Dev Tools 代轉端點查詢**——這正是瀏覽器在 Dev Tools 背後做的事：
+- **直接查詢叢集 API**：`http://prod-log-es-01.pxec.com.tw:9200`（`02` 與 `03` 是同一個叢集的節點），
+  使用 HTTP Basic 認證——需在公司網路或 VPN 上。不要透過 OpenSearch Dashboards：過去透過
+  Dashboards 以瀏覽器查詢曾把它的流量打爆，這正是團隊改為直接打 API 的原因（PXBOX-28776）。
+  基於同樣的理由，查詢要壓小：先 `_count` 再 `_search`、`size` 要有上限，`_source` 只取需要的欄位。
+- **帳密是使用者本人的 Dashboards 登入帳號**，存放在使用者環境變數 `OSD_USER`／`OSD_PASS`；
+  同一組帳號可直接用於 9200 port。在指令中以 `$env:OSD_USER`／`$env:OSD_PASS` 引用；絕不印出，
+  也不要請使用者貼上。權限與使用者本人相同：`GET /`、`_search`、`_count` 與 `_field_caps` 可用；
+  `_cat/indices` 與 `_mapping` 會回 403。各 repo nlog 設定裡的 `backend_log` 帳密是用來寫入 log 的——
+  不要拿來查詢。
+- **連線檢查：** 不帶帳密執行 `curl.exe -v -sS --noproxy "*" --max-time 15
+  http://prod-log-es-01.pxec.com.tw:9200/`，應幾乎立即回傳 `401 Unauthorized`
+  （`Basic realm="OpenSearch Security"`）——401 代表叢集連得到。若 curl 顯示 `Connected` 與
+  `Request completely sent off`，之後卻以收到 0 byte 逾時，那次發生（2026-11-20）的問題出在使用者
+  本機——不是防火牆規則，因為同一時間、同一個 VPN 網段的同事拿到了 401，而且 infra 確認 VPN 規則
+  不會依使用者而不同。重新連線 VPN 或重新開機即解決。
+- **僅作為備案——Dashboards 的 Dev Tools 代轉端點**，在 9200 port 連不到且使用者同意使用時：
   ```
   POST https://prod-log-es-kibana.pxec.com.tw/api/console/proxy?path=<URL 編碼後的叢集路徑>&method=<GET|POST>
   Authorization: Basic <user:pass>
   osd-xsrf: true
   ```
   `path` 是在 Dev Tools 中會輸入的路徑，其中 `/` 要編碼為 `%2F`（例如
-  `log-backend-sit-*%2F_search`）；request body 原樣傳遞。
-- **帳密是使用者本人的 Dashboards 登入帳號**，存放在使用者環境變數 `OSD_USER`／`OSD_PASS`。在指令中
-  以 `$env:OSD_USER`／`$env:OSD_PASS` 引用；絕不印出，也不要請使用者貼上。權限與使用者本人相同：
-  `_search` 與 `_field_caps` 可用；`_cat/indices` 與 `_mapping` 會被拒絕。
+  `log-backend-sit-*%2F_search`，`?`／`=` 則編碼為 `%3F`／`%3D`）；request body 原樣傳遞。
 - **以 `_field_caps` 而非 `_mapping` 查詢有哪些欄位**：`GET <index>/_field_caps?fields=*`
-  會回傳每個欄位的名稱與型別（在 `path` 中，`?` 與 `=` 要編碼為 `%3F` 與 `%3D`）。查詢尚未用過的
+  會回傳每個欄位的名稱與型別。查詢尚未用過的
   欄位前先查一次——欄位來自許多服務，且每天不同。回應中有只差在大小寫的 key（例如 `labels.Date`
   與 `labels.date`），因此在 PowerShell 中要以 `ConvertFrom-Json -AsHashtable` 解析。
 - **以 `service.name.keyword` 篩選服務**，其值為專案名稱，例如 `PXBox.Coupon.API`。text 欄位無法
@@ -156,6 +166,9 @@ topic 與 partition 數量不變，不代表訂閱的處理進度會被保留。
 - 一律加上 `@timestamp` 範圍——index 是每天一個，不設範圍的查詢會掃過每一天。
 - 發生錯誤時，回應會對每個 shard 重複同一個錯誤；只讀 `error.root_cause[0]`。
 - **只查詢 SIT 與 UAT。** 只有在使用者明確要求時才查詢 Prod 的 index——其中可能含有會員資料。
+- **顯示任何 log 文字前先遮蔽個資。** 原始 `message` 與記錄下來的 request／response 內容可能含有
+  會員姓名、電話號碼、Email、地址、生日與 LINE UID——多數在 Prod，但 SIT／UAT 的測試資料也可能是
+  真實資料。印出結果前先遮蔽這些欄位，且絕不放進回覆、Jira 或 commit。
 
 ## 發票開立：依子單改為依母單
 

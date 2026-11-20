@@ -142,24 +142,38 @@ Every B2C service writes its logs through NLog to one shared log cluster, `prod-
   `7.10.2` because a compatibility setting is on for Elastic clients (NLog uses
   `Elastic.NLog.Targets`); the tagline (`The OpenSearch Project`) and `lucene_version` (`9.10.0`)
   give it away. The team calls it "ES" anyway.
-- **Port 9200 is unreachable from the user's machine** (firewalled; DNS resolves fine). So an
-  OpenSearch MCP server cannot connect, and the `backend_log` credentials in the repos' nlog
-  configs are no use either.
-- **Query through OpenSearch Dashboards' Dev Tools proxy instead** — exactly what the browser
-  does behind Dev Tools:
+- **Query the cluster API directly** at `http://prod-log-es-01.pxec.com.tw:9200` (`02` and `03`
+  are nodes of the same cluster), with HTTP Basic auth — over the company network or VPN.
+  Do not go through OpenSearch Dashboards: browser querying through Dashboards once overloaded
+  its traffic, which is why the team moved to the direct API (PXBOX-28776). Keep queries small
+  for the same reason: `_count` before `_search`, a bounded `size`, and only the `_source`
+  fields you need.
+- **Credentials are the user's own Dashboards login**, kept in the user environment variables
+  `OSD_USER` / `OSD_PASS`; the same account works on port 9200 directly. Reference them as
+  `$env:OSD_USER` / `$env:OSD_PASS` inside commands; never print them or ask the user to paste
+  them. Permissions are the user's own: `GET /`, `_search`, `_count`, and `_field_caps` work;
+  `_cat/indices` and `_mapping` return 403. The `backend_log` credentials in the repos' nlog
+  configs are for writing logs — don't use them for querying.
+- **Connectivity check:** `curl.exe -v -sS --noproxy "*" --max-time 15
+  http://prod-log-es-01.pxec.com.tw:9200/` without credentials should return `401 Unauthorized`
+  (`Basic realm="OpenSearch Security"`) almost immediately — 401 means the cluster is
+  reachable. If instead curl shows `Connected` and `Request completely sent off` but then times
+  out with 0 bytes received, the problem was local to the user's machine the one time it
+  happened (2026-11-20) — not a firewall rule, since a colleague in the same VPN subnet got 401
+  at the same time, and infra confirmed VPN rules don't differ per user. Reconnecting the VPN or
+  rebooting fixed it.
+- **Fallback only — Dashboards' Dev Tools proxy**, if port 9200 is unreachable and the user
+  agrees to use it:
   ```
   POST https://prod-log-es-kibana.pxec.com.tw/api/console/proxy?path=<URL-encoded cluster path>&method=<GET|POST>
   Authorization: Basic <user:pass>
   osd-xsrf: true
   ```
   `path` is the path you would type in Dev Tools, with `/` encoded as `%2F` (e.g.
-  `log-backend-sit-*%2F_search`); the request body passes through unchanged.
-- **Credentials are the user's own Dashboards login**, kept in the user environment variables
-  `OSD_USER` / `OSD_PASS`. Reference them as `$env:OSD_USER` / `$env:OSD_PASS` inside commands;
-  never print them or ask the user to paste them. Permissions are the user's own: `_search`
-  and `_field_caps` work; `_cat/indices` and `_mapping` are denied.
+  `log-backend-sit-*%2F_search`, and `?`/`=` as `%3F`/`%3D`); the request body passes through
+  unchanged.
 - **Discover fields with `_field_caps`, not `_mapping`**: `GET <index>/_field_caps?fields=*`
-  returns every field name and type (encode `?` and `=` in `path` as `%3F` and `%3D`). Check it
+  returns every field name and type. Check it
   before querying a field you have not used yet — fields come from many services and differ by
   day. The response has keys differing only in case (e.g. `labels.Date` vs `labels.date`), so in
   PowerShell parse it with `ConvertFrom-Json -AsHashtable`.
@@ -178,6 +192,10 @@ Every B2C service writes its logs through NLog to one shared log cluster, `prod-
   `error.root_cause[0]`.
 - **Query SIT and UAT only.** Query Prod indices only when the user explicitly asks — they can
   contain member data.
+- **Mask personal data before showing any log text.** Raw `message` and logged request/response
+  bodies can contain member names, phone numbers, email addresses, addresses, birthdays, and
+  LINE UIDs — mostly in Prod, but test data in SIT/UAT can be real too. Mask these fields
+  before printing results, and never put them in replies, Jira, or commits.
 
 ## Invoice issuance: per sub-order → per parent order
 

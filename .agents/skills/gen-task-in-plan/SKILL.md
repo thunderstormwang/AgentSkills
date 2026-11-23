@@ -59,7 +59,7 @@ links, and keep authoritative T/FT progress tables there even when bodies split.
 
 ### Step 2 — Verify Design is complete
 
-- Locate the **Design 進度表** in the plan
+- Locate the **Design 進度表** in the plan. In a plan worked in parts (see the plan conventions' Work in Parts), use the current part's table only; earlier parts' tasks are not regenerated
 - Applicable D items must be `Done`, explicitly `Cancel`, or explicitly non-blocking `Pending` with recorded conditions
 - If any required items are `Review` / `Todo` / `InProgress`, or `Pending` without a non-blocking agreement, notify the user and wait for confirmation
 
@@ -105,6 +105,8 @@ End with **Task 進度表**:
 | T01 | [Task 名稱] | D01 | None | Todo |
 | T02 | [Task 名稱] | D01, D02 | T01 | Todo |
 ```
+
+**In a plan worked in parts**: put the tasks and this table in the current part's `### Task` section, and use the plan's part-qualified IDs (for example `P2-T01`, referencing `P2-D01`). A task may depend on an earlier part's task by its full ID.
 
 **Incremental (after Backward Correction)**: Steps 2–4 apply to the changed D items only. Append new tasks continuing the existing `T` numbering. Do not reopen or rewrite implemented tasks — they record the specification at that time. Each new task references the corrected D IDs and names the triggering RQ in its Implementation Details. Optionally add a one-line pointer in the superseded task body to the new task.
 
@@ -241,7 +243,7 @@ Write the file with this header (use a relative path back to the original plan):
 
 #### 5c. Assign the next FT ID
 
-Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the original plan's ID pattern. Check all FT tables and indexed bodies under the entry plan for the highest number; if none exists, start at `FT01`. Do not restart numbering for each split file.
+Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the original plan's ID pattern. Check all FT tables and indexed bodies under the entry plan for the highest number; if none exists, start at `FT01`. Do not restart numbering for each split file. In a plan worked in parts, the FT belongs to the part whose Tasks it follows up and carries that part in its ID per the plan's scheme (for example `P2-FT01`); number FTs within that part.
 
 #### 5d. Append the task detail block to the chosen body location
 

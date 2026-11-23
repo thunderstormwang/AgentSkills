@@ -47,6 +47,16 @@ Discuss the approach before generating FT tasks. Simple renames, comments,
 and straightforward follow-ups can go directly to `gen-task-in-plan`; not
 every FT needs a separate design discussion.
 
+### Design in Parts
+
+When the confirmed Req is too large to discuss in one pass, propose designing
+it in parts, as defined in the plan conventions' Work in Parts section. Each part
+picks a subset from the deferred-item pool and runs its own Pre Design Sync and
+Design under the shared Req. Leaving items in the pool is a valid outcome; do
+not pull every remaining item into the current part. Inherit earlier parts'
+confirmed DQ and D conclusions instead of re-discussing them. Record the part's
+scope and the plan's part/ID scheme in the entry plan before its first DQ.
+
 ## Formal Documents Must Not Depend on Exploration Materials
 
 Req, Pre Design Sync, and Design must not reference requirement source-text,
@@ -71,6 +81,8 @@ Do not split merely to meet a line count.
 Populate `## Pre Design Sync` in the entry plan for unresolved technical choices affecting
 architecture, ownership, data models, caching, contracts, or integrations.
 Use one `DQ01`, `DQ02`, ... per decision. Do not produce the Design section yet.
+In a plan worked in parts, use the part-qualified IDs and the per-part sections
+defined in the plan conventions (for example `P2-DQ01`).
 
 For each DQ:
 
@@ -196,8 +208,9 @@ omit unnecessary Test Plan/TC artifacts but retain Validation Strategy.
 
 ### Design Confirmation
 
-Use `D01`, `D02`, ... for the actual design sections and end the entry plan's
-Design section with this table, even when the bodies are split:
+Use `D01`, `D02`, ... (part-qualified in a plan worked in parts, such as
+`P2-D01`) for the actual design sections and end the entry plan's Design
+section with this table, even when the bodies are split:
 
 ```markdown
 ### Design 進度表

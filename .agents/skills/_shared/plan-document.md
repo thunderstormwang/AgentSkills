@@ -27,6 +27,11 @@ Keep these top-level sections in order:
 ## Release
 ```
 
+A plan carried out in parts (see [Work in Parts](#work-in-parts)) keeps `## Req`,
+`## Review`, and `## Release` once, and replaces the single Pre Design Sync /
+Design / Task trio with one `## Part N: [scope]` section per part, each holding
+its own `### Pre Design Sync`, `### Design`, and `### Task`.
+
 Build the content incrementally. Future sections may be marked not started;
 do not invent Req, decisions, Design, or tasks to fill the outline.
 Populate existing headings when their phase begins; do not append a duplicate
@@ -67,10 +72,13 @@ Detailed formal bodies live either inline or at the indexed location.
 Read the body for the full specification and the plan table for status; an
 index summary never overrides a detailed rule.
 
-Use stable IDs. Follow-up DQ/D groups may keep their local IDs when their
+Use stable IDs. Every ID must be unique within the plan, so that searching for
+it finds exactly one section. Follow-up DQ/D groups may keep their local IDs when their
 document/group is explicit in the index and references. Assign FT IDs across
 the parent plan's task groups, checking existing indexed bodies as well as
-tables; do not create an ambiguous duplicate FT ID in a new file.
+tables; do not create an ambiguous duplicate FT ID in a new file. A plan worked
+in parts carries the part number in its DQ, D, T, and FT IDs; see
+[Work in Parts](#work-in-parts).
 
 Status meanings are shared: `Todo` unstarted, `InProgress` active/incomplete,
 `Review` ready for user review, `Done` user-confirmed, `Cancel` explicitly
@@ -99,6 +107,44 @@ follow-up subsection when useful. A separate FT file is allowed for readability,
 not required for every small task. If an existing plan uses `## Follow-up Task`,
 retain it as an indexed extension of Task rather than creating a second status
 owner. Reuse agreed destinations; confirm a new file location when necessary.
+
+## Work in Parts
+
+A large requirement can be designed and delivered in **parts** instead of all at
+once, so each discussion stays small enough to follow. The Req is confirmed once;
+each part then picks a subset of the work and runs its own Pre Design Sync →
+Design → Task. Not every deferred item has to be designed or delivered: a part
+covers only what it picked, and the rest can stay deferred.
+
+- **Shared across parts:** Req (R/RQ), AC, and TC. A later part reuses them and
+  extends TC for its own scope. It inherits earlier parts' confirmed DQ and D
+  conclusions without re-discussing them, and may cite their IDs.
+- **Per part:** its own Pre Design Sync, Design, and Task, each with its own
+  progress table under that part's `## Part N` section in the entry plan. Each
+  part passes its own gates; starting a later part does not reopen an earlier
+  one. A genuine conflict with an earlier conclusion follows the owning skill's
+  Backward Correction.
+- **Deferred-item pool:** keep work not yet assigned to a part in one indexed
+  backlog (a section or a separate document). When a part picks an item, mark the
+  item with that part and point to the part's Design section.
+- **Split bodies** use a part suffix, such as `{ticket}_design_01.md` and
+  `{ticket}_task_02.md`. Each part section in the plan links to its own bodies.
+- **Record the scheme** in a short section of the entry plan: how parts are
+  chosen, the file suffixes, and the ID format. Later readers rely on it.
+
+### IDs in a plan worked in parts
+
+DQ, D, T, and FT IDs carry the part number so that no two parts share an ID.
+R, RQ, AC, CR, and RL IDs belong to shared sections and carry no part number.
+
+| Situation | ID format |
+| :--- | :--- |
+| Planned in parts from the start | Prefix every DQ, D, T, and FT ID with the part: `P1-DQ01`, `P1-D02`, `P2-T03`, `P2-FT01` |
+| Switched to parts partway | Leave the first part's existing IDs unchanged, since commits and documents already cite them. From the second part on, mark the part in the ID: `P2-DQ01` by default |
+| The plan already records a scheme | Keep it (for example `DQ2-01`, `T2-03`); do not mix two formats in one plan |
+
+Number each item type from `01` within its part. Dependencies and references
+always use the full ID, including the part.
 
 ## Review (Trial)
 
@@ -210,6 +256,9 @@ the team does not prescribe specific test data.
 - Hand off the entry plan path, relevant IDs, and body locations. Update status
   only in the entry plan, keeping affected body/summary edits together. An
   implementation commit includes its code/document changes and plan status.
+- In a plan worked in parts, find and update items by their full ID including
+  the part (`P2-T03`, `T2-03`), and only within that part's section and bodies.
+  A bare `T03` may also exist in another part.
 
 ## Decision Explanations and Change Reporting
 

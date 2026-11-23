@@ -118,7 +118,7 @@ Once the Req is confirmed, the work after it is organized in **parts** by
 default, so each discussion stays small enough to follow. Each part picks a
 subset of the work and runs its own Pre Design Sync → Design → Task. Not every
 deferred item has to be designed or delivered: a part covers only what it
-picked, and the rest can stay deferred.
+picked, and the rest can stay deferred within its agreed delivery constraints.
 
 Use this structure even when the whole change looks like it fits in one part.
 Part 1 starts with part-numbered file names and IDs, so adding a second part
@@ -134,8 +134,7 @@ and other documents already cite.
   one. A genuine conflict with an earlier conclusion follows the owning skill's
   Backward Correction.
 - **Deferred-item pool:** keep work not yet assigned to a part in one indexed
-  backlog (a section or a separate document). When a part picks an item, mark the
-  item with that part and point to the part's Design section.
+  backlog shared across parts; see [Backlog](#backlog).
 - **Split bodies** always use a part suffix, starting with `_01` for Part 1,
   such as `{ticket}_pre_design_sync_01.md`, `{ticket}_design_01.md`, and
   `{ticket}_task_01.md`; Part 2 uses `_02`. Each part section in the plan links
@@ -143,6 +142,40 @@ and other documents already cite.
   separate files when inline content is sufficient.
 - **Record the scheme** in a short section of the entry plan: how parts are
   chosen, the file suffixes, and the ID format. Later readers rely on it.
+
+### Backlog
+
+The backlog records deferred work, not a second plan or a new Req. Keep short
+content in an indexed section of the entry plan; split longer content into a
+linked document such as `{ticket}_backlog.md`, with a backlink to the entry
+plan. It is shared across parts and has no part suffix.
+
+Give each item a stable ID (for example `L01`; preserve an existing scheme),
+its scope and deferral reason, formal references where available, interim
+behavior or risk, intended delivery timing or trigger, and disposition.
+Mark unknown timing explicitly rather than inventing a deadline. Record hard
+constraints such as "before production release" separately from a tentative
+schedule: deferred from this part does not mean optional for release.
+
+Before creating or updating a part's Design or Task, implementing its work, or
+reviewing it, read the indexed backlog and establish which items the part
+includes. Do not silently add unselected items to Design, Task, or code.
+If current work depends on a deferred item, surface the conflict and resolve
+the scope or prerequisite through the owning skill's confirmation flow.
+
+When an item is selected, keep its backlog ID and record the owning part with
+a link to that part's Design section. Retain the row for traceability rather
+than deleting it or duplicating its full design in the backlog. Selection is
+not completion: DQ/D/T progress remains authoritative in the entry plan's
+owning part tables; the backlog tracks disposition and destination, not a
+second copy of implementation progress.
+
+In reviews, do not report an explicitly deferred, unselected item as missing
+from the current part when its interim behavior matches the agreement. Still
+report a dependency that makes the current part unworkable, a missed binding
+delivery constraint, or behavior beyond the recorded interim risk; cite the
+backlog ID and explain the conflict. Do not treat an unselected item or its
+AC as passed merely because it is deferred.
 
 ### IDs
 

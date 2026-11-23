@@ -26,7 +26,7 @@ You always review a **whole feature branch against its base**, with multi-agent 
 2. **Detect a plan.** Discover a plan / feature doc in the repo (e.g. a `plan.md` / feature doc under `docs/`) — don't hardcode a path.
    - **Plan found → plan-based review:** all layers apply, including the plan layers (0–2).
    - **No plan → code-only review:** skip Layers 0–2; rely on Layers 3–6 and infer Design intent from the code and commit messages.
-3. **Load Layer 0 once, in the orchestrator (plan only).** Read the plan top-down yourself *before* fanning out — especially Pre Design Sync (deliberate decisions are not bugs). Follow any links from the plan to supporting Pre Design Sync documents and treat their DQ details as part of Layer 0. Pass the relevant Task / Design excerpts, and the prior Review findings for each subagent's files, down to each subagent rather than having all of them re-read and re-interpret the whole plan.
+3. **Load Layer 0 once, in the orchestrator (plan only).** Read the plan top-down yourself *before* fanning out — especially Pre Design Sync (deliberate decisions are not bugs). Follow any links from the plan to supporting Pre Design Sync documents and treat their DQ details as part of Layer 0. Pass the relevant Task / Design excerpts, backlog scope and interim-risk agreements, and the prior Review findings for each subagent's files, down to each subagent rather than having all of them re-read and re-interpret the whole plan.
    - **Run Layer 1 yourself** against the final state (or hand it to one dedicated subagent given the whole Task table). Cluster subagents see only their slice of the Task table and in practice check it partially, so a "no Task was silently dropped" conclusion cannot rest on them. If Layer 1 was not done in full, say so in the report.
 4. **Fan out — read-only subagents.** A finished branch can touch 100+ files; don't review it in one pass. Cluster the changed files by directory / layer / aggregate and spawn one read-only review subagent per cluster (cap ~5–6; batch if more). Each subagent:
    - loads any project coding-convention / architecture skill covering its slice — that skill is the single source of those conventions, so do not restate them here;
@@ -53,6 +53,18 @@ Read the plan document top-down **before touching any code**:
 3. **Design** — Understand *what the structure and contracts should look like*.
 4. **Task** — Use as the checklist of expected changes.
 5. **Review** — Read the prior findings (`CR` items) and their dispositions. A finding judged Deliberate, Accepted risk, or Pre-existing is already decided; do not raise it again unless the code or its premise has changed. A plan without a Review section simply has no prior findings.
+
+Also read any indexed **backlog**, inline or linked, before assessing completeness
+or Acceptance Criteria. Establish which parts the review covers and which backlog
+items they selected. An explicitly deferred, unselected item is not a missing
+implementation when its interim behavior matches the agreement; cite its ID if
+needed for scope clarity, without marking the item or its AC as passed.
+Selection into a part is not completion: check that part's Design and Task.
+Still report dependencies that make the reviewed work unworkable, missed binding
+delivery constraints, or behavior beyond the recorded interim risk. Judge timing
+against the review's target milestone: "before production" does not mean "required
+in the first UAT part." If the milestone is unclear and changes the verdict,
+clarify it rather than silently treating all deferred work as optional or overdue.
 
 > ⚠️ Skipping Pre Design Sync is the most common cause of false positives in code review. A design choice that looks "wrong" often has a documented reason in Pre Design Sync.
 

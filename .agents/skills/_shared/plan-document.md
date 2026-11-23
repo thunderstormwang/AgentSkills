@@ -20,17 +20,21 @@ Keep these top-level sections in order:
 # [Plan title]
 
 ## Req
-## Pre Design Sync
-## Design
-## Task
+## Part 1: [scope]
+### Pre Design Sync
+### Design
+### Task
 ## Review
 ## Release
 ```
 
-A plan carried out in parts (see [Work in Parts](#work-in-parts)) keeps `## Req`,
-`## Review`, and `## Release` once, and replaces the single Pre Design Sync /
-Design / Task trio with one `## Part N: [scope]` section per part, each holding
-its own `### Pre Design Sync`, `### Design`, and `### Task`.
+Every plan is organized in parts from the start (see
+[Work in Parts](#work-in-parts)), even when only one part is expected.
+`## Req`, `## Review`, and `## Release` appear once; each part adds its own
+`## Part N: [scope]` section, placed after the previous part, with its own
+`### Pre Design Sync`, `### Design`, and `### Task`. Plans created before this
+convention may still use a single `## Pre Design Sync` / `## Design` /
+`## Task` trio; keep that layout until they add a second part.
 
 Build the content incrementally. Future sections may be marked not started;
 do not invent Req, decisions, Design, or tasks to fill the outline.
@@ -59,9 +63,9 @@ When splitting:
 4. Update the body location and index together. Use one canonical detailed body
    per item; when it changes, update any affected summary in the same edit.
 
-Example destinations include `{ticket}_req.md`, `{ticket}_pre_design_sync.md`,
-`{ticket}_design.md`, `{ticket}_task.md`, `{ticket}_review.md`, and
-`{ticket}_release.md`. Names and
+Example destinations include `{ticket}_req.md`, `{ticket}_pre_design_sync_01.md`,
+`{ticket}_design_01.md`, `{ticket}_task_01.md`, `{ticket}_review.md`, and
+`{ticket}_release.md`; per-part bodies always carry the part suffix. Names and
 document count are change-specific, not a required set.
 
 ## Authority, IDs, and Status
@@ -76,9 +80,8 @@ Use stable IDs. Every ID must be unique within the plan, so that searching for
 it finds exactly one section. Follow-up DQ/D groups may keep their local IDs when their
 document/group is explicit in the index and references. Assign FT IDs across
 the parent plan's task groups, checking existing indexed bodies as well as
-tables; do not create an ambiguous duplicate FT ID in a new file. A plan worked
-in parts carries the part number in its DQ, D, T, and FT IDs; see
-[Work in Parts](#work-in-parts).
+tables; do not create an ambiguous duplicate FT ID in a new file. DQ, D, T, and
+FT IDs carry the part number; see [Work in Parts](#work-in-parts).
 
 Status meanings are shared: `Todo` unstarted, `InProgress` active/incomplete,
 `Review` ready for user review, `Done` user-confirmed, `Cancel` explicitly
@@ -102,19 +105,25 @@ grouped by optimization and linked to their formal bodies. Their authoritative
 DQ/D tables also remain in the original plan. Keep a local follow-up design's
 Pre Design Sync and Design together without duplicating the entire Req.
 
-Index FT bodies and their progress rows under the original `## Task`, using a
-follow-up subsection when useful. A separate FT file is allowed for readability,
+Index FT bodies and their progress rows under the owning part's `### Task`
+(the original `## Task` in a legacy plan), using a follow-up subsection when useful.
+A separate FT file is allowed for readability,
 not required for every small task. If an existing plan uses `## Follow-up Task`,
 retain it as an indexed extension of Task rather than creating a second status
 owner. Reuse agreed destinations; confirm a new file location when necessary.
 
 ## Work in Parts
 
-A large requirement can be designed and delivered in **parts** instead of all at
-once, so each discussion stays small enough to follow. The Req is confirmed once;
-each part then picks a subset of the work and runs its own Pre Design Sync →
-Design → Task. Not every deferred item has to be designed or delivered: a part
-covers only what it picked, and the rest can stay deferred.
+Once the Req is confirmed, the work after it is organized in **parts** by
+default, so each discussion stays small enough to follow. Each part picks a
+subset of the work and runs its own Pre Design Sync → Design → Task. Not every
+deferred item has to be designed or delivered: a part covers only what it
+picked, and the rest can stay deferred.
+
+Use this structure even when the whole change looks like it fits in one part.
+Part 1 starts with part-numbered file names and IDs, so adding a second part
+later never requires renaming the first part's documents or the IDs that commits
+and other documents already cite.
 
 - **Shared across parts:** Req (R/RQ), AC, and TC. A later part reuses them and
   extends TC for its own scope. It inherits earlier parts' confirmed DQ and D
@@ -127,21 +136,24 @@ covers only what it picked, and the rest can stay deferred.
 - **Deferred-item pool:** keep work not yet assigned to a part in one indexed
   backlog (a section or a separate document). When a part picks an item, mark the
   item with that part and point to the part's Design section.
-- **Split bodies** use a part suffix, such as `{ticket}_design_01.md` and
-  `{ticket}_task_02.md`. Each part section in the plan links to its own bodies.
+- **Split bodies** always use a part suffix, starting with `_01` for Part 1,
+  such as `{ticket}_pre_design_sync_01.md`, `{ticket}_design_01.md`, and
+  `{ticket}_task_01.md`; Part 2 uses `_02`. Each part section in the plan links
+  to its own bodies. This reserves room for later parts without requiring
+  separate files when inline content is sufficient.
 - **Record the scheme** in a short section of the entry plan: how parts are
   chosen, the file suffixes, and the ID format. Later readers rely on it.
 
-### IDs in a plan worked in parts
+### IDs
 
 DQ, D, T, and FT IDs carry the part number so that no two parts share an ID.
 R, RQ, AC, CR, and RL IDs belong to shared sections and carry no part number.
 
 | Situation | ID format |
 | :--- | :--- |
-| Planned in parts from the start | Prefix every DQ, D, T, and FT ID with the part: `P1-DQ01`, `P1-D02`, `P2-T03`, `P2-FT01` |
-| Switched to parts partway | Leave the first part's existing IDs unchanged, since commits and documents already cite them. From the second part on, mark the part in the ID: `P2-DQ01` by default |
-| The plan already records a scheme | Keep it (for example `DQ2-01`, `T2-03`); do not mix two formats in one plan |
+| Default (new plans) | Prefix every DQ, D, T, and FT ID with the part from Part 1 on: `P1-DQ01`, `P1-D02`, `P1-T03`, `P2-FT01` |
+| An existing plan without parts adds a second part | Leave its existing IDs and file names unchanged, since commits and documents already cite them. From the second part on, use the part prefix: `P2-DQ01` |
+| The plan already records a different scheme | Keep it (for example `DQ2-01`, `T2-03`); do not mix two formats in one plan |
 
 Number each item type from `01` within its part. Dependencies and references
 always use the full ID, including the part.
@@ -193,7 +205,7 @@ when its destination item is `Done`, or when the user confirms its judgment.
 ### Review 進度表
 | ID | 發現 | 來源 | 嚴重度 | 處置 | 去處 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| CR01 | [Finding] | AI review | 🔴 | Correct specification | RQ18, T23 | Done |
+| CR01 | [Finding] | AI review | 🔴 | Correct specification | RQ18, P1-T23 | Done |
 ```
 
 ## Release (Trial)
@@ -256,15 +268,15 @@ the team does not prescribe specific test data.
 - Hand off the entry plan path, relevant IDs, and body locations. Update status
   only in the entry plan, keeping affected body/summary edits together. An
   implementation commit includes its code/document changes and plan status.
-- In a plan worked in parts, find and update items by their full ID including
-  the part (`P2-T03`, `T2-03`), and only within that part's section and bodies.
-  A bare `T03` may also exist in another part.
+- Find and update items by their full ID including the part (`P2-T03`,
+  `T2-03`), and only within that part's section and bodies. A bare `T03` may
+  also exist in another part or in a plan created before parts.
 
 ## Decision Explanations and Change Reporting
 
 When the user questions a proposal, explain its decision lineage rather than
 merely saying "the design requires it." Follow the relevant formal sources,
-for example `T01 ← D02 ← DQ03 ← R04/AC`, and state which requirement or confirmed
+for example `P1-T01 ← P1-D02 ← P1-DQ03 ← R04/AC`, and state which requirement or confirmed
 decision led to the proposal and why. Distinguish fixed requirements, confirmed
 technical choices, and new AI recommendations. Use only actual items; do not
 invent a full chain or rationale that was never recorded. If the source is

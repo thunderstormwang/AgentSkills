@@ -59,13 +59,13 @@ links, and keep authoritative T/FT progress tables there even when bodies split.
 
 ### Step 2 — Verify Design is complete
 
-- Locate the **Design 進度表** in the plan. In a plan worked in parts (see the plan conventions' Work in Parts), use the current part's table only; earlier parts' tasks are not regenerated
+- Locate the **Design 進度表** of the current part (plans are organized in parts; see the plan conventions' Work in Parts). Use that part's table only; earlier parts' tasks are not regenerated
 - Applicable D items must be `Done`, explicitly `Cancel`, or explicitly non-blocking `Pending` with recorded conditions
 - If any required items are `Review` / `Todo` / `InProgress`, or `Pending` without a non-blocking agreement, notify the user and wait for confirmation
 
 ### Step 3 — Read and internalize Design
 
-- Read all applicable Design sub-sections (D01, D02, ...) in full, following the plan's external formal-body links
+- Read all applicable Design sub-sections of the current part (P1-D01, P1-D02, ...) in full, following the plan's external formal-body links
 - Do NOT rely solely on TIA for scope — the Design section is the authoritative spec at this stage
 - Re-read actual code for any area that Design references but doesn't fully specify
 - Read the confirmed validation strategy and any explicit user instructions scoped to these tasks. Carry them into Task generation; do not replace them with a conflicting default.
@@ -88,10 +88,11 @@ Follow:
 - Each task includes `Validation` matching the confirmed strategy; separate verification tasks have an independent purpose or require multiple tasks to be completed
 Fix any gaps silently before presenting. Only notify the user once the self-check passes.
 
-### Step 5 — Populate `## Task` section
+### Step 5 — Populate the current part's Task section
 
-Populate the existing `## Task` after `## Design` in the entry plan, creating
-it only if absent. **Do NOT modify prior decisions.**
+Populate the current part's existing `### Task` after its `### Design` in the
+entry plan, creating it only if absent. Keep the existing heading level in a
+legacy plan. **Do NOT modify prior decisions.**
 Keep bodies inline when readable, or use an agreed split Task document with
 summaries and formal-body links retained here. The following table always stays
 in the entry plan, not in the external body.
@@ -102,13 +103,13 @@ End with **Task 進度表**:
 ### Task 進度表
 | ID | 項目 | 引用 | 依賴 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
-| T01 | [Task 名稱] | D01 | None | Todo |
-| T02 | [Task 名稱] | D01, D02 | T01 | Todo |
+| P1-T01 | [Task 名稱] | P1-D01 | None | Todo |
+| P1-T02 | [Task 名稱] | P1-D01, P1-D02 | P1-T01 | Todo |
 ```
 
-**In a plan worked in parts**: put the tasks and this table in the current part's `### Task` section, and use the plan's part-qualified IDs (for example `P2-T01`, referencing `P2-D01`). A task may depend on an earlier part's task by its full ID.
+**Parts**: put the tasks and this table in the current part's `### Task` section and use part-qualified IDs (for example `P2-T01`, referencing `P2-D01`). A task may depend on an earlier part's task by its full ID. A plan created before parts keeps its own scheme per the plan conventions.
 
-**Incremental (after Backward Correction)**: Steps 2–4 apply to the changed D items only. Append new tasks continuing the existing `T` numbering. Do not reopen or rewrite implemented tasks — they record the specification at that time. Each new task references the corrected D IDs and names the triggering RQ in its Implementation Details. Optionally add a one-line pointer in the superseded task body to the new task.
+**Incremental (after Backward Correction)**: Steps 2–4 apply to the changed D items only. Append new tasks continuing the owning part's existing `T` numbering. Do not reopen or rewrite implemented tasks — they record the specification at that time. Each new task references the corrected D IDs and names the triggering RQ in its Implementation Details. Optionally add a one-line pointer in the superseded task body to the new task.
 
 ### Step 6 — Confirm
 
@@ -216,7 +217,7 @@ keep the authoritative FT progress table in the entry plan.
 **Task block format:** Use the **Mode B template** in `references/task-format.md`. Shared constraints apply (one logical commit per task, no fixed file-count limit, validation included in each task). Read the confirmed validation strategy and any explicit user instructions scoped to the new tasks before writing them.
 
 **Mode B-specific rules:**
-- One invocation may generate **multiple FT tasks** with dependencies (e.g., FT01 updates a contract and its callers, FT02 adds dependent behavior; both include their own validation). Express ordering via the `Dependency` field.
+- One invocation may generate **multiple FT tasks** with dependencies (e.g., P1-FT01 updates a contract and its callers, P1-FT02 adds dependent behavior; both include their own validation). Express ordering via the `Dependency` field.
 - **No preset category order** — follow-up work is too varied to pre-order (補測試 / 改文件 / 純改生產碼…). As in Mode A, actual dependencies determine order; the AI surfaces the proposed order to the user.
 
 #### 5a. Determine the body location
@@ -243,7 +244,7 @@ Write the file with this header (use a relative path back to the original plan):
 
 #### 5c. Assign the next FT ID
 
-Mode B IDs always use the `FT` prefix (e.g., `FT01`, `FT02`), regardless of the original plan's ID pattern. Check all FT tables and indexed bodies under the entry plan for the highest number; if none exists, start at `FT01`. Do not restart numbering for each split file. In a plan worked in parts, the FT belongs to the part whose Tasks it follows up and carries that part in its ID per the plan's scheme (for example `P2-FT01`); number FTs within that part.
+Mode B IDs always use the `FT` prefix. The FT belongs to the part whose Tasks it follows up and carries that part (for example `P1-FT01`, `P2-FT01`); a plan created before parts uses the scheme it records. Check that part's FT table and indexed bodies for the highest number; if none exists, start at `01`. Do not restart numbering for each split file.
 
 #### 5d. Append the task detail block to the chosen body location
 
@@ -260,7 +261,7 @@ entry plan, or in an existing indexed Follow-up Task extension:
 ### Follow-up Task 進度表
 | ID | 項目 | 引用 | 依賴 | 狀態 |
 | :--- | :--- | :--- | :--- | :--- |
-| FT01 | [Task 名稱] | — | — | Todo |
+| P1-FT01 | [Task 名稱] | — | — | Todo |
 ```
 
 If it already exists, append a new row. Do not duplicate the table in the
@@ -268,7 +269,7 @@ external body; migrate an affected legacy table according to the shared rules.
 
 #### 5f. Keep the original plan's Task index up to date
 
-- Keep FT summaries, dependencies, progress rows, and external-body links under `## Task`
+- Keep FT summaries, dependencies, progress rows, and external-body links under the owning part's `### Task` (the original `## Task` in a legacy plan)
 - Retain an existing `## Follow-up Task` as an indexed Task extension
 - For an external body, link the relevant task headings and keep its backlink to the entry plan
 
@@ -278,14 +279,14 @@ Section format:
 ### Follow-up Tasks
 
 > 衍生任務清單：
-> - FT01 [Task purpose](./{ticket-prefix}_ft_01.md#ft01-task-purpose) — Dependency: None
+> - P1-FT01 [Task purpose](./{ticket-prefix}_ft_01.md#p1-ft01-task-purpose) — Dependency: None
 ```
 
 ### Step 6 — Confirm
 
 Report back to the user:
 
-- New Task IDs (e.g., `FT01`, or a range like `FT01`–`FT03` when multiple)
+- New Task IDs (e.g., `P1-FT01`, or a range like `P1-FT01`–`P1-FT03` when multiple)
 - 1-line summary per task
 - Entry plan path and the inline or external body location that was written to
 - Task index and authoritative FT progress table updated in the entry plan
@@ -328,11 +329,11 @@ T items and FT items both use the same status values. Initial status for all gen
 **User**: 「Design 都確認了，幫我生 Task」
 
 **Skill**:
-1. Reads the plan's Design 進度表 — all D01–D06 are `Done`
-2. Reads D01–D06 content in full
-3. Generates T01–T18 ordered by actual dependencies, with each implementation task including its corresponding validation
-4. Appends `## Task` section with all tasks and Task 進度表
-5. Reports: 「✅ 已生成 18 個 Task (T01–T18)，進度表已附於 Design 之後」
+1. Reads Part 1's Design 進度表 — all P1-D01–P1-D06 are `Done`
+2. Reads P1-D01–P1-D06 content in full
+3. Generates P1-T01–P1-T18 ordered by actual dependencies, with each implementation task including its corresponding validation
+4. Populates Part 1's `### Task` section with all tasks and Task 進度表
+5. Reports: 「✅ 已生成 18 個 Task (P1-T01–P1-T18)，進度表已附於第一部分的 Design 之後」
 
 ---
 
@@ -345,10 +346,10 @@ T items and FT items both use the same status values. Initial status for all gen
 2. Identifies intent: 「測試重組，零行為變更，零生產碼動到」
 3. Classifies as **Compatible** (typo fix, only test file attribute, no behavior change)
 4. User chooses a separate FT body and confirms label `01` → creates `docs/pxbox-26324_ft_01.md` with a backlink to the original plan
-5. Appends `FT01` task detail block to `docs/pxbox-26324_ft_01.md`
-6. Appends `FT01` row to Follow-up Task 進度表 in the original plan, not the external body
-7. Updates the original plan's Task index with FT01's purpose and body link
-8. Reports: 「✅ 已加入 FT01 — 修正 `OrderQuantity.cs` 的 Trait typo（寫入 docs/pxbox-26324_ft_01.md）」
+5. Appends `P1-FT01` task detail block to `docs/pxbox-26324_ft_01.md` (or the existing ID scheme for a legacy plan)
+6. Appends `P1-FT01` row to Follow-up Task 進度表 under the owning part in the original plan, not the external body
+7. Updates the original plan's Task index with P1-FT01's purpose and body link
+8. Reports: 「✅ 已加入 P1-FT01 — 修正 `OrderQuantity.cs` 的 Trait typo（寫入 docs/pxbox-26324_ft_01.md）」
 
 ### Example 3 — Mode B: Violating task
 

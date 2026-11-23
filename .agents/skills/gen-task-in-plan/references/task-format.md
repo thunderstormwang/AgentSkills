@@ -28,7 +28,7 @@ For **Mode A category rules and dependency-based ordering** (category priorities
 
 | Field | Modes | Description |
 | :--- | :--- | :--- |
-| **Reference** | Mode A only | The Design ID(s) this task implements (e.g., `[D01]`); add the superseded task IDs when it rewrites an earlier task's code (see below) |
+| **Reference** | Mode A only | The Design ID(s) this task implements (e.g., `[P1-D01]`); add the superseded task IDs when it rewrites an earlier task's code (see below) |
 | **Current state** | Mode B only | What exists now / what's missing (1-2 lines) — explains why the FT is needed; cite an applicable confirmed follow-up Design when one exists; name the superseded task IDs when it rewrites an earlier task's code (see below) |
 | **Goal** | Mode B only | What this task achieves (1-2 lines) |
 | **Dependency** | Both | Prerequisite task ID(s), or `None` |
@@ -45,7 +45,7 @@ When a task rewrites, replaces, or removes code that an earlier T or FT implemen
 Reviewers check the earlier task against the branch's final state. Without this record, a behavior the rewrite drops on purpose is indistinguishable from one it loses by accident.
 
 ```markdown
-- **Current state:** `ProductMarginCache` keys use the old format (T09). Supersedes T09's key format; T09's lock-per-product and miss-refill behavior stay unchanged.
+- **Current state:** `ProductMarginCache` keys use the old format (P1-T09). Supersedes P1-T09's key format; P1-T09's lock-per-product and miss-refill behavior stay unchanged.
 ```
 
 ### Field Ordering
@@ -62,8 +62,8 @@ Reviewers check the earlier task against the branch's final state. Without this 
 
 ## Mode A — T Task Template
 
-### T01 [Task Name]
-- **Reference:** `[D01]`
+### P1-T01 [Task Name]
+- **Reference:** `[P1-D01]`
 - **Dependency:** `None`
 - **Target:** `[Project Name]` -> `[Class Name]` -> `[Method Name]`
 - **Implementation Details:**
@@ -76,9 +76,9 @@ Reviewers check the earlier task against the branch's final state. Without this 
 
 Use a separate task only for an independent verification purpose or checks that require multiple tasks to be completed:
 
-### T05 [Test — Existing Feature Coverage]
-- **Reference:** `[D03]`
-- **Dependency:** `T01, T02`
+### P1-T05 [Test — Existing Feature Coverage]
+- **Reference:** `[P1-D03]`
+- **Dependency:** `P1-T01, P1-T02`
 - **Test Target:** `[Class Name]`
 - **Implementation Details:** Add coverage for [Given/When/Then] scenarios of existing behavior. Testing is this task's independent purpose.
 - **Validation:** Run [targeted test command]; all specified scenarios must pass.
@@ -89,7 +89,7 @@ Use a separate task only for an independent verification purpose or checks that 
 
 ## Mode B — FT Task Template
 
-### FT01 [Task Name]
+### P1-FT01 [Task Name]
 - **Current state**: {what exists / what's missing — 1-2 lines}
 - **Goal**: {what this task achieves — 1-2 lines}
 - **Dependency**: {prerequisite FT ID or `None`}

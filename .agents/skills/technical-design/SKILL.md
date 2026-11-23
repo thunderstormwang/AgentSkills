@@ -49,13 +49,16 @@ every FT needs a separate design discussion.
 
 ### Design in Parts
 
-When the confirmed Req is too large to discuss in one pass, propose designing
-it in parts, as defined in the plan conventions' Work in Parts section. Each part
-picks a subset from the deferred-item pool and runs its own Pre Design Sync and
-Design under the shared Req. Leaving items in the pool is a valid outcome; do
-not pull every remaining item into the current part. Inherit earlier parts'
-confirmed DQ and D conclusions instead of re-discussing them. Record the part's
-scope and the plan's part/ID scheme in the entry plan before its first DQ.
+Design is organized in parts by default, as defined in the plan conventions'
+Work in Parts section. Start Part 1 with part-numbered file names and IDs even
+when the change looks small enough for one part, so a later part never forces a
+rename. Each part picks a subset from the deferred-item pool and runs its own
+Pre Design Sync and Design under the shared Req. When the remaining work is too
+much to follow in one discussion, propose ending the current part and leaving
+items in the pool; do not pull every remaining item into the current part.
+Inherit earlier parts' confirmed DQ and D conclusions instead of re-discussing
+them. Record the part's scope and the plan's part/ID scheme in the entry plan
+before its first DQ.
 
 ## Formal Documents Must Not Depend on Exploration Materials
 
@@ -78,11 +81,11 @@ Do not split merely to meet a line count.
 
 ## 1. Pre Design Sync
 
-Populate `## Pre Design Sync` in the entry plan for unresolved technical choices affecting
-architecture, ownership, data models, caching, contracts, or integrations.
-Use one `DQ01`, `DQ02`, ... per decision. Do not produce the Design section yet.
-In a plan worked in parts, use the part-qualified IDs and the per-part sections
-defined in the plan conventions (for example `P2-DQ01`).
+Populate the current part's `### Pre Design Sync` in the entry plan for unresolved
+technical choices affecting architecture, ownership, data models, caching,
+contracts, or integrations. Keep the existing heading level in a legacy plan.
+Use one part-qualified ID per decision (`P1-DQ01`, `P1-DQ02`, ...; see the plan
+conventions for plans created before parts). Do not produce the Design section yet.
 
 For each DQ:
 
@@ -105,7 +108,7 @@ Req, not DQ. Stop the affected design work and return such an issue to
 ### Pre Design Sync 進度表
 | ID | 項目 | 結論 | 狀態 |
 | :--- | :--- | :--- | :--- |
-| DQ01 | [Design decision] |  | Todo |
+| P1-DQ01 | [Design decision] |  | Todo |
 ```
 
 Use `Todo` / `InProgress` for unresolved decisions, `Review` for a proposed
@@ -114,14 +117,15 @@ Use `Cancel` for an explicitly cancelled item. `Pending` may pass the gate
 only when explicitly non-blocking, with its exclusion or agreed condition
 recorded; it cannot conceal an undecided input needed by the design.
 
-Proceed only when all DQs are `Done`, `Cancel`, or explicitly non-blocking
+Proceed only when all applicable DQs for the current part are `Done`, `Cancel`, or explicitly non-blocking
 `Pending`. If no unresolved technical choice exists, record why the phase has
 no DQs; do not invent questions to fill a template.
 
 ## 2. Design
 
-Populate `## Design` in the entry plan after Pre Design Sync without removing or overwriting its
-decisions. Define structural and behavioral contracts: what changes, where
+Populate the current part's `### Design` in the entry plan after its Pre Design
+Sync without removing or overwriting its decisions. Keep the existing heading
+level in a legacy plan. Define structural and behavioral contracts: what changes, where
 responsibilities belong, and which ordering/invariants must hold.
 
 Propose useful sections from the confirmed decisions and actual change.
@@ -208,15 +212,14 @@ omit unnecessary Test Plan/TC artifacts but retain Validation Strategy.
 
 ### Design Confirmation
 
-Use `D01`, `D02`, ... (part-qualified in a plan worked in parts, such as
-`P2-D01`) for the actual design sections and end the entry plan's Design
+Use part-qualified IDs (`P1-D01`, `P1-D02`, ...) for the actual design sections and end the entry plan's Design
 section with this table, even when the bodies are split:
 
 ```markdown
 ### Design 進度表
 | ID | 項目 | 狀態 |
 | :--- | :--- | :--- |
-| D01 | [Design section] | Review |
+| P1-D01 | [Design section] | Review |
 ```
 
 Use `Todo` / `InProgress` for incomplete sections, `Review` when ready for
@@ -230,7 +233,7 @@ a confirmed decision.
 
 ## 3. Handoff and Backward Correction
 
-After every D item is confirmed or explicitly non-blocking/cancelled, hand off
+After every applicable D item in the current part is confirmed or explicitly non-blocking/cancelled, hand off
 to `gen-task-in-plan`: Mode A for initial tasks, Mode B for follow-ups.
 Work produced by a Backward Correction that changes Req/AC goes to Mode A's
 incremental path (new `T` IDs), never to Mode B's `FT`.

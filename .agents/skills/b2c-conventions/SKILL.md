@@ -1,6 +1,6 @@
 ---
 name: b2c-conventions
-description: Team conventions and tacit knowledge for the user's B2C e-commerce system — any repo whose name starts with `PXBox` or `PXEC` (the system's two project-name lineages, case-insensitive), or whenever B2C itself — the user's department/system, as distinct from B2E or 3PL — comes up in conversation, even outside such a repo. Covers things not derivable from the code itself — file-language rules, team practices, and the PXEC-to-PXBox history. Load this the first time in a session such a repo is touched or B2C is discussed, before writing any code, docs, instruction files, or commits.
+description: Team conventions and tacit knowledge for the user's B2C e-commerce system — any repo whose name starts with `PXBox` or `PXEC` (the system's two project-name lineages, case-insensitive), or whenever B2C itself — the user's department/system, as distinct from B2E or 3PL — comes up in conversation, even outside such a repo. Also use for B2C API gateway firewall changes, Redmine application content, or API exposure requests. Covers things not derivable from code — file-language rules, team practices, and the PXEC-to-PXBox history. Load this the first time in a session such a repo is touched or B2C is discussed, before writing any code, docs, instruction files, or commits.
 ---
 
 # B2C Conventions
@@ -88,6 +88,51 @@ lowercased and word-separated by underscores:
 Expose API endpoints using only `GET` and `POST`. Use `GET` for read-only operations and `POST`
 for operations that create, update, delete, or otherwise change state. Do not introduce `PUT`,
 `PATCH`, or `DELETE` endpoints.
+
+## API gateway firewall applications
+
+B2C `app` and `backend` APIs are externally exposed and need firewall changes; `service` APIs
+are for calls from other backend services and do not need firewall changes. The user manually
+submits a Redmine application; a supervisor approves it before Infra changes the firewall.
+For Redmine's dropdowns, remind the user to select:
+
+- **專案**：`PXEC 系統與設備維運需求`
+- **追蹤標籤**：`網路設備異動`
+
+When asked to prepare an application, examine the actual API changes in the requested scope
+and produce a subject and a Markdown description the user can paste into Redmine. Distinguish
+added and deleted routes; exclude `service` routes from the firewall application. Verify each
+method, complete route, authorization and purpose against the available evidence. Ask the user
+for any information needed but not established, including applicable environments, JIRA,
+developer, or authorization; do not infer them from an example or silently fill in a guess.
+Leave **Infra設定編號** blank if unknown. `SIT、UAT、UAT2、PROD` is an example, not a
+default for every request. Do not submit the application on the user's behalf.
+
+Use the following subject and description formats, replacing the placeholders with verified
+values. Make the subject's count agree with the rows when a count is included. When applicable
+to a deletion, preserve any user-specified reason and the instruction to skip APIs Infra never
+configured; do not assume that condition for every deletion.
+
+**Subject — addition:** `B2C(全電商):ApiGateway - <微服務> 增加 <數量> 支 API`
+
+**Subject — deletion:** `B2C(全電商):ApiGateway - <微服務> 刪除 API`
+
+**Description:**
+
+```markdown
+微服務： <微服務>
+新增／刪除以下 API
+環境： <適用環境>
+
+<刪除原因及未設定時的處理方式，僅在適用時填寫>
+
+| Method | Route | Authorization | Infra設定編號 | JIRA | 開發人員 | 功能用意 |
+|--------|-------|---------------|--------------|------|---------|---------|
+| <GET 或 POST> | <完整路由> | <授權> | <設定編號，未知留空> | <票號> | <開發人員> | <功能用意> |
+```
+
+Choose either `新增` or `刪除`, not the combined placeholder. Group rows by microservice and
+operation so the subject and description match their contents.
 
 ## Database read/write split
 

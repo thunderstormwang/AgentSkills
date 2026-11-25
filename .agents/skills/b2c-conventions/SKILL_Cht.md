@@ -1,6 +1,6 @@
 ---
 name: b2c-conventions
-description: 使用者 B2C 電商系統的團隊慣例與默會知識——涵蓋任何名稱以 `PXBox` 或 `PXEC` 開頭（這個系統的兩條專案命名脈絡，不分大小寫）的 repo，也涵蓋只要對話中提到 B2C 本身（相對於 B2E 或 3PL 而言，使用者所屬的部門／系統）就該載入的情況，即使當下不在這類 repo 裡也一樣。B2C API gateway 防火牆異動、Redmine 申請內容或 API 開放需求也適用。涵蓋無法從程式碼推導出的事項——檔案語言規則、團隊實務作法，以及 PXEC 到 PXBox 的沿革。在該 session 首次接觸此類 repo，或首次談到 B2C 時載入，須早於任何程式碼、文件、指令檔或 commit 的撰寫。
+description: 適用於 PXBox 與 PXEC 儲存庫，或儲存庫以外的 B2C 討論的 B2C 團隊慣例。涵蓋團隊實務、系統沿革及透過 Redmine 申請 API gateway 防火牆異動。在 session 首次討論 B2C 或首次接觸 PXBox／PXEC 儲存庫時載入，須早於撰寫程式碼、文件、指令或提交。
 ---
 
 # B2C 慣例

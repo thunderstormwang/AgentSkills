@@ -1,6 +1,6 @@
 ---
 name: b2c-conventions
-description: Team conventions and tacit knowledge for the user's B2C e-commerce system — any repo whose name starts with `PXBox` or `PXEC` (the system's two project-name lineages, case-insensitive), or whenever B2C itself — the user's department/system, as distinct from B2E or 3PL — comes up in conversation, even outside such a repo. Also use for B2C API gateway firewall changes, Redmine application content, or API exposure requests. Covers things not derivable from code — file-language rules, team practices, and the PXEC-to-PXBox history. Load this the first time in a session such a repo is touched or B2C is discussed, before writing any code, docs, instruction files, or commits.
+description: B2C team conventions for PXBox and PXEC repositories, or B2C discussions outside a repo. Covers team practices, system history, and API gateway firewall applications via Redmine. Load on first B2C discussion or first touch of a PXBox/PXEC repo in a session, before writing code, docs, instructions, or commits.
 ---
 
 # B2C Conventions
